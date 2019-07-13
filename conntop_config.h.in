@@ -1,0 +1,62 @@
+/**
+ * @file
+ * @brief Build configuration.
+ * This file is processed by CMake.
+ */
+
+#ifndef CONNTOP_CONFIG_H
+#define CONNTOP_CONFIG_H
+
+#define CONNTOP_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define CONNTOP_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define CONNTOP_VERSION_PATCH @PROJECT_VERSION_PATCH@
+
+#define CONNTOP_APP_NAME "@CONNTOP_APP@"
+
+#define CONNTOP_VERSION_STRING "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@"
+
+#define CONNTOP_INSTALL_PREFIX "@CMAKE_INSTALL_PREFIX@"
+
+// Defined when building conntop dedicated server.
+#cmakedefine CONNTOP_DEDICATED
+
+// Defined on all operating systems from Unix family (Linux, BSD, ...).
+#cmakedefine CONNTOP_PLATFORM_UNIX
+// Defined on Linux systems.
+#cmakedefine CONNTOP_PLATFORM_LINUX
+
+// Defined when Netfilter collector is being used.
+#cmakedefine CONNTOP_COLLECTOR_NETFILTER
+
+// Defined when Curses UI is being used.
+#cmakedefine CONNTOP_UI_CURSES
+
+// Defined when own build of libmaxminddb (Library/MaxMindDB) is being used.
+#cmakedefine CONNTOP_USE_OWN_LIBMAXMINDDB
+
+#if defined(__BYTE_ORDER__)
+
+  // GCC and Clang
+  #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+  #define CONNTOP_MACHINE_IS_BIG_ENDIAN
+  #endif
+
+#elif defined(__BIG_ENDIAN__) || defined(__LITTLE_ENDIAN__)
+
+  #if defined(__BIG_ENDIAN__) && ! defined(__LITTLE_ENDIAN__)
+  #define CONNTOP_MACHINE_IS_BIG_ENDIAN
+  #endif
+
+#elif defined(_BIG_ENDIAN) || defined(_LITTLE_ENDIAN)
+
+  #if defined(_BIG_ENDIAN) && ! defined(_LITTLE_ENDIAN)
+  #define CONNTOP_MACHINE_IS_BIG_ENDIAN
+  #endif
+
+#else
+
+  #error "Unable to detect system byte order"
+
+#endif
+
+#endif  // CONNTOP_CONFIG_H

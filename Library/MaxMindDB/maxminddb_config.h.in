@@ -1,0 +1,26 @@
+/**
+ * @file
+ * @brief Build configuration of MaxMindDB library.
+ * This file is processed by CMake.
+ */
+
+#ifndef MAXMINDDB_CONFIG_H
+#define MAXMINDDB_CONFIG_H
+
+#include "conntop_config.h"
+
+#define PACKAGE_VERSION "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@"
+
+#if __SIZEOF_INT128__ == 16
+#define MMDB_UINT128_IS_BYTE_ARRAY 0  // use __int128
+#else
+#define MMDB_UINT128_IS_BYTE_ARRAY 1
+#endif
+
+#ifdef CONNTOP_MACHINE_IS_BIG_ENDIAN
+#define MMDB_LITTLE_ENDIAN 0
+#else
+#define MMDB_LITTLE_ENDIAN 1
+#endif
+
+#endif  // MAXMINDDB_CONFIG_H
