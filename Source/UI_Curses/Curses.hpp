@@ -45,9 +45,9 @@ namespace ctp
 		void prevScreen();
 		void showHelp();
 		void closeHelp();
-		int getTerminalSize( int & lines, int & columns );
+		int getTerminalSize(int & lines, int & columns);
 
-		static void KeyboardPollHandler( int flags, void *param );
+		static void KeyboardPollHandler(int flags, void *param);
 
 	public:
 		Curses();
@@ -55,19 +55,19 @@ namespace ctp
 
 		void init();
 
-		void onEvent( const CursesEvent & event ) override;
-		void onEvent( const ClientEvent & event ) override;
+		void onEvent(const CursesEvent & event) override;
+		void onEvent(const ClientEvent & event) override;
 
 		ScreenConnectionList & getConnectionListScreen()
 		{
 			return m_screenConnectionList;
 		}
 
-		bool isCurrentScreen( const IScreen & screen ) const
+		bool isCurrentScreen(const IScreen & screen) const
 		{
 			return (m_currentScreen == &screen);
 		}
 
-		void refreshScreen( bool redraw = false );
+		void refreshScreen(bool redraw = false);
 	};
 }

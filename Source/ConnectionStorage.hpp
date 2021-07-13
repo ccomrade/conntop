@@ -36,67 +36,67 @@ namespace ctp
 		{
 		}
 
-		std::pair<AddressData*, bool> addIP4Address( const AddressIP4 & address )
+		std::pair<AddressData*, bool> addIP4Address(const AddressIP4 & address)
 		{
-			auto result = m_addressIP4Map.emplace( address, address );
+			auto result = m_addressIP4Map.emplace(address, address);
 			auto it = result.first;
 			bool isNew = result.second;
 			AddressData *pData = &it->second;
-			if ( isNew )
+			if (isNew)
 			{
-				pData->setAddress( it->first );
+				pData->setAddress(it->first);
 			}
 			return { pData, isNew };
 		}
 
-		std::pair<AddressData*, bool> addIP6Address( const AddressIP6 & address )
+		std::pair<AddressData*, bool> addIP6Address(const AddressIP6 & address)
 		{
-			auto result = m_addressIP6Map.emplace( address, address );
+			auto result = m_addressIP6Map.emplace(address, address);
 			auto it = result.first;
 			bool isNew = result.second;
 			AddressData *pData = &it->second;
-			if ( isNew )
+			if (isNew)
 			{
-				pData->setAddress( it->first );
+				pData->setAddress(it->first);
 			}
 			return { pData, isNew };
 		}
 
-		std::pair<PortData*, bool> addPort( const Port & port )
+		std::pair<PortData*, bool> addPort(const Port & port)
 		{
-			auto result = m_portMap.emplace( port, port );
+			auto result = m_portMap.emplace(port, port);
 			auto it = result.first;
 			bool isNew = result.second;
 			PortData *pData = &it->second;
-			if ( isNew )
+			if (isNew)
 			{
-				pData->setPort( it->first );
+				pData->setPort(it->first);
 			}
 			return { pData, isNew };
 		}
 
 		template<class... Args>
-		std::pair<ConnectionData*, bool> addConnection( const Connection & c, Args &&... args )
+		std::pair<ConnectionData*, bool> addConnection(const Connection & c, Args &&... args)
 		{
-			auto result = m_connectionMap.emplace( c, ConnectionData( c, std::forward<Args>( args )... ) );
+			auto result = m_connectionMap.emplace(c, ConnectionData(c, std::forward<Args>(args)...));
 			auto it = result.first;
 			bool isNew = result.second;
 			ConnectionData *pData = &it->second;
-			if ( isNew )
+			if (isNew)
 			{
-				pData->setConnection( it->first );
+				pData->setConnection(it->first);
 			}
 			return { pData, isNew };
 		}
 
-		void *removeConnection( const Connection & connection )
+		void *removeConnection(const Connection & connection)
 		{
 			void *pData = nullptr;
-			auto it = m_connectionMap.find( connection );
-			if ( it != m_connectionMap.end() )
+			auto it = m_connectionMap.find(connection);
+			if (it != m_connectionMap.end())
 			{
 				pData = &it->second;
-				m_connectionMap.erase( it );
+				m_connectionMap.erase(it);
 			}
 			return pData;
 		}
@@ -106,27 +106,27 @@ namespace ctp
 			m_connectionMap.clear();
 		}
 
-		ConnectionData *getConnection( const Connection & connection )
+		ConnectionData *getConnection(const Connection & connection)
 		{
-			auto it = m_connectionMap.find( connection );
+			auto it = m_connectionMap.find(connection);
 			return (it != m_connectionMap.end()) ? &it->second : nullptr;
 		}
 
-		AddressData *getIP4Address( const AddressIP4 & address )
+		AddressData *getIP4Address(const AddressIP4 & address)
 		{
-			auto it = m_addressIP4Map.find( address );
+			auto it = m_addressIP4Map.find(address);
 			return (it != m_addressIP4Map.end()) ? &it->second : nullptr;
 		}
 
-		AddressData *getIP6Address( const AddressIP6 & address )
+		AddressData *getIP6Address(const AddressIP6 & address)
 		{
-			auto it = m_addressIP6Map.find( address );
+			auto it = m_addressIP6Map.find(address);
 			return (it != m_addressIP6Map.end()) ? &it->second : nullptr;
 		}
 
-		PortData *getPort( const Port & port )
+		PortData *getPort(const Port & port)
 		{
-			auto it = m_portMap.find( port );
+			auto it = m_portMap.find(port);
 			return (it != m_portMap.end()) ? &it->second : nullptr;
 		}
 

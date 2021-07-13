@@ -45,9 +45,9 @@ namespace ctp
 
 		static constexpr unsigned int COLUMN_COUNT = 18;
 
-		static unsigned int GetDefaultWidth( EType column );
-		static KString GetLabel( EType column );
-		static KString GetName( EType column );
+		static unsigned int GetDefaultWidth(EType column);
+		static KString GetLabel(EType column);
+		static KString GetName(EType column);
 
 	private:
 		EType m_type;
@@ -55,7 +55,7 @@ namespace ctp
 		bool m_hasLabel;
 
 	public:
-		ConnectionColumn( EType type, unsigned int width, bool hasLabel = true )
+		ConnectionColumn(EType type, unsigned int width, bool hasLabel = true)
 		: m_type(type),
 		  m_width(width),
 		  m_hasLabel(hasLabel)
@@ -74,17 +74,17 @@ namespace ctp
 
 		unsigned int getDefaultWidth() const
 		{
-			return GetDefaultWidth( m_type );
+			return GetDefaultWidth(m_type);
 		}
 
 		KString getLabel() const
 		{
-			return (m_hasLabel) ? GetLabel( m_type ) : KString();
+			return (m_hasLabel) ? GetLabel(m_type) : KString();
 		}
 
 		KString getName() const
 		{
-			return GetName( m_type );
+			return GetName(m_type);
 		}
 	};
 
@@ -97,9 +97,9 @@ namespace ctp
 			bool m_isEnabled;
 
 		public:
-			ColumnConfig( ConnectionColumn::EType type, bool isEnabled )
+			ColumnConfig(ConnectionColumn::EType type, bool isEnabled)
 			: m_type(type),
-			  m_width(ConnectionColumn::GetDefaultWidth( type )),
+			  m_width(ConnectionColumn::GetDefaultWidth(type)),
 			  m_isEnabled(isEnabled)
 			{
 			}
@@ -121,20 +121,20 @@ namespace ctp
 
 			KString getName() const
 			{
-				return ConnectionColumn::GetName( m_type );
+				return ConnectionColumn::GetName(m_type);
 			}
 
-			void setType( ConnectionColumn::EType type )
+			void setType(ConnectionColumn::EType type)
 			{
 				m_type = type;
 			}
 
-			void setWidth( unsigned int width )
+			void setWidth(unsigned int width)
 			{
 				m_width = width;
 			}
 
-			void setEnabled( bool isEnabled )
+			void setEnabled(bool isEnabled)
 			{
 				m_isEnabled = isEnabled;
 			}
@@ -148,18 +148,18 @@ namespace ctp
 		void applyConfig();
 		void restoreConfig();
 		void draw();
-		void drawEntry( unsigned int index );
-		void fillEmpty( int count );
+		void drawEntry(unsigned int index);
+		void fillEmpty(int count);
 		void fillEmpty();
 
 		void handleResize() override;
-		bool handleKey( int ch ) override;
+		bool handleKey(int ch) override;
 
 	public:
-		DialogConnectionColumns( ScreenConnectionList *parent );
+		DialogConnectionColumns(ScreenConnectionList *parent);
 
 		void open();
-		void close( bool apply = false );
+		void close(bool apply = false);
 
 		const std::vector<ConnectionColumn> & getColumns() const
 		{
@@ -170,13 +170,13 @@ namespace ctp
 		{
 			unsigned int width = 0;
 
-			for ( const ConnectionColumn & column : m_columns )
+			for (const ConnectionColumn & column : m_columns)
 			{
 				width += column.getWidth();
 				width += 1;  // column separator
 			}
 
-			if ( width > 0 )
+			if (width > 0)
 			{
 				width -= 1;  // remove last column separator
 			}
@@ -184,11 +184,11 @@ namespace ctp
 			return width;
 		}
 
-		bool isColumnEnabled( ConnectionColumn::EType type ) const
+		bool isColumnEnabled(ConnectionColumn::EType type) const
 		{
-			for ( const ConnectionColumn & column : m_columns )
+			for (const ConnectionColumn & column : m_columns)
 			{
-				if ( column.getType() == type )
+				if (column.getType() == type)
 				{
 					return true;
 				}

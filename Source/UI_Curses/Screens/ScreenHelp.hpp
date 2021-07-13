@@ -14,7 +14,7 @@ namespace ctp
 		void draw();
 
 		void handleResize() override;
-		bool handleKey( int ch ) override;
+		bool handleKey(int ch) override;
 
 	public:
 		ScreenHelp();

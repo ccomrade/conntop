@@ -23,7 +23,7 @@ namespace ctp
 			int x;
 			int y;
 
-			constexpr Pos( int X = 0, int Y = 0 )
+			constexpr Pos(int X = 0, int Y = 0)
 			: x(X),
 			  y(Y)
 			{
@@ -44,58 +44,58 @@ namespace ctp
 
 		Size calculateSize();
 		void updateScreenRect();
-		bool scrollScreenRectX( int amount );
-		bool scrollScreenRectY( int amount );
+		bool scrollScreenRectX(int amount);
+		bool scrollScreenRectY(int amount);
 
 	protected:
-		Screen( const Size & minSize, const Size & maxSize, Screen *pParentScreen = nullptr );
+		Screen(const Size & minSize, const Size & maxSize, Screen *pParentScreen = nullptr);
 
 		Size getMinSize() const
 		{
 			return m_minSize;
 		}
 
-		void setMinSize( const Size & minSize );
+		void setMinSize(const Size & minSize);
 
 		Size getMaxSize() const
 		{
 			return m_maxSize;
 		}
 
-		void setMaxSize( const Size & maxSize );
+		void setMaxSize(const Size & maxSize);
 
 		Size getSize() const
 		{
 			Size size;
-			getmaxyx( m_window, size.y, size.x );
+			getmaxyx(m_window, size.y, size.x);
 			return size;
 		}
 
 		int getWidth() const
 		{
-			return getmaxx( m_window );
+			return getmaxx(m_window);
 		}
 
 		int getHeight() const
 		{
-			return getmaxy( m_window );
+			return getmaxy(m_window);
 		}
 
 		Size getTerminalSize() const
 		{
 			Size size;
-			getmaxyx( stdscr, size.y, size.x );
+			getmaxyx(stdscr, size.y, size.x);
 			return size;
 		}
 
 		int getTerminalWidth() const
 		{
-			return getmaxx( stdscr );
+			return getmaxx(stdscr);
 		}
 
 		int getTerminalHeight() const
 		{
-			return getmaxy( stdscr );
+			return getmaxy(stdscr);
 		}
 
 		void windowContentModified()
@@ -103,14 +103,14 @@ namespace ctp
 			m_isRefreshRequired = true;
 		}
 
-		void enableAttr( int attr )
+		void enableAttr(int attr)
 		{
-			wattron( m_window, attr );
+			wattron(m_window, attr);
 		}
 
-		void disableAttr( int attr )
+		void disableAttr(int attr)
 		{
-			wattroff( m_window, attr );
+			wattroff(m_window, attr);
 		}
 
 		void resetAttr();
@@ -118,39 +118,39 @@ namespace ctp
 		Pos getPos()
 		{
 			Pos pos;
-			getyx( m_window, pos.y, pos.x );
+			getyx(m_window, pos.y, pos.x);
 			return pos;
 		}
 
-		void setPos( const Pos & pos )
+		void setPos(const Pos & pos)
 		{
-			wmove( m_window, pos.y, pos.x );
+			wmove(m_window, pos.y, pos.x);
 		}
 
-		void setPos( int posX, int posY )
+		void setPos(int posX, int posY)
 		{
-			wmove( m_window, posY, posX );
+			wmove(m_window, posY, posX);
 		}
 
-		void writeString( const char *string, int maxLength = -1 )
+		void writeString(const char *string, int maxLength = -1)
 		{
-			waddnstr( m_window, string, maxLength );
+			waddnstr(m_window, string, maxLength);
 			m_isRefreshRequired = true;
 		}
 
-		void writeString( const KString & string, int maxLength = -1 )
+		void writeString(const KString & string, int maxLength = -1)
 		{
-			waddnstr( m_window, string.c_str(), maxLength );
+			waddnstr(m_window, string.c_str(), maxLength);
 			m_isRefreshRequired = true;
 		}
 
-		void writeChar( int ch )
+		void writeChar(int ch)
 		{
-			waddch( m_window, ch );
+			waddch(m_window, ch);
 			m_isRefreshRequired = true;
 		}
 
-		int writef( const char *format, ... ) COMPILER_PRINTF_ARGS_CHECK(2,3);
+		int writef(const char *format, ...) COMPILER_PRINTF_ARGS_CHECK(2,3);
 
 		bool hasParentScreen() const
 		{
@@ -163,21 +163,21 @@ namespace ctp
 		}
 
 		virtual void handleResize() = 0;
-		virtual bool handleKey( int ch ) = 0;
+		virtual bool handleKey(int ch) = 0;
 
 	public:
 		virtual ~Screen();
 
 		bool isRefreshRequired() override
 		{
-			if ( m_isRefreshRequired )
+			if (m_isRefreshRequired)
 			{
 				return true;
 			}
 
-			for ( Screen *dialog : m_dialogStack )
+			for (Screen *dialog : m_dialogStack)
 			{
-				if ( dialog->isRefreshRequired() )
+				if (dialog->isRefreshRequired())
 				{
 					return true;
 				}
@@ -189,37 +189,37 @@ namespace ctp
 		void refresh() override;
 		void invalidate() override;
 		void onResize() override;
-		bool onKey( int ch ) override;
+		bool onKey(int ch) override;
 
-		void pushDialog( Screen *pDialogScreen )
+		void pushDialog(Screen *pDialogScreen)
 		{
-			if ( hasDialog( pDialogScreen ) )
+			if (hasDialog(pDialogScreen))
 			{
 				return;
 			}
 
-			m_dialogStack.push_back( pDialogScreen );
+			m_dialogStack.push_back(pDialogScreen);
 			pDialogScreen->onResize();
 			invalidate();
-			for ( Screen *dialog : m_dialogStack )
+			for (Screen *dialog : m_dialogStack)
 			{
 				dialog->invalidate();
 			}
 		}
 
-		void removeDialog( const Screen *pDialogScreen )
+		void removeDialog(const Screen *pDialogScreen)
 		{
 			bool removed = false;
-			for ( auto it = m_dialogStack.begin(); it != m_dialogStack.end(); )
+			for (auto it = m_dialogStack.begin(); it != m_dialogStack.end();)
 			{
-				if ( *it == pDialogScreen )
+				if (*it == pDialogScreen)
 				{
-					it = m_dialogStack.erase( it );
+					it = m_dialogStack.erase(it);
 					removed = true;
 				}
 				else
 				{
-					if ( removed )
+					if (removed)
 					{
 						(*it)->invalidate();
 					}
@@ -227,17 +227,17 @@ namespace ctp
 				}
 			}
 
-			if ( removed )
+			if (removed)
 			{
 				invalidate();
 			}
 		}
 
-		bool hasDialog( const Screen *pDialogScreen ) const
+		bool hasDialog(const Screen *pDialogScreen) const
 		{
-			for ( const Screen *dialog : m_dialogStack )
+			for (const Screen *dialog : m_dialogStack)
 			{
-				if ( dialog == pDialogScreen )
+				if (dialog == pDialogScreen)
 				{
 					return true;
 				}
@@ -252,13 +252,13 @@ namespace ctp
 		}
 	};
 
-	inline bool operator==( const Screen::Pos & a, const Screen::Pos & b )
+	inline bool operator==(const Screen::Pos & a, const Screen::Pos & b)
 	{
 		return a.x == b.x && a.y == b.y;
 	}
 
-	inline bool operator!=( const Screen::Pos & a, const Screen::Pos & b )
+	inline bool operator!=(const Screen::Pos & a, const Screen::Pos & b)
 	{
-		return ! (a == b);
+		return !(a == b);
 	}
 }

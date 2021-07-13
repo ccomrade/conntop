@@ -59,16 +59,16 @@ namespace ctp
 		bool m_isColorizeEnabled;
 		int m_fd;
 
-		void logWrite( const KString & data );
+		void logWrite(const KString & data);
 		void initColorize();
 
 	public:
-		Log( EVerbosity verbosity, EColorize colorize, EStyle style );
-		Log( EVerbosity verbosity, EColorize colorize, EStyle style, const KString & fileName, bool clear = false );
+		Log(EVerbosity verbosity, EColorize colorize, EStyle style);
+		Log(EVerbosity verbosity, EColorize colorize, EStyle style, const KString & fileName, bool clear = false);
 		~Log();
 
-		void logV( EType msgType, const char *format, va_list args );
-		void setVerbosity( EVerbosity verbosity );
+		void logV(EType msgType, const char *format, va_list args);
+		void setVerbosity(EVerbosity verbosity);
 
 		EVerbosity getVerbosity() const
 		{
@@ -92,7 +92,7 @@ namespace ctp
 
 		bool hasFile() const
 		{
-			return ! m_fileName.empty();
+			return !m_fileName.empty();
 		}
 
 		bool isColorizeEnabled() const
@@ -100,15 +100,15 @@ namespace ctp
 			return m_isColorizeEnabled;
 		}
 
-		bool isMsgEnabled( EType msgType ) const
+		bool isMsgEnabled(EType msgType) const
 		{
-			switch ( msgType )
+			switch (msgType)
 			{
 				case ALWAYS:
 				case ERROR:
 				case WARNING:
 				{
-					if ( m_verbosity >= VERBOSITY_LOW )
+					if (m_verbosity >= VERBOSITY_LOW)
 					{
 						return true;
 					}
@@ -116,7 +116,7 @@ namespace ctp
 				}
 				case NOTICE:
 				{
-					if ( m_verbosity >= VERBOSITY_NORMAL )
+					if (m_verbosity >= VERBOSITY_NORMAL)
 					{
 						return true;
 					}
@@ -124,7 +124,7 @@ namespace ctp
 				}
 				case INFO:
 				{
-					if ( m_verbosity >= VERBOSITY_HIGH )
+					if (m_verbosity >= VERBOSITY_HIGH)
 					{
 						return true;
 					}
@@ -132,7 +132,7 @@ namespace ctp
 				}
 				case DEBUG:
 				{
-					if ( m_verbosity >= VERBOSITY_DEBUG )
+					if (m_verbosity >= VERBOSITY_DEBUG)
 					{
 						return true;
 					}
@@ -143,60 +143,60 @@ namespace ctp
 			return false;
 		}
 
-		void log( EType msgType, const char *format, ... ) COMPILER_PRINTF_ARGS_CHECK(3,4)
+		void log(EType msgType, const char *format, ...) COMPILER_PRINTF_ARGS_CHECK(3,4)
 		{
 			va_list args;
-			va_start( args, format );
-			logV( msgType, format, args );
-			va_end( args );
+			va_start(args, format);
+			logV(msgType, format, args);
+			va_end(args);
 		}
 
-		void always( const char *format, ... ) COMPILER_PRINTF_ARGS_CHECK(2,3)
+		void always(const char *format, ...) COMPILER_PRINTF_ARGS_CHECK(2,3)
 		{
 			va_list args;
-			va_start( args, format );
-			logV( ALWAYS, format, args );
-			va_end( args );
+			va_start(args, format);
+			logV(ALWAYS, format, args);
+			va_end(args);
 		}
 
-		void error( const char *format, ... ) COMPILER_PRINTF_ARGS_CHECK(2,3)
+		void error(const char *format, ...) COMPILER_PRINTF_ARGS_CHECK(2,3)
 		{
 			va_list args;
-			va_start( args, format );
-			logV( ERROR, format, args );
-			va_end( args );
+			va_start(args, format);
+			logV(ERROR, format, args);
+			va_end(args);
 		}
 
-		void warning( const char *format, ... ) COMPILER_PRINTF_ARGS_CHECK(2,3)
+		void warning(const char *format, ...) COMPILER_PRINTF_ARGS_CHECK(2,3)
 		{
 			va_list args;
-			va_start( args, format );
-			logV( WARNING, format, args );
-			va_end( args );
+			va_start(args, format);
+			logV(WARNING, format, args);
+			va_end(args);
 		}
 
-		void notice( const char *format, ... ) COMPILER_PRINTF_ARGS_CHECK(2,3)
+		void notice(const char *format, ...) COMPILER_PRINTF_ARGS_CHECK(2,3)
 		{
 			va_list args;
-			va_start( args, format );
-			logV( NOTICE, format, args );
-			va_end( args );
+			va_start(args, format);
+			logV(NOTICE, format, args);
+			va_end(args);
 		}
 
-		void info( const char *format, ... ) COMPILER_PRINTF_ARGS_CHECK(2,3)
+		void info(const char *format, ...) COMPILER_PRINTF_ARGS_CHECK(2,3)
 		{
 			va_list args;
-			va_start( args, format );
-			logV( INFO, format, args );
-			va_end( args );
+			va_start(args, format);
+			logV(INFO, format, args);
+			va_end(args);
 		}
 
-		void debug( const char *format, ... ) COMPILER_PRINTF_ARGS_CHECK(2,3)
+		void debug(const char *format, ...) COMPILER_PRINTF_ARGS_CHECK(2,3)
 		{
 			va_list args;
-			va_start( args, format );
-			logV( DEBUG, format, args );
-			va_end( args );
+			va_start(args, format);
+			logV(DEBUG, format, args);
+			va_end(args);
 		}
 	};
 }

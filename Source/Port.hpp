@@ -40,7 +40,7 @@ namespace ctp
 		 * @param type Port type.
 		 * @param number Port number in system byte order.
 		 */
-		Port( EPortType type, uint16_t number )
+		Port(EPortType type, uint16_t number)
 		: m_type(type),
 		  m_number(number)
 		{
@@ -61,7 +61,7 @@ namespace ctp
 		 */
 		KString getTypeName() const
 		{
-			switch ( m_type )
+			switch (m_type)
 			{
 				case EPortType::UDP: return "UDP";
 				case EPortType::TCP: return "TCP";
@@ -102,12 +102,12 @@ namespace ctp
 			return m_pack.size();
 		}
 
-		const Port & operator[]( size_t index ) const
+		const Port & operator[](size_t index) const
 		{
 			return m_pack[index];
 		}
 
-		Port & operator[]( size_t index )
+		Port & operator[](size_t index)
 		{
 			return m_pack[index];
 		}
@@ -117,15 +117,15 @@ namespace ctp
 			m_pack.clear();
 		}
 
-		void add( const Port & port )
+		void add(const Port & port)
 		{
-			m_pack.push_back( port );
+			m_pack.push_back(port);
 		}
 
 		template<class... Args>
-		void emplace( Args &&... args )
+		void emplace(Args &&... args)
 		{
-			m_pack.emplace_back( std::forward<Args>( args )... );
+			m_pack.emplace_back(std::forward<Args>(args)...);
 		}
 	};
 
@@ -154,13 +154,13 @@ namespace ctp
 		 * The port must be stored somewhere else because this class holds only a pointer to it.
 		 * @param port The port.
 		 */
-		PortData( const Port & port )
+		PortData(const Port & port)
 		: m_pPort(&port),
 	#ifndef CONNTOP_DEDICATED
 		  m_isServiceResolved(false),
 		  m_service(),
 	#endif
-		  m_numeric(std::to_string( port.getNumber() ))
+		  m_numeric(std::to_string(port.getNumber()))
 		{
 		}
 
@@ -180,7 +180,7 @@ namespace ctp
 		 */
 		bool isServiceAvailable() const
 		{
-			return ! m_service.empty();
+			return !m_service.empty();
 		}
 	#endif
 
@@ -258,9 +258,9 @@ namespace ctp
 		 * @brief Sets port service name.
 		 * @param service Port service name.
 		 */
-		void setResolvedService( std::string && service )
+		void setResolvedService(std::string && service)
 		{
-			m_service = std::move( service );
+			m_service = std::move(service);
 			m_isServiceResolved = true;
 		}
 	#endif
@@ -270,20 +270,20 @@ namespace ctp
 		 * This function should be used only in ConnectionStorage class.
 		 * @param port The port.
 		 */
-		void setPort( const Port & port )
+		void setPort(const Port & port)
 		{
 			m_pPort = &port;
 		}
 	};
 
-	inline bool operator==( const Port & a, const Port & b )
+	inline bool operator==(const Port & a, const Port & b)
 	{
 		return a.getType() == b.getType() && a.getNumber() == b.getNumber();
 	}
 
-	inline bool operator!=( const Port & a, const Port & b )
+	inline bool operator!=(const Port & a, const Port & b)
 	{
-		return ! (a == b);
+		return !(a == b);
 	}
 }
 
@@ -295,12 +295,12 @@ namespace std
 		using argument_type = ctp::Port;
 		using result_type = size_t;
 
-		result_type operator()( const argument_type & v ) const
+		result_type operator()(const argument_type & v) const
 		{
 			using ctp::HashCombine;
 
-			result_type h = hash<uint16_t>()( v.getNumber() );
-			HashCombine( h, hash<int>()( static_cast<int>( v.getType() ) ) );
+			result_type h = hash<uint16_t>()(v.getNumber());
+			HashCombine(h, hash<int>()(static_cast<int>(v.getType())));
 
 			return h;
 		}

@@ -26,7 +26,7 @@ namespace ctp
 		EType m_type;
 
 	public:
-		CursesEvent( EType type )
+		CursesEvent(EType type)
 		: m_type(type)
 		{
 		}

@@ -47,12 +47,12 @@ namespace ctp
 		void drawPausedState();
 		void drawSyncState();
 		void drawCollectorInfo();
-		void drawListEntry( const ConnectionListUpdate & update );
-		void drawDataLeft( const KString & data, unsigned int width, int attr );
-		void drawDataRight( const KString & data, unsigned int width, int attr );
-		void drawDataEmpty( unsigned int width, int attr );
+		void drawListEntry(const ConnectionListUpdate & update);
+		void drawDataLeft(const KString & data, unsigned int width, int attr);
+		void drawDataRight(const KString & data, unsigned int width, int attr);
+		void drawDataEmpty(unsigned int width, int attr);
 		void clearList();
-		void fillEmpty( int count );
+		void fillEmpty(int count);
 		void fillEmpty();
 		void setMinWidth();
 
@@ -67,7 +67,7 @@ namespace ctp
 		}
 
 		void handleResize() override;
-		bool handleKey( int ch ) override;
+		bool handleKey(int ch) override;
 
 	public:
 		ScreenConnectionList();
@@ -75,6 +75,6 @@ namespace ctp
 		void updateList();
 		void updateColumns();
 		void updateSortMode();
-		void updateClientInfo( const ClientEvent & event );
+		void updateClientInfo(const ClientEvent & event);
 	};
 }

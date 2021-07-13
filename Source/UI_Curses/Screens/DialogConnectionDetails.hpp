@@ -46,19 +46,19 @@ namespace ctp
 		ConnectionTraffic m_traffic;
 
 		void drawStatic();
-		void drawUpdate( int updateFlags );
-		void writeStringSafe( const KString & string );
-		void fillEmpty( int count );
+		void drawUpdate(int updateFlags);
+		void writeStringSafe(const KString & string);
+		void fillEmpty(int count);
 		void fillEmpty();
 
 		void handleResize() override;
-		bool handleKey( int ch ) override;
+		bool handleKey(int ch) override;
 
 	public:
-		DialogConnectionDetails( ScreenConnectionList *parent );
+		DialogConnectionDetails(ScreenConnectionList *parent);
 
-		void open( const ConnectionData *data );
-		void update( const ConnectionData *data, int updateFlags );
+		void open(const ConnectionData *data);
+		void update(const ConnectionData *data, int updateFlags);
 		void close();
 	};
 }

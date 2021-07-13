@@ -33,47 +33,47 @@ namespace ctp
 		const IAddress *m_currentAddress;
 		uint16_t m_currentPort;
 
-		static void HostResolveCallback( std::string & hostname, AddressPack & pack, void *param )
+		static void HostResolveCallback(std::string & hostname, AddressPack & pack, void *param)
 		{
-			ClientConnector *self = static_cast<ClientConnector*>( param );
+			ClientConnector *self = static_cast<ClientConnector*>(param);
 
-			if ( pack.isEmpty() )
+			if (pack.isEmpty())
 			{
 				std::string errMsg = "Unable to resolve server address '";
 				errMsg += hostname;
 				errMsg += "'";
-				throw Exception( std::move( errMsg ), "Client" );
+				throw Exception(std::move(errMsg), "Client");
 			}
 			else
 			{
-				self->m_resolvedAddresses = std::move( pack );
+				self->m_resolvedAddresses = std::move(pack);
 				self->m_addressIndex = 0;
 				self->tryNext();
 			}
 		}
 
-		static void PortResolveCallback( std::string & service, EPortType, PortPack & pack, void *param )
+		static void PortResolveCallback(std::string & service, EPortType, PortPack & pack, void *param)
 		{
-			ClientConnector *self = static_cast<ClientConnector*>( param );
+			ClientConnector *self = static_cast<ClientConnector*>(param);
 
-			if ( pack.isEmpty() )
+			if (pack.isEmpty())
 			{
 				std::string errMsg = "Unable to resolve server port '";
 				errMsg += service;
 				errMsg += "'";
-				throw Exception( std::move( errMsg ), "Client" );
+				throw Exception(std::move(errMsg), "Client");
 			}
 			else
 			{
-				self->m_resolvedPorts = std::move( pack );
+				self->m_resolvedPorts = std::move(pack);
 				self->m_portIndex = 0;
 				// resolve server host
-				gApp->getResolver()->resolveHostname( self->m_host, HostResolveCallback, self );
+				gApp->getResolver()->resolveHostname(self->m_host, HostResolveCallback, self);
 			}
 		}
 
 	public:
-		ClientConnector( ClientSession & session )
+		ClientConnector(ClientSession & session)
 		: m_pSession(&session),
 		  m_host(),
 		  m_resolvedAddresses(),
@@ -83,25 +83,25 @@ namespace ctp
 		  m_currentAddress(),
 		  m_currentPort()
 		{
-			CmdLineArg *connectArg = gCmdLine->getArg( "connect" );
-			if ( ! connectArg )
+			CmdLineArg *connectArg = gCmdLine->getArg("connect");
+			if (!connectArg)
 			{
-				throw Exception( "No server to connect", "Client" );
+				throw Exception("No server to connect", "Client");
 			}
 
 			m_host = connectArg->getValue();
 
-			CmdLineArg *portArg = gCmdLine->getArg( "port" );
-			if ( portArg )
+			CmdLineArg *portArg = gCmdLine->getArg("port");
+			if (portArg)
 			{
 				KString port = portArg->getValue();
 				// resolve server port
-				gApp->getResolver()->resolveService( port, EPortType::TCP, PortResolveCallback, this );
+				gApp->getResolver()->resolveService(port, EPortType::TCP, PortResolveCallback, this);
 			}
 			else
 			{
 				// resolve server host
-				gApp->getResolver()->resolveHostname( m_host, HostResolveCallback, this );
+				gApp->getResolver()->resolveHostname(m_host, HostResolveCallback, this);
 			}
 		}
 
@@ -122,20 +122,20 @@ namespace ctp
 
 		void tryNext()
 		{
-			if ( m_resolvedAddresses.isEmpty() )
+			if (m_resolvedAddresses.isEmpty())
 			{
 				return;
 			}
 
 			StreamSocket socket;
-			while ( ! socket.isConnected() )
+			while (!socket.isConnected())
 			{
 				m_currentAddress = nullptr;
 				m_currentPort = DEFAULT_PORT;
 
-				if ( m_resolvedPorts.isEmpty() )
+				if (m_resolvedPorts.isEmpty())
 				{
-					if ( m_addressIndex < m_resolvedAddresses.getSize() )
+					if (m_addressIndex < m_resolvedAddresses.getSize())
 					{
 						m_currentAddress = &m_resolvedAddresses[m_addressIndex];
 						m_addressIndex++;
@@ -143,7 +143,7 @@ namespace ctp
 				}
 				else
 				{
-					if ( m_addressIndex >= m_resolvedAddresses.getSize() )
+					if (m_addressIndex >= m_resolvedAddresses.getSize())
 					{
 						m_portIndex++;
 						m_addressIndex = 0;
@@ -152,7 +152,7 @@ namespace ctp
 					m_currentAddress = &m_resolvedAddresses[m_addressIndex];
 					m_addressIndex++;
 
-					if ( m_portIndex < m_resolvedPorts.getSize() )
+					if (m_portIndex < m_resolvedPorts.getSize())
 					{
 						m_currentPort = m_resolvedPorts[m_portIndex].getNumber();
 					}
@@ -162,27 +162,27 @@ namespace ctp
 					}
 				}
 
-				if ( ! m_currentAddress )  // no more address-port combinations to try
+				if (!m_currentAddress)  // no more address-port combinations to try
 				{
 					std::string errMsg = "Unable to connect to '";
 					errMsg += m_host;
 					errMsg += "'";
-					throw Exception( std::move( errMsg ), "Client" );
+					throw Exception(std::move(errMsg), "Client");
 				}
 
 				try
 				{
-					socket.connect( *m_currentAddress, m_currentPort, EStreamSocketType::TCP );
+					socket.connect(*m_currentAddress, m_currentPort, EStreamSocketType::TCP);
 				}
-				catch ( const SocketException & e )
+				catch (const SocketException & e)
 				{
-					const std::string dest = Util::AddressPortToString( *m_currentAddress, m_currentPort );
+					const std::string dest = Util::AddressPortToString(*m_currentAddress, m_currentPort);
 
-					gLog->error( "[Client] Connection to %s failed: %s", dest.c_str(), e.what() );
+					gLog->error("[Client] Connection to %s failed: %s", dest.c_str(), e.what());
 				}
 			}
 
-			m_pSession->connect( std::move( socket ) );
+			m_pSession->connect(std::move(socket));
 		}
 	};
 
@@ -205,9 +205,9 @@ namespace ctp
 
 	void Client::init()
 	{
-		m_pConnector = std::make_unique<ClientConnector>( m_session );
+		m_pConnector = std::make_unique<ClientConnector>(m_session);
 
-		gApp->getEventSystem()->dispatch<ClientEvent>( ClientEvent::CONNECT_STARTED );
+		gApp->getEventSystem()->dispatch<ClientEvent>(ClientEvent::CONNECT_STARTED);
 	}
 
 	void Client::onUpdate()
@@ -217,9 +217,9 @@ namespace ctp
 
 	void Client::disconnect()
 	{
-		gLog->info( "[Client] Disconnecting..." );
+		gLog->info("[Client] Disconnecting...");
 
-		if ( m_pConnector )
+		if (m_pConnector)
 		{
 			// destroy connector
 			m_pConnector.reset();
@@ -227,24 +227,24 @@ namespace ctp
 
 		m_session.disconnect();
 
-		gApp->getEventSystem()->dispatch<ClientEvent>( ClientEvent::DISCONNECT_STARTED );
+		gApp->getEventSystem()->dispatch<ClientEvent>(ClientEvent::DISCONNECT_STARTED);
 	}
 
-	void Client::setPaused( bool paused )
+	void Client::setPaused(bool paused)
 	{
-		if ( m_isPaused != paused )
+		if (m_isPaused != paused)
 		{
 			m_isPaused = paused;
 
-			if ( m_isPaused )
+			if (m_isPaused)
 			{
-				gLog->debug( "[Client] Paused" );
+				gLog->debug("[Client] Paused");
 			}
 			else
 			{
-				gLog->debug( "[Client] Resumed" );
+				gLog->debug("[Client] Resumed");
 
-				if ( m_remainingDataFlags == 0 && ! m_isDataRequested )
+				if (m_remainingDataFlags == 0 && !m_isDataRequested)
 				{
 					requestData();
 				}
@@ -252,35 +252,35 @@ namespace ctp
 		}
 	}
 
-	void Client::onSessionConnectionEstablished( ClientSession* )
+	void Client::onSessionConnectionEstablished(ClientSession*)
 	{
-		if ( m_pConnector )
+		if (m_pConnector)
 		{
-			m_session.setServerHostString( m_pConnector->getHost() );
+			m_session.setServerHostString(m_pConnector->getHost());
 			// destroy connector
 			m_pConnector.reset();
 		}
 
-		if ( gLog->isMsgEnabled( Log::INFO ) )
+		if (gLog->isMsgEnabled(Log::INFO))
 		{
-			gLog->info( "[Client] Connection to %s (%s) established",
+			gLog->info("[Client] Connection to %s (%s) established",
 			  m_session.getServerEndpoint().toString().c_str(),
 			  m_session.getServerHostString().c_str()
 			);
 		}
 
-		gApp->getEventSystem()->dispatch<ClientEvent>( ClientEvent::CONNECTION_ESTABLISHED );
+		gApp->getEventSystem()->dispatch<ClientEvent>(ClientEvent::CONNECTION_ESTABLISHED);
 	}
 
-	void Client::onSessionEstablished( ClientSession* )
+	void Client::onSessionEstablished(ClientSession*)
 	{
-		gLog->always( "[Client] Connected to server %s at %s (%s)",
+		gLog->always("[Client] Connected to server %s at %s (%s)",
 		  m_session.getServerName().c_str(),
 		  m_session.getServerEndpoint().toString().c_str(),
 		  m_session.getServerHostString().c_str()
 		);
 
-		gLog->info( "[Client] Server version is %s (platform: %s)",
+		gLog->info("[Client] Server version is %s (platform: %s)",
 		  m_session.getServerVersionString().c_str(),
 		  m_session.getServerPlatformName().c_str()
 		);
@@ -292,15 +292,15 @@ namespace ctp
 
 		m_isSynchronized = false;
 
-		gApp->getEventSystem()->dispatch<ClientEvent>( ClientEvent::SESSION_ESTABLISHED );
+		gApp->getEventSystem()->dispatch<ClientEvent>(ClientEvent::SESSION_ESTABLISHED);
 	}
 
-	void Client::onSessionDisconnect( ClientSession* )
+	void Client::onSessionDisconnect(ClientSession*)
 	{
 		std::string text;
-		if ( m_session.hasDisconnectError() )
+		if (m_session.hasDisconnectError())
 		{
-			if ( m_session.getDisconnectReason() == EDisconnectReason::UNKNOWN )
+			if (m_session.getDisconnectReason() == EDisconnectReason::UNKNOWN)
 			{
 				text = "Unknown reason";  // better than "?"
 			}
@@ -316,12 +316,12 @@ namespace ctp
 			text = m_session.getDisconnectReasonName();
 		}
 
-		if ( m_pConnector )
+		if (m_pConnector)
 		{
 			const IAddress & address = *m_pConnector->getCurrentAddress();
-			const std::string dest = Util::AddressPortToString( address, m_pConnector->getCurrentPort() );
+			const std::string dest = Util::AddressPortToString(address, m_pConnector->getCurrentPort());
 
-			gLog->error( "[Client] Connection to %s failed: %s",
+			gLog->error("[Client] Connection to %s failed: %s",
 			  dest.c_str(),
 			  text.c_str()
 			);
@@ -330,7 +330,7 @@ namespace ctp
 		}
 		else
 		{
-			gLog->always( "[Client] Disconnected from %s (%s): %s",
+			gLog->always("[Client] Disconnected from %s (%s): %s",
 			  m_session.getServerEndpoint().toString().c_str(),
 			  m_session.getServerHostString().c_str(),
 			  text.c_str()
@@ -339,36 +339,36 @@ namespace ctp
 			m_isSynchronized = false;
 			m_isDataRequested = false;
 
-			gApp->getEventSystem()->dispatch<ClientEvent>( ClientEvent::DISCONNECTED );
+			gApp->getEventSystem()->dispatch<ClientEvent>(ClientEvent::DISCONNECTED);
 		}
 
-		if ( m_session.getDisconnectReason() == EDisconnectReason::USER_DECISION )
+		if (m_session.getDisconnectReason() == EDisconnectReason::USER_DECISION)
 		{
 			gApp->quit();
 		}
 	}
 
-	void Client::onSessionServerTick( ClientSession* )
+	void Client::onSessionServerTick(ClientSession*)
 	{
-		gLog->debug( "[Client] Server update tick (%u)", m_session.getCurrentTimestamp() );
+		gLog->debug("[Client] Server update tick (%u)", m_session.getCurrentTimestamp());
 
-		gApp->getEventSystem()->dispatch<ClientEvent>( ClientEvent::SERVER_UPDATE_TICK );
+		gApp->getEventSystem()->dispatch<ClientEvent>(ClientEvent::SERVER_UPDATE_TICK);
 
-		if ( m_remainingDataFlags )
+		if (m_remainingDataFlags)
 		{
 			m_remainingDataFlags = 0;
 			m_requestedDataUpdateFlags = 0;
 
-			setSynchronized( false );
+			setSynchronized(false);
 
-			if ( ! m_isPaused )
+			if (!m_isPaused)
 			{
 				requestData();
 			}
 		}
-		else if ( m_session.isDataRequestInProgress() || m_isPaused )
+		else if (m_session.isDataRequestInProgress() || m_isPaused)
 		{
-			setSynchronized( false );
+			setSynchronized(false);
 		}
 		else
 		{
@@ -378,58 +378,58 @@ namespace ctp
 		m_isDataRequested = false;
 	}
 
-	void Client::onSessionDataStatus( ClientSession*, bool isDifferent )
+	void Client::onSessionDataStatus(ClientSession*, bool isDifferent)
 	{
 		const int dataFlags = m_session.getDataFlags();
 		const int dataUpdateFlags = m_session.getDataUpdateFlags();
 
-		gLog->debug( "[Client] %s data status: %d %d", (isDifferent) ? "New" : "Same", dataFlags, dataUpdateFlags );
+		gLog->debug("[Client] %s data status: %d %d", (isDifferent) ? "New" : "Same", dataFlags, dataUpdateFlags);
 
 		m_requestedDataFlags &= dataFlags;
 		m_requestedDataUpdateFlags &= dataUpdateFlags;
 
-		if ( m_requestedDataUpdateFlags && ! m_isSynchronized )
+		if (m_requestedDataUpdateFlags && !m_isSynchronized)
 		{
 			m_requestedDataUpdateFlags = 0;
 			requestData();
 		}
 
-		if ( isDifferent )
+		if (isDifferent)
 		{
-			gApp->getEventSystem()->dispatch<ClientEvent>( ClientEvent::NEW_DATA_AVAILABLE );
+			gApp->getEventSystem()->dispatch<ClientEvent>(ClientEvent::NEW_DATA_AVAILABLE);
 		}
 	}
 
-	void Client::onSessionData( ClientSession*, int type, bool isUpdate, rapidjson::Value & data )
+	void Client::onSessionData(ClientSession*, int type, bool isUpdate, rapidjson::Value & data)
 	{
-		gLog->debug( "[Client] Received data%s: %d", (isUpdate) ? " update" : "", type );
+		gLog->debug("[Client] Received data%s: %d", (isUpdate) ? " update" : "", type);
 
-		if ( (isUpdate && ! m_isSynchronized) || ! (type & m_remainingDataFlags) || m_isPaused )
+		if ((isUpdate && !m_isSynchronized) || !(type & m_remainingDataFlags) || m_isPaused)
 		{
 			return;
 		}
 
-		if ( type & EDataFlags::CONNECTION )
+		if (type & EDataFlags::CONNECTION)
 		{
-			gLog->debug( "[Client] CONNECTION data (%zu)", data.Size() );
+			gLog->debug("[Client] CONNECTION data (%zu)", data.Size());
 
-			if ( ! data.IsArray() )
+			if (!data.IsArray())
 			{
-				throw std::invalid_argument( "Data is not an array" );
+				throw std::invalid_argument("Data is not an array");
 			}
 
-			if ( ! isUpdate )
+			if (!isUpdate)
 			{
 				gApp->getConnectionList()->clear();
 			}
 
 			// deserialize
-			for ( auto it = data.Begin(); it != data.End(); ++it )
+			for (auto it = data.Begin(); it != data.End(); ++it)
 			{
-				ConnectionData::Deserialize( *it, gApp->getConnectionList() );
+				ConnectionData::Deserialize(*it, gApp->getConnectionList());
 			}
 
-			if ( gApp->hasUI() )
+			if (gApp->hasUI())
 			{
 				gApp->getUI()->refreshConnectionList();
 			}
@@ -438,17 +438,17 @@ namespace ctp
 		}
 		else
 		{
-			gLog->warning( "[Client] Unknown data of type %d, ignoring...", type );
+			gLog->warning("[Client] Unknown data of type %d, ignoring...", type);
 			return;
 		}
 
-		gLog->debug( "[Client] Data deserialization done" );
+		gLog->debug("[Client] Data deserialization done");
 
-		if ( ! m_remainingDataFlags )
+		if (!m_remainingDataFlags)
 		{
-			if ( ! m_isSynchronized )
+			if (!m_isSynchronized)
 			{
-				setSynchronized( true );
+				setSynchronized(true);
 				m_requestedDataUpdateFlags = m_requestedDataFlags;
 			}
 
@@ -458,18 +458,18 @@ namespace ctp
 
 	void Client::requestData()
 	{
-		gLog->debug( "[Client] Requesting data: %d %d", m_requestedDataFlags, m_requestedDataUpdateFlags );
-		m_session.requestData( m_requestedDataFlags, m_requestedDataUpdateFlags );
+		gLog->debug("[Client] Requesting data: %d %d", m_requestedDataFlags, m_requestedDataUpdateFlags);
+		m_session.requestData(m_requestedDataFlags, m_requestedDataUpdateFlags);
 		m_isDataRequested = true;
 	}
 
-	void Client::setSynchronized( bool isSynchronized )
+	void Client::setSynchronized(bool isSynchronized)
 	{
-		if ( m_isSynchronized != isSynchronized )
+		if (m_isSynchronized != isSynchronized)
 		{
 			m_isSynchronized = isSynchronized;
-			gLog->debug( "[Client] Synchronization state changed to %s", (m_isSynchronized) ? "true" : "false" );
-			gApp->getEventSystem()->dispatch<ClientEvent>( ClientEvent::SYNC_STATE_CHANGED );
+			gLog->debug("[Client] Synchronization state changed to %s", (m_isSynchronized) ? "true" : "false");
+			gApp->getEventSystem()->dispatch<ClientEvent>(ClientEvent::SYNC_STATE_CHANGED);
 		}
 	}
 }

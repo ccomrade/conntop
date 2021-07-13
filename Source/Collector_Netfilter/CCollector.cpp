@@ -18,9 +18,9 @@ namespace ctp
 		{
 		}
 
-		void init( IConnectionUpdateCallback *callback )
+		void init(IConnectionUpdateCallback *callback)
 		{
-			m_conntrack.init( callback );
+			m_conntrack.init(callback);
 		}
 
 		void onUpdate()
@@ -33,9 +33,9 @@ namespace ctp
 			return m_conntrack.isPaused();
 		}
 
-		void setPaused( bool paused )
+		void setPaused(bool paused)
 		{
-			m_conntrack.setPaused( paused );
+			m_conntrack.setPaused(paused);
 		}
 	};
 
@@ -53,9 +53,9 @@ namespace ctp
 		return "Netfilter (conntrack)";
 	}
 
-	void CCollector_Netfilter::init( IConnectionUpdateCallback *callback )
+	void CCollector_Netfilter::init(IConnectionUpdateCallback *callback)
 	{
-		m_impl->init( callback );
+		m_impl->init(callback);
 	}
 
 	void CCollector_Netfilter::onUpdate()
@@ -68,8 +68,8 @@ namespace ctp
 		return m_impl->isPaused();
 	}
 
-	void CCollector_Netfilter::setPaused( bool paused )
+	void CCollector_Netfilter::setPaused(bool paused)
 	{
-		m_impl->setPaused( paused );
+		m_impl->setPaused(paused);
 	}
 }

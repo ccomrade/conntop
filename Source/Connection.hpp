@@ -102,8 +102,8 @@ namespace ctp
 			UNKNOWN = 0
 		};
 
-		KString StateToString( int state );
-		EState StateToEnum( const KString & state );
+		KString StateToString(int state);
+		EState StateToEnum(const KString & state);
 	}
 
 	/**
@@ -133,8 +133,8 @@ namespace ctp
 			CLOSED
 		};
 
-		KString StateToString( int state );
-		EState StateToEnum( const KString & state );
+		KString StateToString(int state);
+		EState StateToEnum(const KString & state);
 	}
 
 	/**
@@ -157,10 +157,10 @@ namespace ctp
 
 			EConnectionType m_type;
 
-			void copy( const Internal & other )
+			void copy(const Internal & other)
 			{
 				m_type = other.m_type;
-				switch ( m_type )
+				switch (m_type)
 				{
 					case EConnectionType::UDP4:
 					case EConnectionType::UDP6:
@@ -175,7 +175,7 @@ namespace ctp
 			}
 
 		public:
-			Internal( EConnectionType type, const PortData & srcPort, const PortData & dstPort )
+			Internal(EConnectionType type, const PortData & srcPort, const PortData & dstPort)
 			: m_ports(),
 			  m_type(type)
 			{
@@ -183,23 +183,23 @@ namespace ctp
 				m_ports.pDstPort = &dstPort;
 			}
 
-			Internal( const Internal & other )
+			Internal(const Internal & other)
 			{
-				copy( other );
+				copy(other);
 			}
 
-			Internal & operator=( const Internal & other )
+			Internal & operator=(const Internal & other)
 			{
-				if ( this != &other )
+				if (this != &other)
 				{
-					copy( other );
+					copy(other);
 				}
 				return *this;
 			}
 
 			// no move
-			Internal( Internal && ) = delete;
-			Internal & operator=( Internal && ) = delete;
+			Internal(Internal &&) = delete;
+			Internal & operator=(Internal &&) = delete;
 
 			~Internal()
 			{
@@ -227,7 +227,7 @@ namespace ctp
 
 			bool hasPorts() const
 			{
-				switch ( m_type )
+				switch (m_type)
 				{
 					case EConnectionType::UDP4:
 					case EConnectionType::UDP6:
@@ -240,19 +240,19 @@ namespace ctp
 				return false;
 			}
 
-			bool isEqual( const Internal & other ) const
+			bool isEqual(const Internal & other) const
 			{
-				if ( m_type == other.m_type )
+				if (m_type == other.m_type)
 				{
-					switch ( m_type )
+					switch (m_type)
 					{
 						case EConnectionType::UDP4:
 						case EConnectionType::UDP6:
 						case EConnectionType::TCP4:
 						case EConnectionType::TCP6:
 						{
-							if ( m_ports.pSrcPort == other.m_ports.pSrcPort
-							  && m_ports.pDstPort == other.m_ports.pDstPort )
+							if (m_ports.pSrcPort == other.m_ports.pSrcPort
+							  && m_ports.pDstPort == other.m_ports.pDstPort)
 							{
 								return true;
 							}
@@ -265,16 +265,16 @@ namespace ctp
 
 			size_t computeHash() const
 			{
-				size_t h = std::hash<int>()( static_cast<int>( m_type ) );
-				switch ( m_type )
+				size_t h = std::hash<int>()(static_cast<int>(m_type));
+				switch (m_type)
 				{
 					case EConnectionType::UDP4:
 					case EConnectionType::UDP6:
 					case EConnectionType::TCP4:
 					case EConnectionType::TCP6:
 					{
-						HashCombine( h, std::hash<const void*>()( m_ports.pSrcPort ) );
-						HashCombine( h, std::hash<const void*>()( m_ports.pDstPort ) );
+						HashCombine(h, std::hash<const void*>()(m_ports.pSrcPort));
+						HashCombine(h, std::hash<const void*>()(m_ports.pDstPort));
 						break;
 					}
 				}
@@ -294,11 +294,11 @@ namespace ctp
 		 * @param dstAddress Destination address.
 		 * @param dstPort Destination address.
 		 */
-		Connection( const AddressData & srcAddress, const PortData & srcPort,
-		            const AddressData & dstAddress, const PortData & dstPort )
+		Connection(const AddressData & srcAddress, const PortData & srcPort,
+		            const AddressData & dstAddress, const PortData & dstPort)
 		: m_pSrcAddr(&srcAddress),
 		  m_pDstAddr(&dstAddress),
-		  m_internal(CreateType( srcAddress.getAddressType(), srcPort.getPortType() ), srcPort, dstPort)
+		  m_internal(CreateType(srcAddress.getAddressType(), srcPort.getPortType()), srcPort, dstPort)
 		{
 		}
 
@@ -317,7 +317,7 @@ namespace ctp
 		 */
 		KString getTypeName() const
 		{
-			return TypeToString( m_internal.getType() );
+			return TypeToString(m_internal.getType());
 		}
 
 		/**
@@ -390,11 +390,11 @@ namespace ctp
 		 * @brief Compares the connection with another.
 		 * @return True, if connections are equal, otherwise false.
 		 */
-		bool isEqual( const Connection & other ) const
+		bool isEqual(const Connection & other) const
 		{
 			return m_pSrcAddr == other.m_pSrcAddr
 			    && m_pDstAddr == other.m_pDstAddr
-			    && m_internal.isEqual( other.m_internal );
+			    && m_internal.isEqual(other.m_internal);
 		}
 
 		/**
@@ -404,8 +404,8 @@ namespace ctp
 		size_t computeHash() const
 		{
 			size_t h = m_internal.computeHash();
-			HashCombine( h, std::hash<const void*>()( m_pSrcAddr ) );
-			HashCombine( h, std::hash<const void*>()( m_pDstAddr ) );
+			HashCombine(h, std::hash<const void*>()(m_pSrcAddr));
+			HashCombine(h, std::hash<const void*>()(m_pDstAddr));
 			return h;
 		}
 
@@ -414,9 +414,9 @@ namespace ctp
 		 * @param state Connection state.
 		 * @return Connection state name.
 		 */
-		KString getStateName( int state ) const
+		KString getStateName(int state) const
 		{
-			return StateToString( state, m_internal.getType() );
+			return StateToString(state, m_internal.getType());
 		}
 
 		/**
@@ -425,13 +425,13 @@ namespace ctp
 		 * @param portType Port type.
 		 * @return Connection type.
 		 */
-		static EConnectionType CreateType( EAddressType addressType, EPortType portType )
+		static EConnectionType CreateType(EAddressType addressType, EPortType portType)
 		{
-			switch ( addressType )
+			switch (addressType)
 			{
 				case EAddressType::IP4:
 				{
-					switch ( portType )
+					switch (portType)
 					{
 						case EPortType::UDP:
 						{
@@ -446,7 +446,7 @@ namespace ctp
 				}
 				case EAddressType::IP6:
 				{
-					switch ( portType )
+					switch (portType)
 					{
 						case EPortType::UDP:
 						{
@@ -461,22 +461,22 @@ namespace ctp
 				}
 			}
 
-			return static_cast<EConnectionType>( -1 );
+			return static_cast<EConnectionType>(-1);
 		}
 
 		/**
 		 * @brief Compares connection types.
 		 * @return True, if connection types are equal, otherwise false.
 		 */
-		static bool IsProtoEqual( EConnectionType a, EConnectionType b )
+		static bool IsProtoEqual(EConnectionType a, EConnectionType b)
 		{
-			switch ( a )
+			switch (a)
 			{
 				case EConnectionType::UDP4:
 				case EConnectionType::UDP6:
 				{
-					if ( b == EConnectionType::UDP4
-					  || b == EConnectionType::UDP6 )
+					if (b == EConnectionType::UDP4
+					  || b == EConnectionType::UDP6)
 					{
 						return true;
 					}
@@ -485,8 +485,8 @@ namespace ctp
 				case EConnectionType::TCP4:
 				case EConnectionType::TCP6:
 				{
-					if ( b == EConnectionType::TCP4
-					  || b == EConnectionType::TCP6 )
+					if (b == EConnectionType::TCP4
+					  || b == EConnectionType::TCP6)
 					{
 						return true;
 					}
@@ -496,13 +496,13 @@ namespace ctp
 			return false;
 		}
 
-		static KString TypeToString( EConnectionType type );
-		static EConnectionType TypeToEnum( const KString & type );
+		static KString TypeToString(EConnectionType type);
+		static EConnectionType TypeToEnum(const KString & type);
 
-		static KString ActionToString( EConnectionAction action );
-		static EConnectionAction ActionToEnum( const KString & action );
+		static KString ActionToString(EConnectionAction action);
+		static EConnectionAction ActionToEnum(const KString & action);
 
-		static KString StateToString( int state, EConnectionType type );
+		static KString StateToString(int state, EConnectionType type);
 	};
 
 	/**
@@ -539,7 +539,7 @@ namespace ctp
 		 * @param rxS Current receive speed.
 		 * @param txS Current send speed.
 		 */
-		ConnectionTraffic( uint64_t rxP, uint64_t txP, uint64_t rxB, uint64_t txB, uint64_t rxS, uint64_t txS )
+		ConnectionTraffic(uint64_t rxP, uint64_t txP, uint64_t rxB, uint64_t txB, uint64_t rxS, uint64_t txS)
 		: rxPackets(rxP),
 		  txPackets(txP),
 		  rxBytes(rxB),
@@ -576,7 +576,7 @@ namespace ctp
 		 * The connection must be stored somewhere else because this class holds only a pointer to it.
 		 * @param connection The connection.
 		 */
-		ConnectionData( const Connection & connection )
+		ConnectionData(const Connection & connection)
 		: m_pConnection(&connection),
 		  m_traffic(),
 		  m_state(0),
@@ -592,7 +592,7 @@ namespace ctp
 		 * @param traffic Connection traffic.
 		 * @param state Current connection state.
 		 */
-		ConnectionData( const Connection & connection, const ConnectionTraffic & traffic, int state = 0 )
+		ConnectionData(const Connection & connection, const ConnectionTraffic & traffic, int state = 0)
 		: m_pConnection(&connection),
 		  m_traffic(traffic),
 		  m_state(state),
@@ -709,7 +709,7 @@ namespace ctp
 		 */
 		KString getStateName() const
 		{
-			return m_pConnection->getStateName( m_state );
+			return m_pConnection->getStateName(m_state);
 		}
 
 		/**
@@ -788,7 +788,7 @@ namespace ctp
 		 * @brief Sets current connection state.
 		 * @param state Connection state.
 		 */
-		void setState( int state )
+		void setState(int state)
 		{
 			m_state = state;
 		}
@@ -798,14 +798,14 @@ namespace ctp
 		 * This function should be used only in ConnectionStorage class.
 		 * @param connection The connection.
 		 */
-		void setConnection( const Connection & connection )
+		void setConnection(const Connection & connection)
 		{
 			m_pConnection = &connection;
 		}
 
-		void serialize( rapidjson::Document & document, EConnectionAction action, int updateFlags = -1 ) const;
+		void serialize(rapidjson::Document & document, EConnectionAction action, int updateFlags = -1) const;
 
-		static bool Deserialize( const rapidjson::Value & document, IConnectionUpdateCallback *callback );
+		static bool Deserialize(const rapidjson::Value & document, IConnectionUpdateCallback *callback);
 	};
 
 	/**
@@ -815,31 +815,31 @@ namespace ctp
 	 */
 	struct IConnectionUpdateCallback
 	{
-		virtual AddressData *getAddress( const IAddress & address, bool add = false ) = 0;
+		virtual AddressData *getAddress(const IAddress & address, bool add = false) = 0;
 
-		virtual PortData *getPort( const Port & port, bool add = false ) = 0;
+		virtual PortData *getPort(const Port & port, bool add = false) = 0;
 
-		virtual ConnectionData *find( const Connection & connection ) = 0;
+		virtual ConnectionData *find(const Connection & connection) = 0;
 
-		virtual ConnectionData *add( const Connection & connection ) = 0;
+		virtual ConnectionData *add(const Connection & connection) = 0;
 
-		virtual ConnectionData *add( const Connection & connection, const ConnectionTraffic & traffic, int state ) = 0;
+		virtual ConnectionData *add(const Connection & connection, const ConnectionTraffic & traffic, int state) = 0;
 
-		virtual void update( const ConnectionData & data, int updateFlags ) = 0;
+		virtual void update(const ConnectionData & data, int updateFlags) = 0;
 
-		virtual void remove( const Connection & connection ) = 0;
+		virtual void remove(const Connection & connection) = 0;
 
 		virtual void clear() = 0;
 	};
 
-	inline bool operator==( const Connection & a, const Connection & b )
+	inline bool operator==(const Connection & a, const Connection & b)
 	{
-		return a.isEqual( b );
+		return a.isEqual(b);
 	}
 
-	inline bool operator!=( const Connection & a, const Connection & b )
+	inline bool operator!=(const Connection & a, const Connection & b)
 	{
-		return ! (a == b);
+		return !(a == b);
 	}
 }
 
@@ -851,7 +851,7 @@ namespace std
 		using argument_type = ctp::Connection;
 		using result_type = size_t;
 
-		result_type operator()( const argument_type & v ) const
+		result_type operator()(const argument_type & v) const
 		{
 			return v.computeHash();
 		}

@@ -7,9 +7,9 @@
 
 namespace ctp
 {
-	KString EGlobalEventID::ToString( int id )
+	KString EGlobalEventID::ToString(int id)
 	{
-		switch ( static_cast<EGlobalEventID::EID>( id ) )
+		switch (static_cast<EGlobalEventID::EID>(id))
 		{
 			case UPDATE_EVENT:               return "UPDATE_EVENT";
 			case CLIENT_EVENT:               return "CLIENT_EVENT";

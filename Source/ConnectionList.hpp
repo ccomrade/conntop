@@ -28,7 +28,7 @@ namespace ctp
 		{
 		}
 
-		ConnectionListUpdate( const ConnectionData *pData, int updateFlags, unsigned int rowNumber, bool isCursor )
+		ConnectionListUpdate(const ConnectionData *pData, int updateFlags, unsigned int rowNumber, bool isCursor)
 		: m_pData(pData),
 		  m_updateFlags(updateFlags),
 		  m_rowNumber(rowNumber),
@@ -70,7 +70,7 @@ namespace ctp
 			int updateFlags;
 			bool isRefreshRequired;
 
-			Item( const ConnectionData *pData, int dataUpdateFlags = -1 )
+			Item(const ConnectionData *pData, int dataUpdateFlags = -1)
 			: pConnection(pData),
 			  updateFlags(dataUpdateFlags),
 			  isRefreshRequired(true)
@@ -78,7 +78,7 @@ namespace ctp
 			}
 		};
 
-		using CompareFunction = bool (*)( const Item & a, const Item & b );  // operator<
+		using CompareFunction = bool (*)(const Item & a, const Item & b);  // operator<
 
 		ConnectionStorage m_storage;
 		std::deque<Item> m_list;
@@ -110,11 +110,11 @@ namespace ctp
 			return (m_list.size() > m_scrollOffset) ? m_list.begin() + m_scrollOffset : m_list.end();
 		}
 
-		bool containsItem( const Item & item ) const
+		bool containsItem(const Item & item) const
 		{
-			for ( const Item & listItem : m_list )
+			for (const Item & listItem : m_list)
 			{
-				if ( listItem.pConnection == item.pConnection )
+				if (listItem.pConnection == item.pConnection)
 					return true;
 			}
 			return false;
@@ -122,40 +122,40 @@ namespace ctp
 
 		void fill();
 		void sort();
-		void insertItem( const Item & item );
-		void handleNewConnection( const ConnectionData & connection );
-		void handleRemovedConnection( void *pConnection );
+		void insertItem(const Item & item);
+		void handleNewConnection(const ConnectionData & connection);
+		void handleRemovedConnection(void *pConnection);
 		void updateCompareFunc();
 
-		static void ResolverCallbackAddress( AddressData & address, ResolvedAddress & resolved, void *param );
-		static void ResolverCallbackPort( PortData & port, ResolvedPort & resolved, void *param );
+		static void ResolverCallbackAddress(AddressData & address, ResolvedAddress & resolved, void *param);
+		static void ResolverCallbackPort(PortData & port, ResolvedPort & resolved, void *param);
 
 	public:
 		ConnectionList();
 
 		// IConnectionUpdateCallback
 
-		AddressData *getAddress( const IAddress & address, bool add = false ) override;
-		PortData *getPort( const Port & port, bool add = false ) override;
-		ConnectionData *find( const Connection & connection ) override;
-		ConnectionData *add( const Connection & connection ) override;
-		ConnectionData *add( const Connection & connection, const ConnectionTraffic & traffic, int state ) override;
-		void update( const ConnectionData & data, int updateFlags ) override;
-		void remove( const Connection & connection ) override;
+		AddressData *getAddress(const IAddress & address, bool add = false) override;
+		PortData *getPort(const Port & port, bool add = false) override;
+		ConnectionData *find(const Connection & connection) override;
+		ConnectionData *add(const Connection & connection) override;
+		ConnectionData *add(const Connection & connection, const ConnectionTraffic & traffic, int state) override;
+		void update(const ConnectionData & data, int updateFlags) override;
+		void remove(const Connection & connection) override;
 		void clear() override;
 
-		void addressDataUpdated( const AddressData & address );
-		void portDataUpdated( const PortData & port );
+		void addressDataUpdated(const AddressData & address);
+		void portDataUpdated(const PortData & port);
 
 		ConnectionListUpdate getNextUpdate();
 		void invalidateAllVisible();
 		void invalidateCursor();
-		void moveCursor( int amount );
-		void doScroll( int amount );
+		void moveCursor(int amount);
+		void doScroll(int amount);
 		void initConnectionDetail();
 		void resetConnectionDetailRefresh();
-		void setTargetSize( unsigned int size );
-		void setSortMode( EConnectionSortMode sortMode, bool isAscending = false );
+		void setTargetSize(unsigned int size);
+		void setSortMode(EConnectionSortMode sortMode, bool isAscending = false);
 
 		bool isRefreshRequired() const
 		{

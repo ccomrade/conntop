@@ -32,37 +32,37 @@ namespace ctp
 			IMPL_DESTROY  //!< arg is nullptr
 		};
 
-		using ImplFunction = void (*)( EventWrapper *self, EImplOperation operation, void *arg );
+		using ImplFunction = void (*)(EventWrapper *self, EImplOperation operation, void *arg);
 
 		template<class T>
 		struct HeapImpl
 		{
-			static void Function( EventWrapper *self, EImplOperation operation, void *arg ) noexcept
+			static void Function(EventWrapper *self, EImplOperation operation, void *arg) noexcept
 			{
-				switch ( operation )
+				switch (operation)
 				{
 					case IMPL_ID:
 					{
-						int *pID = static_cast<int*>( arg );
+						int *pID = static_cast<int*>(arg);
 						(*pID) = T::ID;
 						break;
 					}
 					case IMPL_GET:
 					{
-						T **pObjectPtr = static_cast<T**>( arg );
-						(*pObjectPtr) = static_cast<T*>( self->m_storage.heap );
+						T **pObjectPtr = static_cast<T**>(arg);
+						(*pObjectPtr) = static_cast<T*>(self->m_storage.heap);
 						break;
 					}
 					case IMPL_MOVE:
 					{
-						StorageUnion *pStorage = static_cast<StorageUnion*>( arg );
+						StorageUnion *pStorage = static_cast<StorageUnion*>(arg);
 						pStorage->heap = self->m_storage.heap;
 						self->m_storage.heap = nullptr;
 						break;
 					}
 					case IMPL_DESTROY:
 					{
-						delete static_cast<T*>( self->m_storage.heap );
+						delete static_cast<T*>(self->m_storage.heap);
 						self->m_storage.heap = nullptr;
 						break;
 					}
@@ -70,63 +70,63 @@ namespace ctp
 			}
 
 			template<class U>
-			static void Create( StorageUnion *storage, U && object )
+			static void Create(StorageUnion *storage, U && object)
 			{
-				storage->heap = new T( std::forward<U>( object ) );
+				storage->heap = new T(std::forward<U>(object));
 			}
 
 			template<class... Args>
-			static void Create( StorageUnion *storage, Args &&... args )
+			static void Create(StorageUnion *storage, Args &&... args)
 			{
-				storage->heap = new T( std::forward<Args>( args )... );
+				storage->heap = new T(std::forward<Args>(args)...);
 			}
 		};
 
 		template<class T>
 		struct StackImpl
 		{
-			static void Function( EventWrapper *self, EImplOperation operation, void *arg ) noexcept
+			static void Function(EventWrapper *self, EImplOperation operation, void *arg) noexcept
 			{
-				switch ( operation )
+				switch (operation)
 				{
 					case IMPL_ID:
 					{
-						int *pID = static_cast<int*>( arg );
+						int *pID = static_cast<int*>(arg);
 						(*pID) = T::ID;
 						break;
 					}
 					case IMPL_GET:
 					{
-						T **pObjectPtr = static_cast<T**>( arg );
-						(*pObjectPtr) = reinterpret_cast<T*>( &self->m_storage.stack );
+						T **pObjectPtr = static_cast<T**>(arg);
+						(*pObjectPtr) = reinterpret_cast<T*>(&self->m_storage.stack);
 						break;
 					}
 					case IMPL_MOVE:
 					{
-						StorageUnion *pStorage = static_cast<StorageUnion*>( arg );
-						T & object = reinterpret_cast<T&>( self->m_storage.stack );
-						new (&pStorage->stack) T( std::move( object ) );
-						reinterpret_cast<T*>( &self->m_storage.stack )->~T();
+						StorageUnion *pStorage = static_cast<StorageUnion*>(arg);
+						T & object = reinterpret_cast<T&>(self->m_storage.stack);
+						new (&pStorage->stack) T(std::move(object));
+						reinterpret_cast<T*>(&self->m_storage.stack)->~T();
 						break;
 					}
 					case IMPL_DESTROY:
 					{
-						reinterpret_cast<T*>( &self->m_storage.stack )->~T();
+						reinterpret_cast<T*>(&self->m_storage.stack)->~T();
 						break;
 					}
 				}
 			}
 
 			template<class U>
-			static void Create( StorageUnion *pStorage, U && object )
+			static void Create(StorageUnion *pStorage, U && object)
 			{
-				new (&pStorage->stack) T( std::forward<U>( object ) );
+				new (&pStorage->stack) T(std::forward<U>(object));
 			}
 
 			template<class... Args>
-			static void Create( StorageUnion *pStorage, Args &&... args )
+			static void Create(StorageUnion *pStorage, Args &&... args)
 			{
-				new (&pStorage->stack) T( std::forward<Args>( args )... );
+				new (&pStorage->stack) T(std::forward<Args>(args)...);
 			}
 		};
 
@@ -138,24 +138,24 @@ namespace ctp
 		using Impl = std::conditional_t<UseStackStorage<T>::value, StackImpl<T>, HeapImpl<T>>;
 
 		template<class T>
-		static ImplFunction CreateImpl( StorageUnion *pStorage, T && object )
+		static ImplFunction CreateImpl(StorageUnion *pStorage, T && object)
 		{
 			using ObjType = std::decay_t<T>;
 
-			static_assert( std::is_move_constructible<ObjType>::value, "The type must be MoveConstructible" );
+			static_assert(std::is_move_constructible<ObjType>::value, "The type must be MoveConstructible");
 
-			Impl<ObjType>::Create( pStorage, std::forward<T>( object ) );
+			Impl<ObjType>::Create(pStorage, std::forward<T>(object));
 			return Impl<ObjType>::Function;
 		}
 
 		template<class T, class... Args>
-		static ImplFunction CreateImpl( StorageUnion *pStorage, Args &&... args )
+		static ImplFunction CreateImpl(StorageUnion *pStorage, Args &&... args)
 		{
 			using ObjType = std::decay_t<T>;
 
-			static_assert( std::is_move_constructible<ObjType>::value, "The type must be MoveConstructible" );
+			static_assert(std::is_move_constructible<ObjType>::value, "The type must be MoveConstructible");
 
-			Impl<ObjType>::Create( pStorage, std::forward<Args>( args )... );
+			Impl<ObjType>::Create(pStorage, std::forward<Args>(args)...);
 			return Impl<ObjType>::Function;
 		}
 
@@ -169,39 +169,39 @@ namespace ctp
 		}
 
 		template<class T>
-		explicit EventWrapper( T && object )
+		explicit EventWrapper(T && object)
 		{
-			m_implFunction = CreateImpl<T>( &m_storage, std::forward<T>( object ) );
+			m_implFunction = CreateImpl<T>(&m_storage, std::forward<T>(object));
 		}
 
 		// no copy
-		EventWrapper( const EventWrapper& ) = delete;
-		EventWrapper & operator=( const EventWrapper& ) = delete;
+		EventWrapper(const EventWrapper&) = delete;
+		EventWrapper & operator=(const EventWrapper&) = delete;
 
-		EventWrapper( EventWrapper && other ) noexcept
+		EventWrapper(EventWrapper && other) noexcept
 		{
-			if ( other.empty() )
+			if (other.empty())
 			{
 				m_implFunction = nullptr;
 			}
 			else
 			{
-				other.m_implFunction( &other, IMPL_MOVE, &m_storage );
+				other.m_implFunction(&other, IMPL_MOVE, &m_storage);
 				m_implFunction = other.m_implFunction;
 				other.m_implFunction = nullptr;
 			}
 		}
 
-		EventWrapper & operator=( EventWrapper && other ) noexcept
+		EventWrapper & operator=(EventWrapper && other) noexcept
 		{
-			if ( other.empty() )
+			if (other.empty())
 			{
 				reset();
 			}
-			else if ( this != &other )
+			else if (this != &other)
 			{
 				reset();
-				other.m_implFunction( &other, IMPL_MOVE, &m_storage );
+				other.m_implFunction(&other, IMPL_MOVE, &m_storage);
 				m_implFunction = other.m_implFunction;
 				other.m_implFunction = nullptr;
 			}
@@ -220,14 +220,14 @@ namespace ctp
 
 		int getEventID() const noexcept
 		{
-			if ( empty() )
+			if (empty())
 			{
 				return -1;
 			}
 			else
 			{
 				int id;
-				m_implFunction( const_cast<EventWrapper*>( this ), IMPL_ID, &id );
+				m_implFunction(const_cast<EventWrapper*>(this), IMPL_ID, &id);
 				return id;
 			}
 		}
@@ -235,14 +235,14 @@ namespace ctp
 		template<class T>
 		const T *get() const noexcept
 		{
-			if ( empty() || T::ID != getEventID() )
+			if (empty() || T::ID != getEventID())
 			{
 				return nullptr;
 			}
 			else
 			{
 				T *pObject;
-				m_implFunction( const_cast<EventWrapper*>( this ), IMPL_GET, &pObject );
+				m_implFunction(const_cast<EventWrapper*>(this), IMPL_GET, &pObject);
 				return pObject;
 			}
 		}
@@ -250,45 +250,45 @@ namespace ctp
 		template<class T>
 		T *get() noexcept
 		{
-			if ( empty() || T::ID != getEventID() )
+			if (empty() || T::ID != getEventID())
 			{
 				return nullptr;
 			}
 			else
 			{
 				T *pObject;
-				m_implFunction( this, IMPL_GET, &pObject );
+				m_implFunction(this, IMPL_GET, &pObject);
 				return pObject;
 			}
 		}
 
 		template<class T, class... Args>
-		T *emplace( Args &&... args )
+		T *emplace(Args &&... args)
 		{
 			reset();
-			m_implFunction = CreateImpl<T>( &m_storage, std::forward<Args>( args )... );
+			m_implFunction = CreateImpl<T>(&m_storage, std::forward<Args>(args)...);
 
 			T *pObject;
-			m_implFunction( this, IMPL_GET, &pObject );
+			m_implFunction(this, IMPL_GET, &pObject);
 			return pObject;
 		}
 
 		template<class T>
-		T *store( T && object )
+		T *store(T && object)
 		{
 			reset();
-			m_implFunction = CreateImpl<T>( &m_storage, std::forward<T>( object ) );
+			m_implFunction = CreateImpl<T>(&m_storage, std::forward<T>(object));
 
 			T *pObject;
-			m_implFunction( this, IMPL_GET, &pObject );
+			m_implFunction(this, IMPL_GET, &pObject);
 			return pObject;
 		}
 
 		void reset() noexcept
 		{
-			if ( ! empty() )
+			if (!empty())
 			{
-				m_implFunction( this, IMPL_DESTROY, nullptr );
+				m_implFunction(this, IMPL_DESTROY, nullptr);
 				m_implFunction = nullptr;
 			}
 		}

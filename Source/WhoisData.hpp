@@ -29,40 +29,40 @@ namespace ctp
 		std::string m_data;
 
 	public:
-		WhoisData( EType type = UNKNOWN )
+		WhoisData(EType type = UNKNOWN)
 		: m_type(type),
 		  m_hasStatus(false),
 		  m_data()
 		{
 		}
 
-		WhoisData( EType type, std::string && data, bool hasStatus = false )
+		WhoisData(EType type, std::string && data, bool hasStatus = false)
 		: m_type(type),
 		  m_hasStatus(hasStatus),
-		  m_data(std::move( data ))
+		  m_data(std::move(data))
 		{
 		}
 
-		WhoisData( const WhoisData & ) = default;
+		WhoisData(const WhoisData &) = default;
 
-		WhoisData( WhoisData && other )
+		WhoisData(WhoisData && other)
 		: m_type(other.m_type),
 		  m_hasStatus(other.m_hasStatus),
-		  m_data(std::move( other.m_data ))
+		  m_data(std::move(other.m_data))
 		{
 			other.m_type = UNKNOWN;
 			other.m_hasStatus = false;
 		}
 
-		WhoisData & operator=( const WhoisData & ) = default;
+		WhoisData & operator=(const WhoisData &) = default;
 
-		WhoisData & operator=( WhoisData && other )
+		WhoisData & operator=(WhoisData && other)
 		{
-			if ( this != &other )
+			if (this != &other)
 			{
 				m_type = other.m_type;
 				m_hasStatus = other.m_hasStatus;
-				m_data = std::move( other.m_data );
+				m_data = std::move(other.m_data);
 				other.m_type = UNKNOWN;
 				other.m_hasStatus = false;
 			}

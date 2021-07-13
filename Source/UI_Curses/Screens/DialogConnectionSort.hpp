@@ -31,19 +31,19 @@ namespace ctp
 		void applyConfig();
 		void restoreConfig();
 		void draw();
-		void drawEntry( unsigned int index );
+		void drawEntry(unsigned int index);
 		void drawCheckbox();
-		void fillEmpty( int count );
+		void fillEmpty(int count);
 		void fillEmpty();
 
 		void handleResize() override;
-		bool handleKey( int ch ) override;
+		bool handleKey(int ch) override;
 
 	public:
-		DialogConnectionSort( ScreenConnectionList *parent );
+		DialogConnectionSort(ScreenConnectionList *parent);
 
 		void open();
-		void close( bool apply = false );
+		void close(bool apply = false);
 
 		EConnectionSortMode getSortMode() const
 		{

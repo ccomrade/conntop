@@ -12,33 +12,33 @@ namespace ctp
 	{
 		CharBuffer<256> buffer;
 
-		if ( hasDate() )
+		if (hasDate())
 		{
 			// date format
-			buffer.append_f( "%.4d-%.2d-%.2d", m_year, m_month, m_day );
+			buffer.append_f("%.4d-%.2d-%.2d", m_year, m_month, m_day);
 		}
 
-		if ( hasTime() )
+		if (hasTime())
 		{
-			if ( hasDate() )
+			if (hasDate())
 			{
 				// space between date and time
-				buffer.append( ' ' );
+				buffer.append(' ');
 			}
 
 			// time format
-			buffer.append_f( "%.2d:%.2d:%.2d", m_hour, m_minute, m_second );
+			buffer.append_f("%.2d:%.2d:%.2d", m_hour, m_minute, m_second);
 
-			if ( hasMillisecond() )
+			if (hasMillisecond())
 			{
-				buffer.append_f( ".%.3d", m_millisecond );
+				buffer.append_f(".%.3d", m_millisecond);
 			}
 
-			if ( hasTimezone() )
+			if (hasTimezone())
 			{
-				if ( m_timezone.isUTC() )
+				if (m_timezone.isUTC())
 				{
-					buffer.append( 'Z' );
+					buffer.append('Z');
 				}
 				else
 				{
@@ -46,7 +46,7 @@ namespace ctp
 					int tzHour = m_timezone.getHourOffset();
 					int tzMinute = m_timezone.getMinuteOffset();
 
-					buffer.append_f( "%c%.2d%.2d", tzSign, tzHour, tzMinute );
+					buffer.append_f("%c%.2d%.2d", tzSign, tzHour, tzMinute);
 				}
 			}
 		}
@@ -58,15 +58,15 @@ namespace ctp
 	{
 		CharBuffer<32> buffer;
 
-		if ( ! isEmpty() )
+		if (!isEmpty())
 		{
-			if ( hasMilliseconds() )
+			if (hasMilliseconds())
 			{
-				buffer.append_f( "%zd.%.3d", m_seconds, m_milliseconds );
+				buffer.append_f("%zd.%.3d", m_seconds, m_milliseconds);
 			}
 			else
 			{
-				buffer.append_f( "%zd", m_seconds );
+				buffer.append_f("%zd", m_seconds);
 			}
 		}
 

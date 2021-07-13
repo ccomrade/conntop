@@ -33,7 +33,7 @@ namespace ctp
 		"Send speed"
 	};
 
-	DialogConnectionSort::DialogConnectionSort( ScreenConnectionList *parent )
+	DialogConnectionSort::DialogConnectionSort(ScreenConnectionList *parent)
 	: Screen({ 40, SORT_MODE_COUNT + 4 }, { 40, SORT_MODE_COUNT + 4 }, parent),
 	  m_sortMode(EConnectionSortMode::NONE),
 	  m_cursorPos(0),
@@ -45,18 +45,18 @@ namespace ctp
 
 	void DialogConnectionSort::open()
 	{
-		ScreenConnectionList *parent = static_cast<ScreenConnectionList*>( getParentScreen() );
+		ScreenConnectionList *parent = static_cast<ScreenConnectionList*>(getParentScreen());
 
-		parent->pushDialog( this );
+		parent->pushDialog(this);
 	}
 
-	void DialogConnectionSort::close( bool apply )
+	void DialogConnectionSort::close(bool apply)
 	{
-		ScreenConnectionList *parent = static_cast<ScreenConnectionList*>( getParentScreen() );
+		ScreenConnectionList *parent = static_cast<ScreenConnectionList*>(getParentScreen());
 
-		parent->removeDialog( this );
+		parent->removeDialog(this);
 
-		if ( apply )
+		if (apply)
 		{
 			applyConfig();
 			parent->updateSortMode();
@@ -69,13 +69,13 @@ namespace ctp
 
 	void DialogConnectionSort::applyConfig()
 	{
-		m_sortMode = static_cast<EConnectionSortMode>( (m_cursorPos < SORT_MODE_COUNT) ? m_cursorPos : 0 );
+		m_sortMode = static_cast<EConnectionSortMode>((m_cursorPos < SORT_MODE_COUNT) ? m_cursorPos : 0);
 		m_isSortAscending = m_checkBoxState;
 	}
 
 	void DialogConnectionSort::restoreConfig()
 	{
-		m_cursorPos = static_cast<unsigned int>( m_sortMode );
+		m_cursorPos = static_cast<unsigned int>(m_sortMode);
 		m_checkBoxState = m_isSortAscending;
 
 		// restore dialog content
@@ -84,78 +84,78 @@ namespace ctp
 
 	void DialogConnectionSort::draw()
 	{
-		box( getWindow(), 0, 0 );
+		box(getWindow(), 0, 0);
 
-		for ( unsigned int i = 0; i < SORT_MODE_COUNT; i++ )
+		for (unsigned int i = 0; i < SORT_MODE_COUNT; i++)
 		{
-			drawEntry( i );
+			drawEntry(i);
 		}
 
 		drawCheckbox();
 	}
 
-	void DialogConnectionSort::drawEntry( unsigned int index )
+	void DialogConnectionSort::drawEntry(unsigned int index)
 	{
-		if ( index >= SORT_MODE_COUNT )
+		if (index >= SORT_MODE_COUNT)
 		{
 			drawCheckbox();
 
 			return;
 		}
 
-		const int cursorAttr = gColorSystem->getAttr( ColorSystem::ATTR_SELECTED_ROW );
+		const int cursorAttr = gColorSystem->getAttr(ColorSystem::ATTR_SELECTED_ROW);
 		const bool isCursor = (m_cursorPos == index);
 
-		if ( isCursor )
+		if (isCursor)
 		{
-			enableAttr( cursorAttr );
+			enableAttr(cursorAttr);
 		}
 
-		setPos( 1, index+1 );
-		writeString( SORT_MODE_NAMES[index] );
+		setPos(1, index+1);
+		writeString(SORT_MODE_NAMES[index]);
 
 		fillEmpty();
 
-		if ( isCursor )
+		if (isCursor)
 		{
-			disableAttr( cursorAttr );
+			disableAttr(cursorAttr);
 		}
 	}
 
 	void DialogConnectionSort::drawCheckbox()
 	{
-		const int cursorAttr = gColorSystem->getAttr( ColorSystem::ATTR_SELECTED_ROW );
+		const int cursorAttr = gColorSystem->getAttr(ColorSystem::ATTR_SELECTED_ROW);
 		const bool isCursor = (m_cursorPos == SORT_MODE_COUNT);
 
-		if ( isCursor )
+		if (isCursor)
 		{
-			enableAttr( cursorAttr );
+			enableAttr(cursorAttr);
 		}
 
-		setPos( 1, SORT_MODE_COUNT+2 );
-		writeString( m_checkBoxState ? "[x] - " : "[ ] - " );
-		writeString( "Ascending sort" );
+		setPos(1, SORT_MODE_COUNT+2);
+		writeString(m_checkBoxState ? "[x] - " : "[ ] - ");
+		writeString("Ascending sort");
 
 		fillEmpty();
 
-		if ( isCursor )
+		if (isCursor)
 		{
-			disableAttr( cursorAttr );
+			disableAttr(cursorAttr);
 		}
 	}
 
-	void DialogConnectionSort::fillEmpty( int count )
+	void DialogConnectionSort::fillEmpty(int count)
 	{
-		while ( count > 0 )
+		while (count > 0)
 		{
-			writeChar( ' ' );
+			writeChar(' ');
 			count--;
 		}
 	}
 
 	void DialogConnectionSort::fillEmpty()
 	{
-		fillEmpty( getWidth() - getPos().x - 1 );  // window box
+		fillEmpty(getWidth() - getPos().x - 1);  // window box
 	}
 
 	void DialogConnectionSort::handleResize()
@@ -163,9 +163,9 @@ namespace ctp
 		draw();
 	}
 
-	bool DialogConnectionSort::handleKey( int ch )
+	bool DialogConnectionSort::handleKey(int ch)
 	{
-		switch ( ch )
+		switch (ch)
 		{
 			case KEY_LEFT:
 			case KEY_RIGHT:
@@ -178,16 +178,16 @@ namespace ctp
 				const unsigned int maxOffset = m_cursorPos;
 
 				unsigned int offset = (ch == KEY_PPAGE && getHeight() > 1) ? getHeight()-1 : 1;
-				if ( offset > maxOffset )
+				if (offset > maxOffset)
 				{
 					offset = maxOffset;
 				}
 
-				if ( offset > 0 )
+				if (offset > 0)
 				{
 					m_cursorPos -= offset;
-					drawEntry( m_cursorPos + offset );
-					drawEntry( m_cursorPos );
+					drawEntry(m_cursorPos + offset);
+					drawEntry(m_cursorPos);
 				}
 
 				return true;
@@ -198,25 +198,25 @@ namespace ctp
 				const unsigned int maxOffset = SORT_MODE_COUNT - m_cursorPos;
 
 				unsigned int offset = (ch == KEY_NPAGE && getHeight() > 1) ? getHeight()-1 : 1;
-				if ( offset > maxOffset )
+				if (offset > maxOffset)
 				{
 					offset = maxOffset;
 				}
 
-				if ( offset > 0 )
+				if (offset > 0)
 				{
 					m_cursorPos += offset;
-					drawEntry( m_cursorPos - offset );
-					drawEntry( m_cursorPos );
+					drawEntry(m_cursorPos - offset);
+					drawEntry(m_cursorPos);
 				}
 
 				return true;
 			}
 			case ' ':  // spacebar
 			{
-				if ( m_cursorPos == SORT_MODE_COUNT )
+				if (m_cursorPos == SORT_MODE_COUNT)
 				{
-					m_checkBoxState = ! m_checkBoxState;
+					m_checkBoxState = !m_checkBoxState;
 					drawCheckbox();
 				}
 
@@ -224,9 +224,9 @@ namespace ctp
 			}
 			case '\015':  // ENTER key
 			{
-				if ( m_cursorPos < SORT_MODE_COUNT )
+				if (m_cursorPos < SORT_MODE_COUNT)
 				{
-					close( true );
+					close(true);
 				}
 
 				return true;

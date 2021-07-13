@@ -18,11 +18,11 @@ namespace ctp
 
 		virtual KString getName() const = 0;
 
-		virtual void init( IConnectionUpdateCallback *callback ) = 0;
+		virtual void init(IConnectionUpdateCallback *callback) = 0;
 
 		virtual void onUpdate() = 0;
 
 		virtual bool isPaused() const = 0;
-		virtual void setPaused( bool paused ) = 0;
+		virtual void setPaused(bool paused) = 0;
 	};
 }

@@ -22,7 +22,7 @@ namespace ctp
 		int m_status;
 
 	public:
-		GenericGetAddrInfo( const char *node, const char *service, int family, int type = SOCK_STREAM, int protocol = 0 )
+		GenericGetAddrInfo(const char *node, const char *service, int family, int type = SOCK_STREAM, int protocol = 0)
 		: m_pAddrInfo(nullptr),
 		  m_pCurrentInfo(nullptr),
 		  m_status()
@@ -33,9 +33,9 @@ namespace ctp
 			hints.ai_socktype = type;
 			hints.ai_protocol = protocol;
 
-			m_status = getaddrinfo( node, service, &hints, &m_pAddrInfo );
+			m_status = getaddrinfo(node, service, &hints, &m_pAddrInfo);
 
-			if ( m_status == 0 )
+			if (m_status == 0)
 			{
 				m_pCurrentInfo = m_pAddrInfo;
 			}
@@ -43,9 +43,9 @@ namespace ctp
 
 		~GenericGetAddrInfo()
 		{
-			if ( m_pAddrInfo )
+			if (m_pAddrInfo)
 			{
-				freeaddrinfo( m_pAddrInfo );
+				freeaddrinfo(m_pAddrInfo);
 			}
 		}
 
@@ -71,7 +71,7 @@ namespace ctp
 
 		void next()
 		{
-			if ( m_pCurrentInfo )
+			if (m_pCurrentInfo)
 			{
 				m_pCurrentInfo = m_pCurrentInfo->ai_next;
 			}
@@ -84,7 +84,7 @@ namespace ctp
 
 		std::string getErrorString() const
 		{
-			return (m_status == EAI_SYSTEM) ? Util::ErrnoToString() : gai_strerror( m_status );
+			return (m_status == EAI_SYSTEM) ? Util::ErrnoToString() : gai_strerror(m_status);
 		}
 	};
 

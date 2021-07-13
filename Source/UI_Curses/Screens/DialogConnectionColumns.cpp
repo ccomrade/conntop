@@ -11,9 +11,9 @@
 
 namespace ctp
 {
-	unsigned int ConnectionColumn::GetDefaultWidth( EType column )
+	unsigned int ConnectionColumn::GetDefaultWidth(EType column)
 	{
-		switch ( column )
+		switch (column)
 		{
 			case PROTO:            return  6;  // "tcp6"
 			case PROTO_STATE:      return 12;  // "ESTABLISHED"
@@ -41,9 +41,9 @@ namespace ctp
 		return 0;
 	}
 
-	KString ConnectionColumn::GetLabel( EType column )
+	KString ConnectionColumn::GetLabel(EType column)
 	{
-		switch ( column )
+		switch (column)
 		{
 			case PROTO:
 			{
@@ -89,9 +89,9 @@ namespace ctp
 		return KString();
 	}
 
-	KString ConnectionColumn::GetName( EType column )
+	KString ConnectionColumn::GetName(EType column)
 	{
-		switch ( column )
+		switch (column)
 		{
 			case PROTO:            return "Connection protocol";
 			case PROTO_STATE:      return "Connection protocol state";
@@ -119,7 +119,7 @@ namespace ctp
 		return "?";
 	}
 
-	DialogConnectionColumns::DialogConnectionColumns( ScreenConnectionList *parent )
+	DialogConnectionColumns::DialogConnectionColumns(ScreenConnectionList *parent)
 	: Screen({ 50, ConnectionColumn::COLUMN_COUNT + 2 }, { 50, ConnectionColumn::COLUMN_COUNT + 2 }, parent),
 	  m_columns(),
 	  m_columnConfig{{  // default column configuration
@@ -152,18 +152,18 @@ namespace ctp
 
 	void DialogConnectionColumns::open()
 	{
-		ScreenConnectionList *parent = static_cast<ScreenConnectionList*>( getParentScreen() );
+		ScreenConnectionList *parent = static_cast<ScreenConnectionList*>(getParentScreen());
 
-		parent->pushDialog( this );
+		parent->pushDialog(this);
 	}
 
-	void DialogConnectionColumns::close( bool apply )
+	void DialogConnectionColumns::close(bool apply)
 	{
-		ScreenConnectionList *parent = static_cast<ScreenConnectionList*>( getParentScreen() );
+		ScreenConnectionList *parent = static_cast<ScreenConnectionList*>(getParentScreen());
 
-		parent->removeDialog( this );
+		parent->removeDialog(this);
 
-		if ( apply )
+		if (apply)
 		{
 			applyConfig();
 			parent->updateColumns();
@@ -181,22 +181,22 @@ namespace ctp
 		bool hasLabelDown = false;
 		bool hasLabelUp = false;
 
-		for ( ColumnConfig & config : m_columnConfig )
+		for (ColumnConfig & config : m_columnConfig)
 		{
-			if ( ! config.isEnabled() )
+			if (!config.isEnabled())
 			{
 				continue;
 			}
 
 			bool enableLabel = true;
 
-			switch ( config.getType() )
+			switch (config.getType())
 			{
 				case ConnectionColumn::RX_PACKETS:
 				case ConnectionColumn::RX_BYTES:
 				case ConnectionColumn::RX_SPEED:
 				{
-					if ( ! hasLabelDown )
+					if (!hasLabelDown)
 					{
 						hasLabelDown = true;
 					}
@@ -210,7 +210,7 @@ namespace ctp
 				case ConnectionColumn::TX_BYTES:
 				case ConnectionColumn::TX_SPEED:
 				{
-					if ( ! hasLabelUp )
+					if (!hasLabelUp)
 					{
 						hasLabelUp = true;
 					}
@@ -226,7 +226,7 @@ namespace ctp
 				}
 			}
 
-			m_columns.emplace_back( config.getType(), config.getWidth(), enableLabel );
+			m_columns.emplace_back(config.getType(), config.getWidth(), enableLabel);
 		}
 
 		m_columnConfigOld = m_columnConfig;
@@ -242,52 +242,52 @@ namespace ctp
 
 	void DialogConnectionColumns::draw()
 	{
-		box( getWindow(), 0, 0 );
+		box(getWindow(), 0, 0);
 
-		for ( unsigned int i = 0; i < m_columnConfig.size(); i++ )
+		for (unsigned int i = 0; i < m_columnConfig.size(); i++)
 		{
-			drawEntry( i );
+			drawEntry(i);
 		}
 	}
 
-	void DialogConnectionColumns::drawEntry( unsigned int index )
+	void DialogConnectionColumns::drawEntry(unsigned int index)
 	{
 		const ColumnConfig & config = m_columnConfig[index];
-		const int cursorAttr = gColorSystem->getAttr( ColorSystem::ATTR_SELECTED_ROW );
+		const int cursorAttr = gColorSystem->getAttr(ColorSystem::ATTR_SELECTED_ROW);
 		const bool isCursor = (m_cursorPos == index);
 
-		setPos( 1, index+1 );
+		setPos(1, index+1);
 
-		if ( isCursor )
+		if (isCursor)
 		{
-			enableAttr( cursorAttr );
+			enableAttr(cursorAttr);
 		}
 
-		writeString( config.isEnabled() ? " [x] - " : " [ ] - " );
-		writeString( config.getName() );
-		writeString( " - " );
-		writeString( std::to_string( config.getWidth() ) );
+		writeString(config.isEnabled() ? " [x] - " : " [ ] - ");
+		writeString(config.getName());
+		writeString(" - ");
+		writeString(std::to_string(config.getWidth()));
 
 		fillEmpty();
 
-		if ( isCursor )
+		if (isCursor)
 		{
-			disableAttr( cursorAttr );
+			disableAttr(cursorAttr);
 		}
 	}
 
-	void DialogConnectionColumns::fillEmpty( int count )
+	void DialogConnectionColumns::fillEmpty(int count)
 	{
-		while ( count > 0 )
+		while (count > 0)
 		{
-			writeChar( ' ' );
+			writeChar(' ');
 			count--;
 		}
 	}
 
 	void DialogConnectionColumns::fillEmpty()
 	{
-		fillEmpty( getWidth() - getPos().x - 1 );  // window box
+		fillEmpty(getWidth() - getPos().x - 1);  // window box
 	}
 
 	void DialogConnectionColumns::handleResize()
@@ -295,9 +295,9 @@ namespace ctp
 		draw();
 	}
 
-	bool DialogConnectionColumns::handleKey( int ch )
+	bool DialogConnectionColumns::handleKey(int ch)
 	{
-		switch ( ch )
+		switch (ch)
 		{
 			case KEY_UP:
 			case KEY_PPAGE:
@@ -305,16 +305,16 @@ namespace ctp
 				const unsigned int maxOffset = m_cursorPos;
 
 				unsigned int offset = (ch == KEY_PPAGE && getHeight() > 1) ? getHeight()-1 : 1;
-				if ( offset > maxOffset )
+				if (offset > maxOffset)
 				{
 					offset = maxOffset;
 				}
 
-				if ( offset > 0 )
+				if (offset > 0)
 				{
 					m_cursorPos -= offset;
-					drawEntry( m_cursorPos + offset );
-					drawEntry( m_cursorPos );
+					drawEntry(m_cursorPos + offset);
+					drawEntry(m_cursorPos);
 				}
 
 				return true;
@@ -325,16 +325,16 @@ namespace ctp
 				const unsigned int maxOffset = m_columnConfig.size() - m_cursorPos - 1;
 
 				unsigned int offset = (ch == KEY_NPAGE && getHeight() > 1) ? getHeight()-1 : 1;
-				if ( offset > maxOffset )
+				if (offset > maxOffset)
 				{
 					offset = maxOffset;
 				}
 
-				if ( offset > 0 )
+				if (offset > 0)
 				{
 					m_cursorPos += offset;
-					drawEntry( m_cursorPos - offset );
-					drawEntry( m_cursorPos );
+					drawEntry(m_cursorPos - offset);
+					drawEntry(m_cursorPos);
 				}
 
 				return true;
@@ -343,10 +343,10 @@ namespace ctp
 			{
 				ColumnConfig & config = m_columnConfig[m_cursorPos];
 
-				if ( config.getWidth() > 2 )
+				if (config.getWidth() > 2)
 				{
-					config.setWidth( config.getWidth() - 1 );
-					drawEntry( m_cursorPos );
+					config.setWidth(config.getWidth() - 1);
+					drawEntry(m_cursorPos);
 				}
 
 				return true;
@@ -355,10 +355,10 @@ namespace ctp
 			{
 				ColumnConfig & config = m_columnConfig[m_cursorPos];
 
-				if ( config.getWidth() < 99 )
+				if (config.getWidth() < 99)
 				{
-					config.setWidth( config.getWidth() + 1 );
-					drawEntry( m_cursorPos );
+					config.setWidth(config.getWidth() + 1);
+					drawEntry(m_cursorPos);
 				}
 
 				return true;
@@ -367,8 +367,8 @@ namespace ctp
 			{
 				ColumnConfig & config = m_columnConfig[m_cursorPos];
 
-				config.setEnabled( ! config.isEnabled() );
-				drawEntry( m_cursorPos );
+				config.setEnabled(!config.isEnabled());
+				drawEntry(m_cursorPos);
 
 				return true;
 			}
@@ -377,7 +377,7 @@ namespace ctp
 			{
 				const bool apply = (ch == '\015');
 
-				close( apply );
+				close(apply);
 
 				return true;
 			}

@@ -46,10 +46,10 @@ namespace ctp
 		class Impl;
 		std::unique_ptr<Impl> m_impl;
 
-		static AddressPack PlatformResolveHostname( const KString & hostname );
-		static PortPack PlatformResolveService( const KString & service, EPortType portType );
-		static std::string PlatformResolveAddress( const IAddress & address );
-		static std::string PlatformResolvePort( const Port & port );
+		static AddressPack PlatformResolveHostname(const KString & hostname);
+		static PortPack PlatformResolveService(const KString & service, EPortType portType);
+		static std::string PlatformResolveAddress(const IAddress & address);
+		static std::string PlatformResolvePort(const Port & port);
 
 	public:
 		Resolver();
@@ -58,9 +58,9 @@ namespace ctp
 		bool isAddressHostnameEnabled() const;
 		bool isPortServiceEnabled() const;
 
-		void resolveHostname( std::string hostname, const CallbackHostname & callback, void *param );
-		void resolveService( std::string service, EPortType type, const CallbackService & callback, void *param );
-		void resolveAddress( AddressData & address, const CallbackAddress & callback, void *param );
-		void resolvePort( PortData & port, const CallbackPort & callback, void *param );
+		void resolveHostname(std::string hostname, const CallbackHostname & callback, void *param);
+		void resolveService(std::string service, EPortType type, const CallbackService & callback, void *param);
+		void resolveAddress(AddressData & address, const CallbackAddress & callback, void *param);
+		void resolvePort(PortData & port, const CallbackPort & callback, void *param);
 	};
 }

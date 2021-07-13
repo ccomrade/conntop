@@ -34,9 +34,9 @@ namespace ctp
 		{
 		}
 
-		SocketEndpoint( std::unique_ptr<IAddress> && pAddress, std::unique_ptr<Port> && pPort )
-		: m_pAddress(std::move( pAddress )),
-		  m_pPort(std::move( pPort ))
+		SocketEndpoint(std::unique_ptr<IAddress> && pAddress, std::unique_ptr<Port> && pPort)
+		: m_pAddress(std::move(pAddress)),
+		  m_pPort(std::move(pPort))
 		{
 		}
 
@@ -67,9 +67,9 @@ namespace ctp
 
 		std::string toString() const
 		{
-			if ( hasAddress() && hasPort() )
+			if (hasAddress() && hasPort())
 			{
-				return Util::AddressPortToString( *m_pAddress, *m_pPort );
+				return Util::AddressPortToString(*m_pAddress, *m_pPort);
 			}
 
 			return std::string();
@@ -82,15 +82,15 @@ namespace ctp
 		std::string m_errorString;
 
 	public:
-		SocketException( int errorNumber )
+		SocketException(int errorNumber)
 		: m_errorNumber(errorNumber),
-		  m_errorString(Util::ErrnoToString( errorNumber ))
+		  m_errorString(Util::ErrnoToString(errorNumber))
 		{
 		}
 
-		SocketException( int errorNumber, std::string errorString )
+		SocketException(int errorNumber, std::string errorString)
 		: m_errorNumber(errorNumber),
-		  m_errorString(std::move( errorString ))
+		  m_errorString(std::move(errorString))
 		{
 		}
 
@@ -118,7 +118,7 @@ namespace ctp
 		int m_fd;
 		EStreamSocketType m_type;
 
-		StreamSocket( int fd, EStreamSocketType type )
+		StreamSocket(int fd, EStreamSocketType type)
 		: m_fd(fd),
 		  m_type(type)
 		{
@@ -134,19 +134,19 @@ namespace ctp
 		}
 
 		// no copy
-		StreamSocket( const StreamSocket & ) = delete;
-		StreamSocket & operator=( const StreamSocket & ) = delete;
+		StreamSocket(const StreamSocket &) = delete;
+		StreamSocket & operator=(const StreamSocket &) = delete;
 
-		StreamSocket( StreamSocket && other )
+		StreamSocket(StreamSocket && other)
 		: m_fd(other.m_fd),
 		  m_type(other.m_type)
 		{
 			other.m_fd = -1;
 		}
 
-		StreamSocket & operator=( StreamSocket && other )
+		StreamSocket & operator=(StreamSocket && other)
 		{
-			if ( this != &other )
+			if (this != &other)
 			{
 				close_nothrow();
 				m_fd = other.m_fd;
@@ -166,15 +166,15 @@ namespace ctp
 			return m_fd >= 0;
 		}
 
-		void connect( const IAddress & address, uint16_t port, EStreamSocketType type );
+		void connect(const IAddress & address, uint16_t port, EStreamSocketType type);
 
 		void verifyConnect();
 
 		void close();
 		bool close_nothrow();
 
-		size_t send( const char *data, size_t dataLength );
-		size_t receive( char *buffer, size_t bufferSize );
+		size_t send(const char *data, size_t dataLength);
+		size_t receive(char *buffer, size_t bufferSize);
 
 		int getType() const;
 		KString getTypeName() const;
@@ -206,19 +206,19 @@ namespace ctp
 		}
 
 		// no copy
-		StreamServerSocket( const StreamServerSocket & ) = delete;
-		StreamServerSocket & operator=( const StreamServerSocket & ) = delete;
+		StreamServerSocket(const StreamServerSocket &) = delete;
+		StreamServerSocket & operator=(const StreamServerSocket &) = delete;
 
-		StreamServerSocket( StreamServerSocket && other )
+		StreamServerSocket(StreamServerSocket && other)
 		: m_fd(other.m_fd),
 		  m_type(other.m_type)
 		{
 			other.m_fd = -1;
 		}
 
-		StreamServerSocket & operator=( StreamServerSocket && other )
+		StreamServerSocket & operator=(StreamServerSocket && other)
 		{
-			if ( this != &other )
+			if (this != &other)
 			{
 				close_nothrow();
 				m_fd = other.m_fd;
@@ -238,14 +238,14 @@ namespace ctp
 			return m_fd >= 0;
 		}
 
-		void open( const IAddress & address, uint16_t port, EStreamSocketType type );
-		void open( const IAddress & address, const KString & portString, EStreamSocketType type );
-		void open( const KString & addressString, uint16_t port, EStreamSocketType type );
-		void open( const KString & addressString, const KString & portString, EStreamSocketType type );
-		void openAny( EAddressType addressType, uint16_t port, EStreamSocketType type );
-		void openAny( EAddressType addressType, const KString & portString, EStreamSocketType type );
-		void openLocalhost( EAddressType addressType, uint16_t port, EStreamSocketType type );
-		void openLocalhost( EAddressType addressType, const KString & portString, EStreamSocketType type );
+		void open(const IAddress & address, uint16_t port, EStreamSocketType type);
+		void open(const IAddress & address, const KString & portString, EStreamSocketType type);
+		void open(const KString & addressString, uint16_t port, EStreamSocketType type);
+		void open(const KString & addressString, const KString & portString, EStreamSocketType type);
+		void openAny(EAddressType addressType, uint16_t port, EStreamSocketType type);
+		void openAny(EAddressType addressType, const KString & portString, EStreamSocketType type);
+		void openLocalhost(EAddressType addressType, uint16_t port, EStreamSocketType type);
+		void openLocalhost(EAddressType addressType, const KString & portString, EStreamSocketType type);
 
 		void close();
 		bool close_nothrow();

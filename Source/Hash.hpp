@@ -17,7 +17,7 @@ namespace ctp
 	 * @param seed Reference to the first hash value. Result is stored there.
 	 * @param hash The second hash value.
 	 */
-	inline void HashCombine( size_t & seed, size_t hash )
+	inline void HashCombine(size_t & seed, size_t hash)
 	{
 	#if SIZE_MAX == UINT32_MAX  // 32-bit size_t
 

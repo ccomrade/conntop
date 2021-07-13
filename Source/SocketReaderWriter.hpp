@@ -24,12 +24,12 @@ namespace ctp
 		Parser m_parser;
 
 	public:
-		StreamSocketReader( StreamSocket & socket, Parser && parser, size_t bufferSize = 4096 )
+		StreamSocketReader(StreamSocket & socket, Parser && parser, size_t bufferSize = 4096)
 		: m_socket(&socket),
-		  m_buffer(std::make_unique<char[]>( bufferSize )),
+		  m_buffer(std::make_unique<char[]>(bufferSize)),
 		  m_bufferPos(0),
 		  m_bufferSize(bufferSize),
-		  m_parser(std::move( parser ))
+		  m_parser(std::move(parser))
 		{
 		}
 
@@ -57,20 +57,20 @@ namespace ctp
 		{
 			char *buffer = m_buffer.get();
 
-			size_t dataLength = m_socket->receive( buffer+m_bufferPos, (m_bufferSize-m_bufferPos)-1 );
-			if ( dataLength == 0 )
+			size_t dataLength = m_socket->receive(buffer+m_bufferPos, (m_bufferSize-m_bufferPos)-1);
+			if (dataLength == 0)
 			{
 				return true;
 			}
 			dataLength += m_bufferPos;
 			buffer[dataLength] = '\0';  // make received data null terminated
 
-			size_t parsedLength = m_parser.parse( buffer, dataLength, m_bufferSize );
-			if ( parsedLength < dataLength )
+			size_t parsedLength = m_parser.parse(buffer, dataLength, m_bufferSize);
+			if (parsedLength < dataLength)
 			{
 				// move the remaining data to the beginning of the buffer
 				size_t chunkLength = dataLength - parsedLength;
-				std::memmove( buffer, buffer+parsedLength, chunkLength );
+				std::memmove(buffer, buffer+parsedLength, chunkLength);
 				m_bufferPos = chunkLength;
 			}
 			else
@@ -99,7 +99,7 @@ namespace ctp
 		T m_msg;
 
 	public:
-		StreamSocketWriter( StreamSocket & socket )
+		StreamSocketWriter(StreamSocket & socket)
 		: m_socket(&socket),
 		  m_msgType(EMessageType::NONE),
 		  m_buffer(),
@@ -117,7 +117,7 @@ namespace ctp
 
 		bool stop()
 		{
-			switch ( m_msgType )
+			switch (m_msgType)
 			{
 				case EMessageType::NONE:
 				{
@@ -125,7 +125,7 @@ namespace ctp
 				}
 				case EMessageType::OWN:
 				{
-					if ( m_dataPos != 0 )
+					if (m_dataPos != 0)
 					{
 						return false;
 					}
@@ -138,9 +138,9 @@ namespace ctp
 				}
 				case EMessageType::SHARED:
 				{
-					if ( m_dataPos != 0 )
+					if (m_dataPos != 0)
 					{
-						m_buffer.assign( m_data+m_dataPos, m_dataLength-m_dataPos );
+						m_buffer.assign(m_data+m_dataPos, m_dataLength-m_dataPos);
 						m_data = m_buffer.c_str();
 						m_dataLength = m_buffer.length();
 						m_dataPos = 0;
@@ -163,14 +163,14 @@ namespace ctp
 			return true;
 		}
 
-		bool send( T && msg )
+		bool send(T && msg)
 		{
-			if ( isSending() )
+			if (isSending())
 			{
 				return false;
 			}
 
-			m_msg = std::move( msg );
+			m_msg = std::move(msg);
 			m_data = m_msg.c_str();
 			m_dataLength = m_msg.length();
 			m_dataPos = 0;
@@ -179,9 +179,9 @@ namespace ctp
 			return true;
 		}
 
-		bool sendShared( const T & msg )
+		bool sendShared(const T & msg)
 		{
-			if ( isSending() )
+			if (isSending())
 			{
 				return false;
 			}
@@ -196,21 +196,21 @@ namespace ctp
 
 		bool doSend()
 		{
-			if ( ! isSending() )
+			if (!isSending())
 			{
 				return true;
 			}
 
-			size_t length = m_socket->send( m_data+m_dataPos, m_dataLength-m_dataPos );
+			size_t length = m_socket->send(m_data+m_dataPos, m_dataLength-m_dataPos);
 
 			m_dataPos += length;
-			if ( m_dataPos >= m_dataLength )
+			if (m_dataPos >= m_dataLength)
 			{
-				if ( m_msgType == EMessageType::OWN )
+				if (m_msgType == EMessageType::OWN)
 				{
 					m_msg.clear();
 				}
-				else if ( m_msgType == EMessageType::BUFFERED )
+				else if (m_msgType == EMessageType::BUFFERED)
 				{
 					m_buffer.clear();
 				}

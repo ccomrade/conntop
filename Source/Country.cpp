@@ -7,15 +7,15 @@
 
 namespace ctp
 {
-	Country Country::ParseCodeString( const KString & code )
+	Country Country::ParseCodeString(const KString & code)
 	{
-		if ( code.length() == 2 && code != "ZZ" )
+		if (code.length() == 2 && code != "ZZ")
 		{
-			for ( unsigned int i = 1; i < COUNTRY_TABLE_SIZE; i++ )  // skip zero index (unknown country)
+			for (unsigned int i = 1; i < COUNTRY_TABLE_SIZE; i++)  // skip zero index (unknown country)
 			{
-				if ( code == COUNTRY_TABLE[i][0] )
+				if (code == COUNTRY_TABLE[i][0])
 				{
-					return Country( static_cast<ECode>( ZZ + i ) );
+					return Country(static_cast<ECode>(ZZ + i));
 				}
 			}
 		}

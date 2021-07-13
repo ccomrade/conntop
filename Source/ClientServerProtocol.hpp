@@ -77,8 +77,8 @@ namespace ctp
 		std::string m_msg;
 		MsgEnum m_type;
 
-		SerializedMessage( std::string && msg, MsgEnum type )
-		: m_msg(std::move( msg )),
+		SerializedMessage(std::string && msg, MsgEnum type)
+		: m_msg(std::move(msg)),
 		  m_type(type)
 		{
 		}
@@ -141,26 +141,26 @@ namespace ctp
 	public:
 		ClientServerProtocol();
 
-		KString getClientMsgName( EClientMsg msg ) const;
-		KString getServerMsgName( EServerMsg msg ) const;
-		KString getDisconnectReasonName( EDisconnectReason reason ) const;
+		KString getClientMsgName(EClientMsg msg) const;
+		KString getServerMsgName(EServerMsg msg) const;
+		KString getDisconnectReasonName(EDisconnectReason reason) const;
 
-		EClientMsg getClientMsgEnum( const KString & msg ) const;
-		EServerMsg getServerMsgEnum( const KString & msg ) const;
-		EDisconnectReason getDisconnectReasonEnum( const KString & reason ) const;
+		EClientMsg getClientMsgEnum(const KString & msg) const;
+		EServerMsg getServerMsgEnum(const KString & msg) const;
+		EDisconnectReason getDisconnectReasonEnum(const KString & reason) const;
 
 		SerializedClientMessage createClientMsg_HELLO() const;
-		SerializedClientMessage createClientMsg_DISCONNECT( EDisconnectReason reason ) const;
-		SerializedClientMessage createClientMsg_REQUEST_DATA( int dataFlags, int dataUpdateFlags ) const;
+		SerializedClientMessage createClientMsg_DISCONNECT(EDisconnectReason reason) const;
+		SerializedClientMessage createClientMsg_REQUEST_DATA(int dataFlags, int dataUpdateFlags) const;
 
 		SerializedServerMessage createServerMsg_BANNER() const;
 		SerializedServerMessage createServerMsg_HELLO() const;
-		SerializedServerMessage createServerMsg_DISCONNECT( EDisconnectReason reason ) const;
-		SerializedServerMessage createServerMsg_UPDATE_TICK( uint32_t timestamp ) const;
-		SerializedServerMessage createServerMsg_DATA_STATUS( int dataFlags, int dataUpdateFlags ) const;
-		SerializedServerMessage createServerMsg_DATA( int type, bool isUpdate, rapidjson::Document && data ) const;
+		SerializedServerMessage createServerMsg_DISCONNECT(EDisconnectReason reason) const;
+		SerializedServerMessage createServerMsg_UPDATE_TICK(uint32_t timestamp) const;
+		SerializedServerMessage createServerMsg_DATA_STATUS(int dataFlags, int dataUpdateFlags) const;
+		SerializedServerMessage createServerMsg_DATA(int type, bool isUpdate, rapidjson::Document && data) const;
 
-		static KString SessionStateToString( ESessionState state );
+		static KString SessionStateToString(ESessionState state);
 	};
 
 	class MessageParserException : public std::exception
@@ -183,22 +183,22 @@ namespace ctp
 		int m_errorCode;
 		std::string m_what;
 
-		static KString InternalErrorToString( EInternalError error );
+		static KString InternalErrorToString(EInternalError error);
 
 	public:
-		MessageParserException( rapidjson::ParseErrorCode errorCode )
+		MessageParserException(rapidjson::ParseErrorCode errorCode)
 		: m_type(JSON_PARSE_ERROR),
 		  m_errorCode(errorCode)
 		{
 			m_what = "JSON parse error: ";
-			m_what += rapidjson::GetParseError_En( errorCode );
+			m_what += rapidjson::GetParseError_En(errorCode);
 		}
 
-		MessageParserException( EInternalError error )
+		MessageParserException(EInternalError error)
 		: m_type(INTERNAL_ERROR),
 		  m_errorCode(error)
 		{
-			m_what = InternalErrorToString( error );
+			m_what = InternalErrorToString(error);
 		}
 
 		const char *what() const noexcept override
@@ -241,19 +241,19 @@ namespace ctp
 		rapidjson::Value *get();
 
 		bool Null();
-		bool Bool( bool value );
-		bool Int( int value );
-		bool Uint( unsigned value );
-		bool Int64( int64_t value );
-		bool Uint64( uint64_t value );
-		bool Double( double value );
-		bool RawNumber( const Ch *numberString, rapidjson::SizeType length, bool copy );
-		bool String( const Ch *string, rapidjson::SizeType length, bool copy );
+		bool Bool(bool value);
+		bool Int(int value);
+		bool Uint(unsigned value);
+		bool Int64(int64_t value);
+		bool Uint64(uint64_t value);
+		bool Double(double value);
+		bool RawNumber(const Ch *numberString, rapidjson::SizeType length, bool copy);
+		bool String(const Ch *string, rapidjson::SizeType length, bool copy);
 		bool StartObject();
-		bool Key( const Ch *name, rapidjson::SizeType length, bool copy );
-		bool EndObject( rapidjson::SizeType memberCount );
+		bool Key(const Ch *name, rapidjson::SizeType length, bool copy);
+		bool EndObject(rapidjson::SizeType memberCount);
 		bool StartArray();
-		bool EndArray( rapidjson::SizeType elementCount );
+		bool EndArray(rapidjson::SizeType elementCount);
 	};
 
 	template<class Callback>
@@ -263,28 +263,28 @@ namespace ctp
 		rapidjson::Reader m_reader;
 		Callback *m_callback;
 
-		size_t doParse( rapidjson::StringStream & stream )
+		size_t doParse(rapidjson::StringStream & stream)
 		{
 			constexpr int PARSER_FLAGS = rapidjson::kParseStopWhenDoneFlag | rapidjson::kParseChunkMode;
 
 			size_t parsedLength = stream.Tell();
-			while ( ! m_reader.IterativeParseComplete() )
+			while (!m_reader.IterativeParseComplete())
 			{
-				if ( m_reader.IterativeParseNext<PARSER_FLAGS>( stream, m_handler ) )
+				if (m_reader.IterativeParseNext<PARSER_FLAGS>(stream, m_handler))
 				{
 					parsedLength = stream.Tell();
 				}
 				else
 				{
-					if ( m_reader.HasParseError() )
+					if (m_reader.HasParseError())
 					{
 						rapidjson::ParseErrorCode errorCode = m_reader.GetParseErrorCode();
 						init();
-						throw MessageParserException( errorCode );
+						throw MessageParserException(errorCode);
 					}
 					else
 					{
-						if ( m_reader.IsLastValueInvalid() )
+						if (m_reader.IsLastValueInvalid())
 						{
 							m_handler.popLastValue();
 						}
@@ -294,22 +294,22 @@ namespace ctp
 			}
 
 			rapidjson::Value *pMessage = m_handler.get();
-			if ( pMessage )
+			if (pMessage)
 			{
-				m_callback->onMessage( *pMessage );
+				m_callback->onMessage(*pMessage);
 				init();
 			}
 			else
 			{
 				init();
-				throw MessageParserException( MessageParserException::MSG_DESERIALIZATION_FAILED );
+				throw MessageParserException(MessageParserException::MSG_DESERIALIZATION_FAILED);
 			}
 
 			return parsedLength;
 		}
 
 	public:
-		MessageParser( Callback *callback )
+		MessageParser(Callback *callback)
 		: m_handler(),
 		  m_reader(),
 		  m_callback(callback)
@@ -322,27 +322,27 @@ namespace ctp
 			m_reader.IterativeParseInit();
 		}
 
-		size_t parse( const char *data, size_t length, size_t bufferSize )
+		size_t parse(const char *data, size_t length, size_t bufferSize)
 		{
-			rapidjson::StringStream stream( data );
+			rapidjson::StringStream stream(data);
 
 			size_t parsedLength = 0;
-			while ( stream.Tell() < length )
+			while (stream.Tell() < length)
 			{
-				if ( stream.Peek() == '\0' )
+				if (stream.Peek() == '\0')
 				{
 					stream.Take();
 					parsedLength = stream.Tell();
 					continue;
 				}
 
-				parsedLength = doParse( stream );
+				parsedLength = doParse(stream);
 			}
 
-			if ( parsedLength == 0 && length >= (bufferSize-1) )
+			if (parsedLength == 0 && length >= (bufferSize-1))
 			{
 				init();
-				throw MessageParserException( MessageParserException::MSG_TOKEN_TOO_BIG );
+				throw MessageParserException(MessageParserException::MSG_TOKEN_TOO_BIG);
 			}
 
 			return parsedLength;
@@ -357,19 +357,19 @@ namespace ctp
 
 	struct IClientSessionCallback
 	{
-		virtual void onSessionConnectionEstablished( ClientSession *session ) = 0;
-		virtual void onSessionEstablished( ClientSession *session ) = 0;
-		virtual void onSessionDisconnect( ClientSession *session ) = 0;
-		virtual void onSessionServerTick( ClientSession *session ) = 0;
-		virtual void onSessionDataStatus( ClientSession *session, bool isDifferent ) = 0;
-		virtual void onSessionData( ClientSession *session, int type, bool isUpdate, rapidjson::Value & data ) = 0;
+		virtual void onSessionConnectionEstablished(ClientSession *session) = 0;
+		virtual void onSessionEstablished(ClientSession *session) = 0;
+		virtual void onSessionDisconnect(ClientSession *session) = 0;
+		virtual void onSessionServerTick(ClientSession *session) = 0;
+		virtual void onSessionDataStatus(ClientSession *session, bool isDifferent) = 0;
+		virtual void onSessionData(ClientSession *session, int type, bool isUpdate, rapidjson::Value & data) = 0;
 	};
 
 	struct IServerSessionCallback
 	{
-		virtual void onSessionEstablished( ServerSession *session ) = 0;
-		virtual void onSessionDisconnect( ServerSession *session ) = 0;
-		virtual void onSessionDataRequest( ServerSession *session, int dataFlags, int dataUpdateFlags ) = 0;
+		virtual void onSessionEstablished(ServerSession *session) = 0;
+		virtual void onSessionDisconnect(ServerSession *session) = 0;
+		virtual void onSessionDataRequest(ServerSession *session, int dataFlags, int dataUpdateFlags) = 0;
 	};
 
 	/**
@@ -381,7 +381,7 @@ namespace ctp
 		IClientSessionCallback *m_sessionCallback;
 
 	public:
-		ClientContext( IClientSessionCallback *sessionCallback )
+		ClientContext(IClientSessionCallback *sessionCallback)
 		: m_proto(),
 		  m_sessionCallback(sessionCallback)
 		{
@@ -411,20 +411,20 @@ namespace ctp
 		SerializedServerMessage m_cachedMsgUpdateTick;
 
 	public:
-		ServerContext( IServerSessionCallback *sessionCallback )
+		ServerContext(IServerSessionCallback *sessionCallback)
 		: m_proto(),
 		  m_sessionCallback(sessionCallback),
 		  m_timestamp(0)
 		{
 			m_cachedMsgBanner = m_proto.createServerMsg_BANNER();
 			m_cachedMsgHello = m_proto.createServerMsg_HELLO();
-			m_cachedMsgUpdateTick = m_proto.createServerMsg_UPDATE_TICK( m_timestamp );
+			m_cachedMsgUpdateTick = m_proto.createServerMsg_UPDATE_TICK(m_timestamp);
 		}
 
 		void onUpdate()
 		{
 			m_timestamp++;
-			m_cachedMsgUpdateTick = m_proto.createServerMsg_UPDATE_TICK( m_timestamp );
+			m_cachedMsgUpdateTick = m_proto.createServerMsg_UPDATE_TICK(m_timestamp);
 		}
 
 		const ClientServerProtocol & getProtocol() const
@@ -488,24 +488,24 @@ namespace ctp
 		EDisconnectReason m_disconnectReason;
 		std::string m_disconnectError;
 
-		void sendMessage( SerializedClientMessage && msg );
-		void quickDisconnect( EDisconnectReason reason, const char *error = nullptr );
-		void onMessage( rapidjson::Value & message );  // ServerMessageParser callback
+		void sendMessage(SerializedClientMessage && msg);
+		void quickDisconnect(EDisconnectReason reason, const char *error = nullptr);
+		void onMessage(rapidjson::Value & message);  // ServerMessageParser callback
 
-		static void SocketPollHandler( int flags, void *param );
+		static void SocketPollHandler(int flags, void *param);
 
 		friend ServerMessageParser;  // onMessage function is private
 
 	public:
-		ClientSession( const ClientContext & context );
+		ClientSession(const ClientContext & context);
 
 		// no copy
-		ClientSession( const ClientSession & ) = delete;
-		ClientSession & operator=( const ClientSession & ) = delete;
+		ClientSession(const ClientSession &) = delete;
+		ClientSession & operator=(const ClientSession &) = delete;
 
 		// move allowed
-		ClientSession( ClientSession && ) = default;
-		ClientSession & operator=( ClientSession && ) = default;
+		ClientSession(ClientSession &&) = default;
+		ClientSession & operator=(ClientSession &&) = default;
 
 		~ClientSession();
 
@@ -551,12 +551,12 @@ namespace ctp
 
 		KString getDisconnectReasonName() const
 		{
-			return m_context->getProtocol().getDisconnectReasonName( m_disconnectReason );
+			return m_context->getProtocol().getDisconnectReasonName(m_disconnectReason);
 		}
 
 		bool hasDisconnectError() const
 		{
-			return ! m_disconnectError.empty();
+			return !m_disconnectError.empty();
 		}
 
 		const std::string & getDisconnectErrorString() const
@@ -594,16 +594,16 @@ namespace ctp
 			return m_expectedMsg == EExpectedMsg::SERVER_DATA_STATUS;
 		}
 
-		void setServerHostString( const KString & host )
+		void setServerHostString(const KString & host)
 		{
 			m_serverHost = host;
 		}
 
 		void onUpdate();
 
-		void connect( StreamSocket && socket );
+		void connect(StreamSocket && socket);
 		void disconnect();
-		void requestData( int dataFlags, int dataUpdateFlags );
+		void requestData(int dataFlags, int dataUpdateFlags);
 	};
 
 	class ServerSession
@@ -613,7 +613,7 @@ namespace ctp
 			bool m_isShared;
 
 		public:
-			SendQueueMsgDeleter( bool isShared = false )
+			SendQueueMsgDeleter(bool isShared = false)
 			: m_isShared(isShared)
 			{
 			}
@@ -623,9 +623,9 @@ namespace ctp
 				return m_isShared;
 			}
 
-			void operator()( SerializedServerMessage *pMsg ) const
+			void operator()(SerializedServerMessage *pMsg) const
 			{
-				if ( ! m_isShared )
+				if (!m_isShared)
 				{
 					delete pMsg;
 				}
@@ -649,25 +649,25 @@ namespace ctp
 		EDisconnectReason m_disconnectReason;
 		std::string m_disconnectError;
 
-		void sendMessage( SerializedServerMessage && msg );
-		void sendSharedMessage( const SerializedServerMessage & msg );
-		void quickDisconnect( EDisconnectReason reason, const char *error = nullptr );
-		void onMessage( rapidjson::Value & message );  // ClientMessageParser callback
+		void sendMessage(SerializedServerMessage && msg);
+		void sendSharedMessage(const SerializedServerMessage & msg);
+		void quickDisconnect(EDisconnectReason reason, const char *error = nullptr);
+		void onMessage(rapidjson::Value & message);  // ClientMessageParser callback
 
-		static void SocketPollHandler( int flags, void *param );
+		static void SocketPollHandler(int flags, void *param);
 
 		friend ClientMessageParser;  // onMessage function is private
 
 	public:
-		ServerSession( StreamSocket && socket, const ServerContext & context );
+		ServerSession(StreamSocket && socket, const ServerContext & context);
 
 		// no copy
-		ServerSession( const ServerSession & ) = delete;
-		ServerSession & operator=( const ServerSession & ) = delete;
+		ServerSession(const ServerSession &) = delete;
+		ServerSession & operator=(const ServerSession &) = delete;
 
 		// move allowed
-		ServerSession( ServerSession && ) = default;
-		ServerSession & operator=( ServerSession && ) = default;
+		ServerSession(ServerSession &&) = default;
+		ServerSession & operator=(ServerSession &&) = default;
 
 		~ServerSession();
 
@@ -708,12 +708,12 @@ namespace ctp
 
 		KString getDisconnectReasonName() const
 		{
-			return m_context->getProtocol().getDisconnectReasonName( m_disconnectReason );
+			return m_context->getProtocol().getDisconnectReasonName(m_disconnectReason);
 		}
 
 		bool hasDisconnectError() const
 		{
-			return ! m_disconnectError.empty();
+			return !m_disconnectError.empty();
 		}
 
 		const std::string & getDisconnectErrorString() const
@@ -744,8 +744,8 @@ namespace ctp
 		void onUpdate();
 
 		void disconnect();
-		void sendDataStatus( int dataFlags, int dataUpdateFlags );
-		void sendData( const SerializedServerMessage & dataMsg );
+		void sendDataStatus(int dataFlags, int dataUpdateFlags);
+		void sendData(const SerializedServerMessage & dataMsg);
 		bool stopSendingData();
 	};
 
@@ -761,19 +761,19 @@ namespace ctp
 		}
 
 		template<class... Args>
-		void addItem( const T & item, Args &&... serializeArgs )
+		void addItem(const T & item, Args &&... serializeArgs)
 		{
 			auto & allocator = m_itemArrayDocument.GetAllocator();
-			rapidjson::Document itemDocument( rapidjson::kObjectType, &allocator );
+			rapidjson::Document itemDocument(rapidjson::kObjectType, &allocator);
 
-			item.serialize( itemDocument, std::forward<Args>( serializeArgs )... );
+			item.serialize(itemDocument, std::forward<Args>(serializeArgs)...);
 
-			m_itemArrayDocument.PushBack( itemDocument, allocator );
+			m_itemArrayDocument.PushBack(itemDocument, allocator);
 		}
 
-		SerializedServerMessage buildMessage( const ClientServerProtocol & protocol, int dataType, bool isUpdate )
+		SerializedServerMessage buildMessage(const ClientServerProtocol & protocol, int dataType, bool isUpdate)
 		{
-			auto message = protocol.createServerMsg_DATA( dataType, isUpdate, std::move( m_itemArrayDocument ) );
+			auto message = protocol.createServerMsg_DATA(dataType, isUpdate, std::move(m_itemArrayDocument));
 			m_itemArrayDocument.SetArray();
 			m_itemArrayDocument.GetAllocator().Clear();
 			return message;

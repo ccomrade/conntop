@@ -23,7 +23,7 @@ namespace ctp
 			UI_CURSES_INTERNAL_EVENT
 		};
 
-		KString ToString( int id );
+		KString ToString(int id);
 	}
 
 	struct UpdateEvent

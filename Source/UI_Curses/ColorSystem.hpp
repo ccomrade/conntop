@@ -57,7 +57,7 @@ namespace ctp
 	public:
 		ColorSystem();
 
-		int getAttr( EAttributeType attr ) const
+		int getAttr(EAttributeType attr) const
 		{
 			return ATTRIBUTE_TABLE[attr];
 		}

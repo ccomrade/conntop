@@ -25,7 +25,7 @@ namespace ctp
 		{
 		}
 
-		TimeZone( bool isNegative, uint8_t hourOffset, uint8_t minuteOffset = 0 )
+		TimeZone(bool isNegative, uint8_t hourOffset, uint8_t minuteOffset = 0)
 		: m_isNegative(isNegative),
 		  m_hourOffset(hourOffset),
 		  m_minuteOffset(minuteOffset)
@@ -87,7 +87,7 @@ namespace ctp
 		{
 		}
 
-		DateTime( int32_t y, int16_t mo, int16_t d, int16_t h, int16_t m, int16_t s, int16_t ms )
+		DateTime(int32_t y, int16_t mo, int16_t d, int16_t h, int16_t m, int16_t s, int16_t ms)
 		: m_year(y),
 		  m_month(mo),
 		  m_day(d),
@@ -100,7 +100,7 @@ namespace ctp
 		{
 		}
 
-		DateTime( int32_t y, int16_t mo, int16_t d, int16_t h, int16_t m, int16_t s, int16_t ms, const TimeZone & tz )
+		DateTime(int32_t y, int16_t mo, int16_t d, int16_t h, int16_t m, int16_t s, int16_t ms, const TimeZone & tz)
 		: m_year(y),
 		  m_month(mo),
 		  m_day(d),
@@ -170,7 +170,7 @@ namespace ctp
 
 		bool isEmpty() const
 		{
-			return ! hasDate() && ! hasTime();
+			return !hasDate() && !hasTime();
 		}
 
 		EType getType() const
@@ -227,7 +227,7 @@ namespace ctp
 		int m_milliseconds;  //!< 0..999
 
 	public:
-		UnixTime( int64_t seconds = -1, int milliseconds = -1 )
+		UnixTime(int64_t seconds = -1, int milliseconds = -1)
 		: m_seconds(seconds),
 		  m_milliseconds(milliseconds)
 		{

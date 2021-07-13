@@ -27,7 +27,7 @@ namespace ctp
 		Connection m_connection;
 
 	public:
-		ConntrackEvent( EType type, const Connection & connection )
+		ConntrackEvent(EType type, const Connection & connection)
 		: m_type(type),
 		  m_connection(connection)
 		{
@@ -49,7 +49,7 @@ namespace ctp
 		nfct_handle *m_socket;
 
 	public:
-		ConntrackSocket( unsigned int events = 0 );
+		ConntrackSocket(unsigned int events = 0);
 		~ConntrackSocket();
 
 		nfct_handle *get()
@@ -59,7 +59,7 @@ namespace ctp
 
 		int getFD()
 		{
-			return nfct_fd( m_socket );
+			return nfct_fd(m_socket);
 		}
 	};
 
@@ -73,18 +73,18 @@ namespace ctp
 		bool m_isRefillRequired;
 		bool m_isPaused;
 
-		void handleQuery( nf_conntrack *ct );
-		void handleEvent( nf_conntrack *ct, ConntrackEvent::EType eventType );
+		void handleQuery(nf_conntrack *ct);
+		void handleEvent(nf_conntrack *ct, ConntrackEvent::EType eventType);
 
-		static int QueryCallback( nf_conntrack_msg_type type, nf_conntrack *ct, void *param );
-		static int EventCallback( nf_conntrack_msg_type type, nf_conntrack *ct, void *param );
-		static void EventPollHandler( int flags, void *param );
+		static int QueryCallback(nf_conntrack_msg_type type, nf_conntrack *ct, void *param);
+		static int EventCallback(nf_conntrack_msg_type type, nf_conntrack *ct, void *param);
+		static void EventPollHandler(int flags, void *param);
 
 	public:
 		Conntrack();
 		~Conntrack();
 
-		void init( IConnectionUpdateCallback *callback );
+		void init(IConnectionUpdateCallback *callback);
 
 		void onUpdate();
 
@@ -93,9 +93,9 @@ namespace ctp
 			return m_isPaused;
 		}
 
-		void setPaused( bool paused )
+		void setPaused(bool paused)
 		{
-			if ( m_isPaused != paused )
+			if (m_isPaused != paused)
 			{
 				m_isPaused = paused;
 				m_isRefillRequired = true;

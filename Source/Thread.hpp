@@ -24,9 +24,9 @@ namespace ctp
 		std::string m_name;
 		std::thread m_thread;
 
-		static void Run( std::string threadName, Function threadFunction );
+		static void Run(std::string threadName, Function threadFunction);
 
-		static void PlatformCurrentThreadSetName( const KString & name );
+		static void PlatformCurrentThreadSetName(const KString & name);
 
 	public:
 		Thread()
@@ -35,15 +35,15 @@ namespace ctp
 		{
 		}
 
-		Thread( std::string threadName, const Function & threadFunction );
+		Thread(std::string threadName, const Function & threadFunction);
 
 		// no copy
-		Thread( const Thread & ) = delete;
-		Thread & operator=( const Thread & ) = delete;
+		Thread(const Thread &) = delete;
+		Thread & operator=(const Thread &) = delete;
 
 		// move allowed
-		Thread( Thread && ) = default;
-		Thread & operator=( Thread && ) = default;
+		Thread(Thread &&) = default;
+		Thread & operator=(Thread &&) = default;
 
 		const std::string & getName() const
 		{
@@ -63,6 +63,6 @@ namespace ctp
 		void join();
 
 		static KString GetCurrentThreadName();
-		static void SetCurrentThreadName( std::string name );
+		static void SetCurrentThreadName(std::string name);
 	};
 }

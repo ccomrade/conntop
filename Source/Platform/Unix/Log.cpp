@@ -57,7 +57,7 @@ namespace ctp
 		[Log::DEBUG]   = "\e[0m"
 	};
 
-	Log::Log( EVerbosity verbosity, EColorize colorize, EStyle style )
+	Log::Log(EVerbosity verbosity, EColorize colorize, EStyle style)
 	: m_verbosity(verbosity),
 	  m_colorize(colorize),
 	  m_style(style),
@@ -70,7 +70,7 @@ namespace ctp
 		initColorize();
 	}
 
-	Log::Log( EVerbosity verbosity, EColorize colorize, EStyle style, const KString & fileName, bool clear )
+	Log::Log(EVerbosity verbosity, EColorize colorize, EStyle style, const KString & fileName, bool clear)
 	: m_verbosity(verbosity),
 	  m_colorize(colorize),
 	  m_style(style),
@@ -79,53 +79,53 @@ namespace ctp
 	  m_fd()
 	{
 		int flags = O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC;
-		if ( clear )
+		if (clear)
 		{
 			flags |= O_TRUNC;
 		}
 
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
-		m_fd = open( fileName.c_str(), flags, mode );
-		if ( m_fd < 0 )
+		m_fd = open(fileName.c_str(), flags, mode);
+		if (m_fd < 0)
 		{
 			std::string errMsg = "Unable to open log file '";
 			errMsg += fileName;
 			errMsg += "' for writing: ";
 			errMsg += Util::ErrnoToString();
-			throw Exception( std::move( errMsg ), "Log" );
+			throw Exception(std::move(errMsg), "Log");
 		}
 
-		//logWrite( "--- LOG BEGIN ---\n" );
+		//logWrite("--- LOG BEGIN ---\n");
 
 		initColorize();
 	}
 
 	Log::~Log()
 	{
-		if ( hasFile() )
+		if (hasFile())
 		{
-			//logWrite( "---  LOG END  ---\n" );
-			close( m_fd );
+			//logWrite("---  LOG END  ---\n");
+			close(m_fd);
 		}
 	}
 
-	void Log::logV( EType msgType, const char *format, va_list args )
+	void Log::logV(EType msgType, const char *format, va_list args)
 	{
 		// drop message with invalid type
-		if ( msgType < ALWAYS || msgType > DEBUG )
+		if (msgType < ALWAYS || msgType > DEBUG)
 		{
 			return;
 		}
 
 		// drop message with type above current verbosity level
-		switch ( msgType )
+		switch (msgType)
 		{
 			case ALWAYS:
 			case ERROR:
 			case WARNING:
 			{
-				if ( m_verbosity < VERBOSITY_LOW )
+				if (m_verbosity < VERBOSITY_LOW)
 				{
 					return;
 				}
@@ -133,7 +133,7 @@ namespace ctp
 			}
 			case NOTICE:
 			{
-				if ( m_verbosity < VERBOSITY_NORMAL )
+				if (m_verbosity < VERBOSITY_NORMAL)
 				{
 					return;
 				}
@@ -141,7 +141,7 @@ namespace ctp
 			}
 			case INFO:
 			{
-				if ( m_verbosity < VERBOSITY_HIGH )
+				if (m_verbosity < VERBOSITY_HIGH)
 				{
 					return;
 				}
@@ -149,7 +149,7 @@ namespace ctp
 			}
 			case DEBUG:
 			{
-				if ( m_verbosity < VERBOSITY_DEBUG )
+				if (m_verbosity < VERBOSITY_DEBUG)
 				{
 					return;
 				}
@@ -160,13 +160,13 @@ namespace ctp
 		CharBuffer<2048> msg;
 
 		KString colorSuffix;
-		if ( m_isColorizeEnabled )
+		if (m_isColorizeEnabled)
 		{
 			msg += COLOR_PREFIX_TABLE[msgType];
 			colorSuffix = COLOR_SUFFIX_TABLE[msgType];
 		}
 
-		switch ( m_style )
+		switch (m_style)
 		{
 			case STYLE_SIMPLE:
 			{
@@ -195,7 +195,7 @@ namespace ctp
 			}
 			case STYLE_DATETIME_UTC:
 			{
-				const std::string dateTimeString = gPlatform->getCurrentDateTime( DateTime::UTC ).toString();
+				const std::string dateTimeString = gPlatform->getCurrentDateTime(DateTime::UTC).toString();
 
 				msg += '[';
 				msg += dateTimeString;
@@ -208,7 +208,7 @@ namespace ctp
 			}
 			case STYLE_DATETIME_LOCAL:
 			{
-				const std::string dateTimeString = gPlatform->getCurrentDateTime( DateTime::LOCAL ).toString();
+				const std::string dateTimeString = gPlatform->getCurrentDateTime(DateTime::LOCAL).toString();
 
 				msg += '[';
 				msg += dateTimeString;
@@ -225,9 +225,9 @@ namespace ctp
 		const size_t suffixLength = colorSuffix.length() + 1;  // newline character
 
 		// build message content
-		int status = msg.append_vf( format, args );  // too long message is truncated
+		int status = msg.append_vf(format, args);  // too long message is truncated
 
-		if ( msg.getAvailableLength() < suffixLength )
+		if (msg.getAvailableLength() < suffixLength)
 		{
 			// the log message is too long to fit in the stack buffer :(
 			// so we need to allocate heap buffer of required size and build the message there
@@ -236,27 +236,27 @@ namespace ctp
 			const size_t totalLength = prefixLength + contentLength + suffixLength + 1;  // terminating null byte
 
 			// allocate the heap buffer
-			std::unique_ptr<char[]> bufferGuard = std::make_unique<char[]>( totalLength );
+			std::unique_ptr<char[]> bufferGuard = std::make_unique<char[]>(totalLength);
 
 			char *buffer = bufferGuard.get();
 			size_t pos = 0;
 
 			// copy existing message prefix from the stack buffer
-			std::memcpy( buffer+pos, msg.get().c_str(), prefixLength );
+			std::memcpy(buffer+pos, msg.get().c_str(), prefixLength);
 			pos += prefixLength;
 
 			// build message content
-			status = std::vsnprintf( buffer+pos, contentLength+1, format, args );
-			if ( status > 0 )
+			status = std::vsnprintf(buffer+pos, contentLength+1, format, args);
+			if (status > 0)
 			{
 				const unsigned int length = status;
 				pos += (length > contentLength) ? contentLength : length;
 			}
 
 			// add message suffix
-			if ( ! colorSuffix.empty() )
+			if (!colorSuffix.empty())
 			{
-				std::memcpy( buffer+pos, colorSuffix.c_str(), colorSuffix.length() );
+				std::memcpy(buffer+pos, colorSuffix.c_str(), colorSuffix.length());
 				pos += colorSuffix.length();
 			}
 			buffer[pos] = '\n';
@@ -266,7 +266,7 @@ namespace ctp
 			buffer[pos] = '\0';
 
 			// send message to the log
-			logWrite( KString( buffer, pos ) );
+			logWrite(KString(buffer, pos));
 		}
 		else
 		{
@@ -275,27 +275,27 @@ namespace ctp
 			msg += '\n';
 
 			// send message to the log
-			logWrite( msg.get() );
+			logWrite(msg.get());
 		}
 	}
 
-	void Log::setVerbosity( EVerbosity verbosity )
+	void Log::setVerbosity(EVerbosity verbosity)
 	{
 		m_verbosity = verbosity;
 	}
 
-	void Log::logWrite( const KString & data )
+	void Log::logWrite(const KString & data)
 	{
 		// this should always succeed
-		if ( write( m_fd, data.c_str(), data.length() ) < 0 )  // write syscall
+		if (write(m_fd, data.c_str(), data.length()) < 0)  // write syscall
 		{
-			throw std::system_error( errno, std::system_category(), "Log write failed" );
+			throw std::system_error(errno, std::system_category(), "Log write failed");
 		}
 	}
 
 	void Log::initColorize()
 	{
-		if ( m_colorize == COLORIZE_ALWAYS || (m_colorize == COLORIZE_AUTO && isatty( m_fd ) == 1) )
+		if (m_colorize == COLORIZE_ALWAYS || (m_colorize == COLORIZE_AUTO && isatty(m_fd) == 1))
 		{
 			m_isColorizeEnabled = true;
 		}

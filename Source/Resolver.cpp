@@ -38,14 +38,14 @@ namespace ctp
 		std::unique_ptr<IResolverRequest> m_pRequest;
 
 	public:
-		ResolverEvent( std::unique_ptr<IResolverRequest> && pRequest )
-		: m_pRequest(std::move( pRequest ))
+		ResolverEvent(std::unique_ptr<IResolverRequest> && pRequest)
+		: m_pRequest(std::move(pRequest))
 		{
 		}
 
 		bool isEmpty() const
 		{
-			return ! m_pRequest;
+			return !m_pRequest;
 		}
 
 		const IResolverRequest & getRequest() const
@@ -62,8 +62,8 @@ namespace ctp
 		AddressPack m_addressPack;
 
 	public:
-		HostnameRequest( std::string && hostname, const Resolver::CallbackHostname & callback, void *param )
-		: m_hostname(std::move( hostname )),
+		HostnameRequest(std::string && hostname, const Resolver::CallbackHostname & callback, void *param)
+		: m_hostname(std::move(hostname)),
 		  m_callback(callback),
 		  m_callbackParam(param),
 		  m_addressPack()
@@ -105,8 +105,8 @@ namespace ctp
 		PortPack m_portPack;
 
 	public:
-		ServiceRequest( std::string && service, EPortType type, const Resolver::CallbackService & callback, void *param )
-		: m_service(std::move( service )),
+		ServiceRequest(std::string && service, EPortType type, const Resolver::CallbackService & callback, void *param)
+		: m_service(std::move(service)),
 		  m_portType(type),
 		  m_callback(callback),
 		  m_callbackParam(param),
@@ -153,7 +153,7 @@ namespace ctp
 		ResolvedAddress m_resolvedData;
 
 	public:
-		AddressRequest( AddressData & addressData, const Resolver::CallbackAddress & callback, void *param )
+		AddressRequest(AddressData & addressData, const Resolver::CallbackAddress & callback, void *param)
 		: m_pAddressData(&addressData),
 		  m_callback(callback),
 		  m_callbackParam(param),
@@ -195,7 +195,7 @@ namespace ctp
 		ResolvedPort m_resolvedData;
 
 	public:
-		PortRequest( PortData & portData, const Resolver::CallbackPort & callback, void *param )
+		PortRequest(PortData & portData, const Resolver::CallbackPort & callback, void *param)
 		: m_pPortData(&portData),
 		  m_callback(callback),
 		  m_callbackParam(param),
@@ -239,57 +239,57 @@ namespace ctp
 
 		void resolverLoop()  // executed by resolver thread
 		{
-			while ( m_isRunning )
+			while (m_isRunning)
 			{
 				std::unique_ptr<IResolverRequest> pRequest;
-				m_requestQueue.wait_dequeue( pRequest );
+				m_requestQueue.wait_dequeue(pRequest);
 
-				if ( ! pRequest )
+				if (!pRequest)
 				{
 					continue;
 				}
 
-				switch ( pRequest->getType() )
+				switch (pRequest->getType())
 				{
 					case EResolverRequest::HOSTNAME:
 					{
-						processHostname( static_cast<HostnameRequest&>( *pRequest ) );
+						processHostname(static_cast<HostnameRequest&>(*pRequest));
 						break;
 					}
 					case EResolverRequest::SERVICE:
 					{
-						processService( static_cast<ServiceRequest&>( *pRequest ) );
+						processService(static_cast<ServiceRequest&>(*pRequest));
 						break;
 					}
 					case EResolverRequest::ADDRESS:
 					{
-						processAddress( static_cast<AddressRequest&>( *pRequest ) );
+						processAddress(static_cast<AddressRequest&>(*pRequest));
 						break;
 					}
 					case EResolverRequest::PORT:
 					{
-						processPort( static_cast<PortRequest&>( *pRequest ) );
+						processPort(static_cast<PortRequest&>(*pRequest));
 						break;
 					}
 				}
 
-				gApp->getEventSystem()->dispatch<ResolverEvent>( std::move( pRequest ) );
+				gApp->getEventSystem()->dispatch<ResolverEvent>(std::move(pRequest));
 			}
 		}
 
-		void processHostname( HostnameRequest & request )
+		void processHostname(HostnameRequest & request)
 		{
 			AddressPack & pack = request.getAddressPack();
 
-			pack = Resolver::PlatformResolveHostname( request.getHostname() );
+			pack = Resolver::PlatformResolveHostname(request.getHostname());
 
-			if ( gLog->isMsgEnabled( Log::INFO ) )
+			if (gLog->isMsgEnabled(Log::INFO))
 			{
-				for ( size_t i = 0; i < pack.getSize(); i++ )
+				for (size_t i = 0; i < pack.getSize(); i++)
 				{
 					const IAddress & address = pack[i];
 
-					gLog->info( "[Resolver] Hostname resolved: '%s' --> %s %s",
+					gLog->info("[Resolver] Hostname resolved: '%s' --> %s %s",
 					  request.getHostname().c_str(),
 					  address.getTypeName().c_str(),
 					  address.toString().c_str()
@@ -298,19 +298,19 @@ namespace ctp
 			}
 		}
 
-		void processService( ServiceRequest & request )
+		void processService(ServiceRequest & request)
 		{
 			PortPack & pack = request.getPortPack();
 
-			pack = Resolver::PlatformResolveService( request.getService(), request.getPortType() );
+			pack = Resolver::PlatformResolveService(request.getService(), request.getPortType());
 
-			if ( gLog->isMsgEnabled( Log::INFO ) )
+			if (gLog->isMsgEnabled(Log::INFO))
 			{
-				for ( size_t i = 0; i < pack.getSize(); i++ )
+				for (size_t i = 0; i < pack.getSize(); i++)
 				{
 					const Port & port = pack[i];
 
-					gLog->info( "[Resolver] Service resolved: '%s' --> %s %hu",
+					gLog->info("[Resolver] Service resolved: '%s' --> %s %hu",
 					  request.getService().c_str(),
 					  port.getTypeName().c_str(),
 					  port.getNumber()
@@ -319,25 +319,25 @@ namespace ctp
 			}
 		}
 
-		void processAddress( AddressRequest & request )
+		void processAddress(AddressRequest & request)
 		{
 			const IAddress & address = request.getAddressData().getAddress();
 			ResolvedAddress & resolved = request.getResolvedData();
 
-			if ( m_isAddressHostnameEnabled )
+			if (m_isAddressHostnameEnabled)
 			{
-				resolved.hostname = Resolver::PlatformResolveAddress( address );
+				resolved.hostname = Resolver::PlatformResolveAddress(address);
 			}
 
-			if ( gApp->hasGeoIP() )
+			if (gApp->hasGeoIP())
 			{
-				resolved.country = gApp->getGeoIP()->queryCountry( address );
-				resolved.asn = gApp->getGeoIP()->queryASN( address );
+				resolved.country = gApp->getGeoIP()->queryCountry(address);
+				resolved.asn = gApp->getGeoIP()->queryASN(address);
 			}
 
-			if ( gLog->isMsgEnabled( Log::INFO ) )
+			if (gLog->isMsgEnabled(Log::INFO))
 			{
-				gLog->info( "[Resolver] Address resolved: %s %s --> '%s' | country: %s | %s %s",
+				gLog->info("[Resolver] Address resolved: %s %s --> '%s' | country: %s | %s %s",
 				  address.getTypeName().c_str(),
 				  request.getAddressData().getNumericString().c_str(),
 				  resolved.hostname.c_str(),
@@ -348,19 +348,19 @@ namespace ctp
 			}
 		}
 
-		void processPort( PortRequest & request )
+		void processPort(PortRequest & request)
 		{
 			const Port & port = request.getPortData().getPort();
 			ResolvedPort & resolved = request.getResolvedData();
 
-			if ( m_isPortServiceEnabled )
+			if (m_isPortServiceEnabled)
 			{
-				resolved.service = Resolver::PlatformResolvePort( port );
+				resolved.service = Resolver::PlatformResolvePort(port);
 			}
 
-			if ( ! resolved.service.empty() && gLog->isMsgEnabled( Log::INFO ) )
+			if (!resolved.service.empty() && gLog->isMsgEnabled(Log::INFO))
 			{
-				gLog->info( "[Resolver] Port resolved: %s %hu --> '%s'",
+				gLog->info("[Resolver] Port resolved: %s %hu --> '%s'",
 				  port.getTypeName().c_str(),
 				  port.getNumber(),
 				  resolved.service.c_str()
@@ -376,16 +376,16 @@ namespace ctp
 		  m_isAddressHostnameEnabled(true),
 		  m_isPortServiceEnabled(true)
 		{
-			if ( gCmdLine->hasArg( "no-hostname" ) )
+			if (gCmdLine->hasArg("no-hostname"))
 			{
 				m_isAddressHostnameEnabled = false;
-				gLog->notice( "[Resolver] Address hostname resolving disabled by command line" );
+				gLog->notice("[Resolver] Address hostname resolving disabled by command line");
 			}
 
-			if ( gCmdLine->hasArg( "no-servname" ) )
+			if (gCmdLine->hasArg("no-servname"))
 			{
 				m_isPortServiceEnabled = false;
-				gLog->notice( "[Resolver] Port service name resolving disabled by command line" );
+				gLog->notice("[Resolver] Port service name resolving disabled by command line");
 			}
 
 			m_isRunning = true;
@@ -396,36 +396,36 @@ namespace ctp
 			};
 
 			// start resolver thread
-			m_resolverThread = Thread( "Resolver", ResolverThreadFunction );
+			m_resolverThread = Thread("Resolver", ResolverThreadFunction);
 
-			gApp->getEventSystem()->registerCallback<ResolverEvent>( this );
+			gApp->getEventSystem()->registerCallback<ResolverEvent>(this);
 		}
 
 		~Impl()
 		{
 			m_isRunning = false;
 
-			gApp->getEventSystem()->removeCallback<ResolverEvent>( this );
+			gApp->getEventSystem()->removeCallback<ResolverEvent>(this);
 
 			// stop resolver thread
-			m_requestQueue.enqueue( nullptr );  // wake resolver thread
+			m_requestQueue.enqueue(nullptr);  // wake resolver thread
 			m_resolverThread.join();
 		}
 
-		void onEvent( const ResolverEvent & event ) override
+		void onEvent(const ResolverEvent & event) override
 		{
-			if ( event.isEmpty() )
+			if (event.isEmpty())
 			{
 				return;
 			}
 
-			IResolverRequest & genericRequest = const_cast<IResolverRequest&>( event.getRequest() );
+			IResolverRequest & genericRequest = const_cast<IResolverRequest&>(event.getRequest());
 
-			switch ( genericRequest.getType() )
+			switch (genericRequest.getType())
 			{
 				case EResolverRequest::HOSTNAME:
 				{
-					HostnameRequest & request = static_cast<HostnameRequest&>( genericRequest );
+					HostnameRequest & request = static_cast<HostnameRequest&>(genericRequest);
 					Resolver::CallbackHostname & callback = request.getCallback();
 
 					callback(
@@ -438,7 +438,7 @@ namespace ctp
 				}
 				case EResolverRequest::SERVICE:
 				{
-					ServiceRequest & request = static_cast<ServiceRequest&>( genericRequest );
+					ServiceRequest & request = static_cast<ServiceRequest&>(genericRequest);
 					Resolver::CallbackService & callback = request.getCallback();
 
 					callback(
@@ -452,7 +452,7 @@ namespace ctp
 				}
 				case EResolverRequest::ADDRESS:
 				{
-					AddressRequest & request = static_cast<AddressRequest&>( genericRequest );
+					AddressRequest & request = static_cast<AddressRequest&>(genericRequest);
 					Resolver::CallbackAddress & callback = request.getCallback();
 
 					callback(
@@ -465,7 +465,7 @@ namespace ctp
 				}
 				case EResolverRequest::PORT:
 				{
-					PortRequest & request = static_cast<PortRequest&>( genericRequest );
+					PortRequest & request = static_cast<PortRequest&>(genericRequest);
 					Resolver::CallbackPort & callback = request.getCallback();
 
 					callback(
@@ -489,9 +489,9 @@ namespace ctp
 			return m_isPortServiceEnabled;
 		}
 
-		void pushRequest( std::unique_ptr<IResolverRequest> && request )
+		void pushRequest(std::unique_ptr<IResolverRequest> && request)
 		{
-			m_requestQueue.enqueue( std::move( request ) );
+			m_requestQueue.enqueue(std::move(request));
 		}
 	};
 
@@ -514,23 +514,23 @@ namespace ctp
 		return m_impl->isPortServiceEnabled();
 	}
 
-	void Resolver::resolveHostname( std::string hostname, const CallbackHostname & callback, void *param )
+	void Resolver::resolveHostname(std::string hostname, const CallbackHostname & callback, void *param)
 	{
-		m_impl->pushRequest( std::make_unique<HostnameRequest>( std::move( hostname ), callback, param ) );
+		m_impl->pushRequest(std::make_unique<HostnameRequest>(std::move(hostname), callback, param));
 	}
 
-	void Resolver::resolveService( std::string service, EPortType type, const CallbackService & callback, void *param )
+	void Resolver::resolveService(std::string service, EPortType type, const CallbackService & callback, void *param)
 	{
-		m_impl->pushRequest( std::make_unique<ServiceRequest>( std::move( service ), type, callback, param ) );
+		m_impl->pushRequest(std::make_unique<ServiceRequest>(std::move(service), type, callback, param));
 	}
 
-	void Resolver::resolveAddress( AddressData & address, const CallbackAddress & callback, void *param )
+	void Resolver::resolveAddress(AddressData & address, const CallbackAddress & callback, void *param)
 	{
-		m_impl->pushRequest( std::make_unique<AddressRequest>( address, callback, param ) );
+		m_impl->pushRequest(std::make_unique<AddressRequest>(address, callback, param));
 	}
 
-	void Resolver::resolvePort( PortData & port, const CallbackPort & callback, void *param )
+	void Resolver::resolvePort(PortData & port, const CallbackPort & callback, void *param)
 	{
-		m_impl->pushRequest( std::make_unique<PortRequest>( port, callback, param ) );
+		m_impl->pushRequest(std::make_unique<PortRequest>(port, callback, param));
 	}
 }

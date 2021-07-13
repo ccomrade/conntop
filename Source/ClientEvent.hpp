@@ -29,7 +29,7 @@ namespace ctp
 		EType m_type;
 
 	public:
-		ClientEvent( EType type )
+		ClientEvent(EType type)
 		: m_type(type)
 		{
 		}

@@ -24,7 +24,7 @@ namespace ctp
 		bool m_hasInvalidFD;
 
 	public:
-		PollEvent( int fd = -1, int flags = 0, bool hasError = false, bool hasHangUp = false, bool hasInvalidFD = false )
+		PollEvent(int fd = -1, int flags = 0, bool hasError = false, bool hasHangUp = false, bool hasInvalidFD = false)
 		: m_fd(fd),
 		  m_flags(flags),
 		  m_hasError(hasError),
@@ -73,9 +73,9 @@ namespace ctp
 		PollHandle();
 		~PollHandle();
 
-		void add( int fd, int flags );
-		void reset( int fd, int flags );
-		void remove( int fd );
+		void add(int fd, int flags);
+		void reset(int fd, int flags);
+		void remove(int fd);
 
 		void wait();
 

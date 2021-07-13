@@ -23,9 +23,9 @@ namespace ctp
 	public:
 		MemoryAllocationException()
 		{
-			if ( gLog )
+			if (gLog)
 			{
-				gLog->error( "Memory allocation failed in %s thread", Thread::GetCurrentThreadName().c_str() );
+				gLog->error("Memory allocation failed in %s thread", Thread::GetCurrentThreadName().c_str());
 			}
 		}
 
@@ -38,11 +38,11 @@ namespace ctp
 		{
 			auto NewHandler = []() -> void
 			{
-				std::set_new_handler( nullptr );
+				std::set_new_handler(nullptr);
 				throw MemoryAllocationException();
 			};
 
-			std::set_new_handler( NewHandler );
+			std::set_new_handler(NewHandler);
 		}
 	};
 
@@ -60,9 +60,9 @@ namespace ctp
 		}
 	};
 
-	static void CreateGlobalCmdLine( int argc, char *argv[] )
+	static void CreateGlobalCmdLine(int argc, char *argv[])
 	{
-		gCmdLine = new CmdLine( argc, argv );
+		gCmdLine = new CmdLine(argc, argv);
 
 		auto DestroyGlobalCmdLine = []() -> void
 		{
@@ -70,7 +70,7 @@ namespace ctp
 			gCmdLine = nullptr;
 		};
 
-		std::atexit( DestroyGlobalCmdLine );
+		std::atexit(DestroyGlobalCmdLine);
 	}
 
 	static void CreateGlobalPlatform()
@@ -83,7 +83,7 @@ namespace ctp
 			gPlatform = nullptr;
 		};
 
-		std::atexit( DestroyGlobalPlatform );
+		std::atexit(DestroyGlobalPlatform);
 	}
 
 	static void CreateGlobalLog()
@@ -93,9 +93,9 @@ namespace ctp
 		Log::EColorize colorize = Log::COLORIZE_NEVER;
 		Log::EStyle style = Log::STYLE_SIMPLE;
 
-		if ( CmdLineArg *verbosityArg = gCmdLine->getArg( "verbose" ) )
+		if (CmdLineArg *verbosityArg = gCmdLine->getArg("verbose"))
 		{
-			switch ( verbosityArg->getCount() )
+			switch (verbosityArg->getCount())
 			{
 				case 0:
 				{
@@ -120,23 +120,23 @@ namespace ctp
 			}
 		}
 
-		if ( CmdLineArg *colorizeArg = gCmdLine->getArg( "log-color" ) )
+		if (CmdLineArg *colorizeArg = gCmdLine->getArg("log-color"))
 		{
 			KString colorizeValue = colorizeArg->getValue();
-			if ( colorizeValue.empty() )
+			if (colorizeValue.empty())
 			{
 				// value of --log-color is optional
 				colorize = Log::COLORIZE_ALWAYS;
 			}
-			else if ( colorizeValue == "never" )
+			else if (colorizeValue == "never")
 			{
 				colorize = Log::COLORIZE_NEVER;
 			}
-			else if ( colorizeValue == "auto" )
+			else if (colorizeValue == "auto")
 			{
 				colorize = Log::COLORIZE_AUTO;
 			}
-			else if ( colorizeValue == "always" )
+			else if (colorizeValue == "always")
 			{
 				colorize = Log::COLORIZE_ALWAYS;
 			}
@@ -145,26 +145,26 @@ namespace ctp
 				std::string errMsg = "Invalid value '";
 				errMsg += colorizeValue;
 				errMsg += "' of '--log-color'";
-				throw Exception( std::move( errMsg ), "Main" );
+				throw Exception(std::move(errMsg), "Main");
 			}
 		}
 
-		if ( CmdLineArg *styleArg = gCmdLine->getArg( "log-style" ) )
+		if (CmdLineArg *styleArg = gCmdLine->getArg("log-style"))
 		{
 			KString styleValue = styleArg->getValue();
-			if ( styleValue == "simple" )
+			if (styleValue == "simple")
 			{
 				style = Log::STYLE_SIMPLE;
 			}
-			else if ( styleValue == "printk" )
+			else if (styleValue == "printk")
 			{
 				style = Log::STYLE_PRINTK;
 			}
-			else if ( styleValue == "timestamp" )
+			else if (styleValue == "timestamp")
 			{
 				style = Log::STYLE_TIMESTAMP;
 			}
-			else if ( styleValue == "datetime" )
+			else if (styleValue == "datetime")
 			{
 				style = Log::STYLE_DATETIME_LOCAL;
 			}
@@ -173,23 +173,23 @@ namespace ctp
 				std::string errMsg = "Invalid value '";
 				errMsg += styleValue;
 				errMsg += "' of '--log-style'";
-				throw Exception( std::move( errMsg ), "Main" );
+				throw Exception(std::move(errMsg), "Main");
 			}
 		}
 
-		if ( style == Log::STYLE_DATETIME_LOCAL && gCmdLine->hasArg( "log-utc" ) )
+		if (style == Log::STYLE_DATETIME_LOCAL && gCmdLine->hasArg("log-utc"))
 		{
 			style = Log::STYLE_DATETIME_UTC;
 		}
 
-		if ( CmdLineArg *fileArg = gCmdLine->getArg( "log-file" ) )
+		if (CmdLineArg *fileArg = gCmdLine->getArg("log-file"))
 		{
-			bool clear = gCmdLine->hasArg( "log-clear" );
-			gLog = new Log( verbosity, colorize, style, fileArg->getValue(), clear );
+			bool clear = gCmdLine->hasArg("log-clear");
+			gLog = new Log(verbosity, colorize, style, fileArg->getValue(), clear);
 		}
 		else
 		{
-			gLog = new Log( verbosity, colorize, style );
+			gLog = new Log(verbosity, colorize, style);
 		}
 
 		auto DestroyGlobalLog = []() -> void
@@ -198,7 +198,7 @@ namespace ctp
 			gLog = nullptr;
 		};
 
-		std::atexit( DestroyGlobalLog );
+		std::atexit(DestroyGlobalLog);
 	}
 
 	static void ShowHelp()
@@ -215,23 +215,23 @@ namespace ctp
 		          << "Compiled by " << COMPILER_NAME_VERSION << std::endl;
 	}
 
-	static void ShowError( const KString & errMsg )
+	static void ShowError(const KString & errMsg)
 	{
 		std::cerr << "ERROR: " << errMsg << std::endl;
 	}
 
-	static void ShowCmdLineError( const KString & appName, const KString & errMsg )
+	static void ShowCmdLineError(const KString & appName, const KString & errMsg)
 	{
 		std::cerr << errMsg << "\n"
 		          << "Try '" << appName << " -h' or '" << appName << " --help' for more information." << std::endl;
 	}
 }
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
 	using namespace ctp;
 
-	Thread::SetCurrentThreadName( "Main" );
+	Thread::SetCurrentThreadName("Main");
 
 	// enable custom replacement of std::bad_alloc
 	MemoryAllocationException::Init();
@@ -239,21 +239,21 @@ int main( int argc, char *argv[] )
 	try
 	{
 		// parse command line
-		CreateGlobalCmdLine( argc, argv );
+		CreateGlobalCmdLine(argc, argv);
 	}
-	catch ( const CmdLineParseException & e )
+	catch (const CmdLineParseException & e)
 	{
-		ShowCmdLineError( argv[0], e.getString() );
+		ShowCmdLineError(argv[0], e.getString());
 		return 2;
 	}
 
-	if ( gCmdLine->hasArg( "help" ) )
+	if (gCmdLine->hasArg("help"))
 	{
 		ShowHelp();
 		return 0;
 	}
 
-	if ( gCmdLine->hasArg( "version" ) )
+	if (gCmdLine->hasArg("version"))
 	{
 		ShowVersion();
 		return 0;
@@ -267,7 +267,7 @@ int main( int argc, char *argv[] )
 		// create gApp
 		App app;
 
-		gLog->debug( "[Main] Global environment created" );
+		gLog->debug("[Main] Global environment created");
 
 		// init platform
 		PlatformInitGuard platformInitGuard;
@@ -275,11 +275,11 @@ int main( int argc, char *argv[] )
 		// start the application and enter update loop
 		gApp->launch();
 	}
-	catch ( const Exception & e )
+	catch (const Exception & e)
 	{
-		if ( ! e.wasLogAvailable() || ! gLog || gLog->hasFile() || gLog->getVerbosity() == Log::VERBOSITY_DISABLED )
+		if (!e.wasLogAvailable() || !gLog || gLog->hasFile() || gLog->getVerbosity() == Log::VERBOSITY_DISABLED)
 		{
-			ShowError( e.getString() );
+			ShowError(e.getString());
 		}
 		return 1;
 	}

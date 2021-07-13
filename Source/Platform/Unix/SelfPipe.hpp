@@ -38,9 +38,9 @@ namespace ctp
 			return m_pipefd[1];
 		}
 
-		size_t writeData( const char *data, size_t dataLength );
+		size_t writeData(const char *data, size_t dataLength);
 
-		size_t readData( char *buffer, size_t bufferSize );
+		size_t readData(char *buffer, size_t bufferSize);
 
 		size_t clear();
 	};

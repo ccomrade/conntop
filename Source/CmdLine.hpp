@@ -30,8 +30,8 @@ namespace ctp
 		KString m_valueTypeName;
 
 	public:
-		constexpr CmdLineArgConfig( const char *shortName, const char *description,
-		                            ECmdLineArgValue valueType = ECmdLineArgValue::NONE, const char *valueTypeName = "" )
+		constexpr CmdLineArgConfig(const char *shortName, const char *description,
+		                            ECmdLineArgValue valueType = ECmdLineArgValue::NONE, const char *valueTypeName = "")
 		: m_shortName(shortName),
 		  m_description(description),
 		  m_valueType(valueType),
@@ -46,17 +46,17 @@ namespace ctp
 
 		constexpr bool hasShortName() const
 		{
-			return ! m_shortName.empty();
+			return !m_shortName.empty();
 		}
 
 		constexpr bool hasDescription() const
 		{
-			return ! m_description.empty();
+			return !m_description.empty();
 		}
 
 		constexpr bool hasValueTypeName() const
 		{
-			return ! m_valueTypeName.empty();
+			return !m_valueTypeName.empty();
 		}
 
 		constexpr KString getShortName() const
@@ -84,7 +84,7 @@ namespace ctp
 		friend class CmdLine;
 
 	public:
-		CmdLineArg( const std::pair<const KString, CmdLineArgConfig> & config )
+		CmdLineArg(const std::pair<const KString, CmdLineArgConfig> & config)
 		: m_config(&config),
 		  m_values(),
 		  m_count()
@@ -93,7 +93,7 @@ namespace ctp
 
 		bool hasValue() const
 		{
-			return ! m_values.empty();
+			return !m_values.empty();
 		}
 
 		bool hasShortName() const
@@ -167,8 +167,8 @@ namespace ctp
 		std::string m_what;
 
 	public:
-		CmdLineParseException( std::string what )
-		: m_what(std::move( what ))
+		CmdLineParseException(std::string what)
+		: m_what(std::move(what))
 		{
 		}
 
@@ -188,25 +188,25 @@ namespace ctp
 		std::map<KString, CmdLineArg> m_args;
 		std::vector<KString> m_nonOptionArgs;
 
-		void parse( int argc, char *argv[] );
+		void parse(int argc, char *argv[]);
 
 	public:
-		CmdLine( int argc, char *argv[] )
+		CmdLine(int argc, char *argv[])
 		: m_args(),
 		  m_nonOptionArgs()
 		{
-			parse( argc, argv );  // may throw CmdLineParseException
+			parse(argc, argv);  // may throw CmdLineParseException
 		}
 
-		CmdLineArg *getArg( const KString & arg ) const
+		CmdLineArg *getArg(const KString & arg) const
 		{
-			auto it = m_args.find( arg );
-			return (it != m_args.end()) ? const_cast<CmdLineArg*>( &it->second ) : nullptr;
+			auto it = m_args.find(arg);
+			return (it != m_args.end()) ? const_cast<CmdLineArg*>(&it->second) : nullptr;
 		}
 
-		bool hasArg( const KString & arg ) const
+		bool hasArg(const KString & arg) const
 		{
-			return m_args.find( arg ) != m_args.end();
+			return m_args.find(arg) != m_args.end();
 		}
 
 		const std::vector<KString> & getNonOptionArgs() const

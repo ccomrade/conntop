@@ -22,11 +22,11 @@ namespace ctp
 
 		KString getName() const override;
 
-		void init( IConnectionUpdateCallback *callback ) override;
+		void init(IConnectionUpdateCallback *callback) override;
 
 		void onUpdate() override;
 
 		bool isPaused() const override;
-		void setPaused( bool paused ) override;
+		void setPaused(bool paused) override;
 	};
 }

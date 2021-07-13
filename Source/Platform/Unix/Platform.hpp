@@ -23,7 +23,7 @@ namespace ctp
 		long m_sharedKBytes;
 
 	public:
-		PlatformProcessMemoryUsage( long total, long peakTotal, long anonymous, long mappedFiles, long shared )
+		PlatformProcessMemoryUsage(long total, long peakTotal, long anonymous, long mappedFiles, long shared)
 		: m_totalKBytes(total),
 		  m_peakTotalKBytes(peakTotal),
 		  m_anonymousKBytes(anonymous),
@@ -101,7 +101,7 @@ namespace ctp
 		std::string getCurrentHostName();
 
 		UnixTime getCurrentUnixTime();
-		DateTime getCurrentDateTime( DateTime::EType type = DateTime::LOCAL );
+		DateTime getCurrentDateTime(DateTime::EType type = DateTime::LOCAL);
 
 		PlatformProcessMemoryUsage getProcessMemoryUsage();
 	};

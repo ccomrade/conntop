@@ -43,40 +43,40 @@ namespace ctp
 		KString getDBFileName_Country() const;
 		KString getDBFileName_ASN() const;
 
-		Country queryCountry( const AddressIP4 & address );
-		Country queryCountry( const AddressIP6 & address );
+		Country queryCountry(const AddressIP4 & address);
+		Country queryCountry(const AddressIP6 & address);
 
-		Country queryCountry( const IAddress & address )
+		Country queryCountry(const IAddress & address)
 		{
-			switch ( address.getType() )
+			switch (address.getType())
 			{
 				case EAddressType::IP4:
 				{
-					return queryCountry( static_cast<const AddressIP4&>( address ) );
+					return queryCountry(static_cast<const AddressIP4&>(address));
 				}
 				case EAddressType::IP6:
 				{
-					return queryCountry( static_cast<const AddressIP6&>( address ) );
+					return queryCountry(static_cast<const AddressIP6&>(address));
 				}
 			}
 
 			return Country();
 		}
 
-		ASN queryASN( const AddressIP4 & address );
-		ASN queryASN( const AddressIP6 & address );
+		ASN queryASN(const AddressIP4 & address);
+		ASN queryASN(const AddressIP6 & address);
 
-		ASN queryASN( const IAddress & address )
+		ASN queryASN(const IAddress & address)
 		{
-			switch ( address.getType() )
+			switch (address.getType())
 			{
 				case EAddressType::IP4:
 				{
-					return queryASN( static_cast<const AddressIP4&>( address ) );
+					return queryASN(static_cast<const AddressIP4&>(address));
 				}
 				case EAddressType::IP6:
 				{
-					return queryASN( static_cast<const AddressIP6&>( address ) );
+					return queryASN(static_cast<const AddressIP6&>(address));
 				}
 			}
 

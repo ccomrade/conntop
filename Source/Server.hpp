@@ -16,17 +16,17 @@ namespace ctp
 {
 	struct ConnectionStorageSerializer : public ServerDataSerializer<ConnectionData>
 	{
-		ConnectionStorageSerializer( const ConnectionStorage & storage )
+		ConnectionStorageSerializer(const ConnectionStorage & storage)
 		{
-			for ( auto it = storage.begin(); it != storage.end(); ++it )
+			for (auto it = storage.begin(); it != storage.end(); ++it)
 			{
-				addItem( it->second, EConnectionAction::CREATE );
+				addItem(it->second, EConnectionAction::CREATE);
 			}
 		}
 
-		SerializedServerMessage build( const ClientServerProtocol & protocol )
+		SerializedServerMessage build(const ClientServerProtocol & protocol)
 		{
-			return buildMessage( protocol, EDataFlags::CONNECTION, false );
+			return buildMessage(protocol, EDataFlags::CONNECTION, false);
 		}
 	};
 
@@ -38,14 +38,14 @@ namespace ctp
 			{
 			}
 
-			void add( const ConnectionData & connection, EConnectionAction action, int updateFlags = -1 )
+			void add(const ConnectionData & connection, EConnectionAction action, int updateFlags = -1)
 			{
-				addItem( connection, action, updateFlags );
+				addItem(connection, action, updateFlags);
 			}
 
-			SerializedServerMessage build( const ClientServerProtocol & protocol )
+			SerializedServerMessage build(const ClientServerProtocol & protocol)
 			{
-				return buildMessage( protocol, EDataFlags::CONNECTION, true );
+				return buildMessage(protocol, EDataFlags::CONNECTION, true);
 			}
 		};
 
@@ -54,7 +54,7 @@ namespace ctp
 		bool m_isSerializationEnabled;
 
 	public:
-		ConnectionUpdateSerializer( ConnectionStorage & storage )
+		ConnectionUpdateSerializer(ConnectionStorage & storage)
 		: m_pStorage(&storage),
 		  m_serializer(),
 		  m_isSerializationEnabled(true)
@@ -66,9 +66,9 @@ namespace ctp
 			return m_isSerializationEnabled;
 		}
 
-		void setSerializationEnabled( bool enable )
+		void setSerializationEnabled(bool enable)
 		{
-			if ( m_isSerializationEnabled && ! enable )
+			if (m_isSerializationEnabled && !enable)
 			{
 				m_serializer.clear();
 			}
@@ -76,90 +76,90 @@ namespace ctp
 			m_isSerializationEnabled = enable;
 		}
 
-		SerializedServerMessage build( const ClientServerProtocol & protocol )
+		SerializedServerMessage build(const ClientServerProtocol & protocol)
 		{
-			return m_serializer.build( protocol );
+			return m_serializer.build(protocol);
 		}
 
 		// IConnectionUpdateCallback
 
-		AddressData *getAddress( const IAddress & address, bool add ) override
+		AddressData *getAddress(const IAddress & address, bool add) override
 		{
-			switch ( address.getType() )
+			switch (address.getType())
 			{
 				case EAddressType::IP4:
 				{
 					return (add) ?
-					  m_pStorage->addIP4Address( static_cast<const AddressIP4&>( address ) ).first :
-					  m_pStorage->getIP4Address( static_cast<const AddressIP4&>( address ) );
+					  m_pStorage->addIP4Address(static_cast<const AddressIP4&>(address)).first :
+					  m_pStorage->getIP4Address(static_cast<const AddressIP4&>(address));
 				}
 				case EAddressType::IP6:
 				{
 					return (add) ?
-					  m_pStorage->addIP6Address( static_cast<const AddressIP6&>( address ) ).first :
-					  m_pStorage->getIP6Address( static_cast<const AddressIP6&>( address ) );
+					  m_pStorage->addIP6Address(static_cast<const AddressIP6&>(address)).first :
+					  m_pStorage->getIP6Address(static_cast<const AddressIP6&>(address));
 				}
 			}
 			return nullptr;
 		}
 
-		PortData *getPort( const Port & port, bool add ) override
+		PortData *getPort(const Port & port, bool add) override
 		{
-			return (add) ? m_pStorage->addPort( port ).first : m_pStorage->getPort( port );
+			return (add) ? m_pStorage->addPort(port).first : m_pStorage->getPort(port);
 		}
 
-		ConnectionData *find( const Connection & connection ) override
+		ConnectionData *find(const Connection & connection) override
 		{
-			return m_pStorage->getConnection( connection );
+			return m_pStorage->getConnection(connection);
 		}
 
-		ConnectionData *add( const Connection & connection ) override
+		ConnectionData *add(const Connection & connection) override
 		{
-			auto result = m_pStorage->addConnection( connection );
+			auto result = m_pStorage->addConnection(connection);
 			ConnectionData *pData = result.first;
-			if ( result.second && m_isSerializationEnabled )
+			if (result.second && m_isSerializationEnabled)
 			{
-				m_serializer.add( *pData, EConnectionAction::CREATE );
+				m_serializer.add(*pData, EConnectionAction::CREATE);
 			}
 			return pData;
 		}
 
-		ConnectionData *add( const Connection & connection, const ConnectionTraffic & traffic, int state ) override
+		ConnectionData *add(const Connection & connection, const ConnectionTraffic & traffic, int state) override
 		{
-			auto result = m_pStorage->addConnection( connection, traffic, state );
+			auto result = m_pStorage->addConnection(connection, traffic, state);
 			ConnectionData *pData = result.first;
-			if ( result.second && m_isSerializationEnabled )
+			if (result.second && m_isSerializationEnabled)
 			{
-				m_serializer.add( *pData, EConnectionAction::CREATE );
+				m_serializer.add(*pData, EConnectionAction::CREATE);
 			}
 			return pData;
 		}
 
-		void update( const ConnectionData & data, int updateFlags ) override
+		void update(const ConnectionData & data, int updateFlags) override
 		{
-			if ( m_isSerializationEnabled )
+			if (m_isSerializationEnabled)
 			{
-				m_serializer.add( data, EConnectionAction::UPDATE, updateFlags );
+				m_serializer.add(data, EConnectionAction::UPDATE, updateFlags);
 			}
 		}
 
-		void remove( const Connection & connection ) override
+		void remove(const Connection & connection) override
 		{
-			ConnectionData *pData = m_pStorage->getConnection( connection );
-			if ( pData )
+			ConnectionData *pData = m_pStorage->getConnection(connection);
+			if (pData)
 			{
-				if ( m_isSerializationEnabled )
+				if (m_isSerializationEnabled)
 				{
-					m_serializer.add( *pData, EConnectionAction::REMOVE );
+					m_serializer.add(*pData, EConnectionAction::REMOVE);
 				}
-				m_pStorage->removeConnection( connection );
+				m_pStorage->removeConnection(connection);
 			}
 		}
 
 		void clear() override
 		{
 			m_pStorage->clearConnections();
-			setSerializationEnabled( false );
+			setSerializationEnabled(false);
 		}
 	};
 
@@ -176,14 +176,14 @@ namespace ctp
 
 		void open();
 		void close();
-		void addSocket( StreamServerSocket && socket );
-		void pollHandler( int flags, StreamServerSocket & serverSocket );
+		void addSocket(StreamServerSocket && socket);
+		void pollHandler(int flags, StreamServerSocket & serverSocket);
 
 		// IServerSessionCallback
 
-		void onSessionEstablished( ServerSession *session ) override;
-		void onSessionDisconnect( ServerSession *session ) override;
-		void onSessionDataRequest( ServerSession *session, int dataFlags, int dataUpdateFlags ) override;
+		void onSessionEstablished(ServerSession *session) override;
+		void onSessionDisconnect(ServerSession *session) override;
+		void onSessionDataRequest(ServerSession *session, int dataFlags, int dataUpdateFlags) override;
 
 		friend class ServerSession;  // IServerSessionCallback functions are private
 

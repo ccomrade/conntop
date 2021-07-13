@@ -15,9 +15,9 @@
 
 namespace ctp
 {
-	void Thread::PlatformCurrentThreadSetName( const KString & name )
+	void Thread::PlatformCurrentThreadSetName(const KString & name)
 	{
-		if ( name.empty() )
+		if (name.empty())
 			return;
 
 	#ifdef CONNTOP_PLATFORM_LINUX
@@ -25,15 +25,15 @@ namespace ctp
 		auto IsMainThread = []() -> bool
 		{
 			const pid_t processID = getpid();
-			const pid_t threadID = syscall( SYS_gettid );
+			const pid_t threadID = syscall(SYS_gettid);
 
 			return processID == threadID;
 		};
 
 		// do not change name of main thread to prevent process rename
-		if ( ! IsMainThread() )
+		if (!IsMainThread())
 		{
-			prctl( PR_SET_NAME, name.c_str() );
+			prctl(PR_SET_NAME, name.c_str());
 		}
 	#endif
 	}

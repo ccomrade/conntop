@@ -19,24 +19,24 @@ namespace ctp
 		bool m_wasLogAvailable;
 
 	public:
-		Exception( std::string what, const char *origin = nullptr, bool log = true )
-		: m_what(std::move( what )),
+		Exception(std::string what, const char *origin = nullptr, bool log = true)
+		: m_what(std::move(what)),
 		  m_origin(origin),
 		  m_wasLogAvailable()
 		{
-			if ( gLog && gLog->getVerbosity() != Log::VERBOSITY_DISABLED )
+			if (gLog && gLog->getVerbosity() != Log::VERBOSITY_DISABLED)
 			{
 				m_wasLogAvailable = true;
 
-				if ( log )
+				if (log)
 				{
-					if ( m_origin )
+					if (m_origin)
 					{
-						gLog->error( "[%s] %s", m_origin, m_what.c_str() );
+						gLog->error("[%s] %s", m_origin, m_what.c_str());
 					}
 					else
 					{
-						gLog->error( "%s", m_what.c_str() );
+						gLog->error("%s", m_what.c_str());
 					}
 				}
 			}

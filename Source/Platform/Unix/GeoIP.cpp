@@ -28,12 +28,12 @@ namespace ctp
 	std::string GeoIP::DBSearchPaths::getNext()
 	{
 		std::string path;
-		switch ( m_currentPath )
+		switch (m_currentPath)
 		{
 			case DB_PATH_HOME:
 			{
-				const char *homeDir = std::getenv( "HOME" );
-				if ( homeDir == nullptr )
+				const char *homeDir = std::getenv("HOME");
+				if (homeDir == nullptr)
 				{
 					// skip current path
 					m_currentPath++;

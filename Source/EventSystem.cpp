@@ -19,7 +19,7 @@ namespace ctp
 		void *m_pExecutor;
 
 	public:
-		EventCallbackData( void *pCallback, void *pExecutor )
+		EventCallbackData(void *pCallback, void *pExecutor)
 		: m_pCallback(pCallback),
 		  m_pExecutor(pExecutor)
 		{
@@ -50,28 +50,28 @@ namespace ctp
 		{
 		}
 
-		void pushEvent( EventWrapper && eventWrapper )
+		void pushEvent(EventWrapper && eventWrapper)
 		{
-			m_eventQueue.enqueue( std::move( eventWrapper ) );
+			m_eventQueue.enqueue(std::move(eventWrapper));
 		}
 
-		void addCallback( void *pCallback, void *pExecutor, int eventID )
+		void addCallback(void *pCallback, void *pExecutor, int eventID)
 		{
-			m_callbackMap.emplace( eventID, EventCallbackData( pCallback, pExecutor ) );
+			m_callbackMap.emplace(eventID, EventCallbackData(pCallback, pExecutor));
 
-			KString eventName = EGlobalEventID::ToString( eventID );
-			gLog->debug( "[EventSystem] Registered callback of event %d (%s)", eventID, eventName.c_str() );
+			KString eventName = EGlobalEventID::ToString(eventID);
+			gLog->debug("[EventSystem] Registered callback of event %d (%s)", eventID, eventName.c_str());
 		}
 
-		void delCallback( void *pCallback, int eventID )
+		void delCallback(void *pCallback, int eventID)
 		{
 			bool isRemoved = false;
-			const auto callbackRange = m_callbackMap.equal_range( eventID );
-			for ( auto it = callbackRange.first; it != callbackRange.second; )
+			const auto callbackRange = m_callbackMap.equal_range(eventID);
+			for (auto it = callbackRange.first; it != callbackRange.second;)
 			{
-				if ( it->second.getCallback() == pCallback )
+				if (it->second.getCallback() == pCallback)
 				{
-					it = m_callbackMap.erase( it );
+					it = m_callbackMap.erase(it);
 					isRemoved = true;
 				}
 				else
@@ -80,39 +80,39 @@ namespace ctp
 				}
 			}
 
-			if ( isRemoved )
+			if (isRemoved)
 			{
-				KString eventName = EGlobalEventID::ToString( eventID );
-				gLog->debug( "[EventSystem] Removed callback of event %d (%s)", eventID, eventName.c_str() );
+				KString eventName = EGlobalEventID::ToString(eventID);
+				gLog->debug("[EventSystem] Removed callback of event %d (%s)", eventID, eventName.c_str());
 			}
 		}
 
 		void run()
 		{
 			m_isRunning = true;
-			moodycamel::ConsumerToken token( m_eventQueue );
+			moodycamel::ConsumerToken token(m_eventQueue);
 
-			gLog->debug( "[EventSystem] Dispatcher started" );
+			gLog->debug("[EventSystem] Dispatcher started");
 
-			while ( m_isRunning )
+			while (m_isRunning)
 			{
 				EventWrapper eventWrapper;
 				// wait for event
-				m_eventQueue.wait_dequeue( token, eventWrapper );
+				m_eventQueue.wait_dequeue(token, eventWrapper);
 
 				const int eventID = eventWrapper.getEventID();
-				const auto callbackRange = m_callbackMap.equal_range( eventID );
+				const auto callbackRange = m_callbackMap.equal_range(eventID);
 				// execute all callbacks registered for the event
-				for ( auto it = callbackRange.first; it != callbackRange.second; ++it )
+				for (auto it = callbackRange.first; it != callbackRange.second; ++it)
 				{
 					const EventCallbackData & data = it->second;
-					ExecutorFunction executor = reinterpret_cast<ExecutorFunction>( data.getExecutor() );
+					ExecutorFunction executor = reinterpret_cast<ExecutorFunction>(data.getExecutor());
 
-					executor( data.getCallback(), eventWrapper );
+					executor(data.getCallback(), eventWrapper);
 				}
 			}
 
-			gLog->debug( "[EventSystem] Dispatcher stopped" );
+			gLog->debug("[EventSystem] Dispatcher stopped");
 		}
 
 		void stop()
@@ -140,18 +140,18 @@ namespace ctp
 		m_impl->stop();
 	}
 
-	void EventSystem::pushEvent( EventWrapper && eventWrapper )
+	void EventSystem::pushEvent(EventWrapper && eventWrapper)
 	{
-		m_impl->pushEvent( std::move( eventWrapper ) );
+		m_impl->pushEvent(std::move(eventWrapper));
 	}
 
-	void EventSystem::addCallback( void *pCallback, void *pExecutor, int eventID )
+	void EventSystem::addCallback(void *pCallback, void *pExecutor, int eventID)
 	{
-		m_impl->addCallback( pCallback, pExecutor, eventID );
+		m_impl->addCallback(pCallback, pExecutor, eventID);
 	}
 
-	void EventSystem::delCallback( void *pCallback, int eventID )
+	void EventSystem::delCallback(void *pCallback, int eventID)
 	{
-		m_impl->delCallback( pCallback, eventID );
+		m_impl->delCallback(pCallback, eventID);
 	}
 }

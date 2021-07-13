@@ -45,7 +45,7 @@ namespace ctp
 		static const unsigned int COUNTRY_TABLE_SIZE;
 
 	public:
-		Country( ECode code = ZZ )
+		Country(ECode code = ZZ)
 		: m_code(code)
 		{
 		}
@@ -70,35 +70,35 @@ namespace ctp
 			return m_code == ZZ;
 		}
 
-		static Country ParseCodeString( const KString & code );
+		static Country ParseCodeString(const KString & code);
 	};
 
-	inline bool operator==( const Country & a, const Country & b )
+	inline bool operator==(const Country & a, const Country & b)
 	{
 		return a.getCode() == b.getCode();
 	}
 
-	inline bool operator!=( const Country & a, const Country & b )
+	inline bool operator!=(const Country & a, const Country & b)
 	{
 		return a.getCode() != b.getCode();
 	}
 
-	inline bool operator<( const Country & a, const Country & b )
+	inline bool operator<(const Country & a, const Country & b)
 	{
 		return a.getCode() < b.getCode();
 	}
 
-	inline bool operator>( const Country & a, const Country & b )
+	inline bool operator>(const Country & a, const Country & b)
 	{
 		return a.getCode() > b.getCode();
 	}
 
-	inline bool operator<=( const Country & a, const Country & b )
+	inline bool operator<=(const Country & a, const Country & b)
 	{
 		return a.getCode() <= b.getCode();
 	}
 
-	inline bool operator>=( const Country & a, const Country & b )
+	inline bool operator>=(const Country & a, const Country & b)
 	{
 		return a.getCode() >= b.getCode();
 	}

@@ -27,16 +27,16 @@ namespace ctp
 		bool m_isPaused;
 
 		void requestData();
-		void setSynchronized( bool isSynchronized );
+		void setSynchronized(bool isSynchronized);
 
 		// IClientSessionCallback
 
-		void onSessionConnectionEstablished( ClientSession *session ) override;
-		void onSessionEstablished( ClientSession *session ) override;
-		void onSessionDisconnect( ClientSession *session ) override;
-		void onSessionServerTick( ClientSession *session ) override;
-		void onSessionDataStatus( ClientSession *session, bool isDifferent ) override;
-		void onSessionData( ClientSession *session, int type, bool isUpdate, rapidjson::Value & data ) override;
+		void onSessionConnectionEstablished(ClientSession *session) override;
+		void onSessionEstablished(ClientSession *session) override;
+		void onSessionDisconnect(ClientSession *session) override;
+		void onSessionServerTick(ClientSession *session) override;
+		void onSessionDataStatus(ClientSession *session, bool isDifferent) override;
+		void onSessionData(ClientSession *session, int type, bool isUpdate, rapidjson::Value & data) override;
 
 		friend class ClientSession;  // IClientSessionCallback functions are private
 
@@ -50,7 +50,7 @@ namespace ctp
 
 		void disconnect();
 
-		void setPaused( bool paused );
+		void setPaused(bool paused);
 
 		bool isPaused() const
 		{

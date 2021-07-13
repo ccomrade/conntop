@@ -166,6 +166,6 @@ namespace ctp
 
 		void quit();
 
-		void fatalError( std::string errorMessage, const char *origin = nullptr, bool log = true );
+		void fatalError(std::string errorMessage, const char *origin = nullptr, bool log = true);
 	};
 }

@@ -71,7 +71,7 @@ namespace ctp
 		 * @brief Copies raw address to some buffer.
 		 * @param buffer The buffer.
 		 */
-		virtual void copyRawTo( void *buffer ) const = 0;
+		virtual void copyRawTo(void *buffer) const = 0;
 	};
 
 	/**
@@ -87,7 +87,7 @@ namespace ctp
 		 * @brief Constructor.
 		 * @param address Raw IPv4 address in network byte order.
 		 */
-		AddressIP4( uint32_t address )
+		AddressIP4(uint32_t address)
 		: m_address(address)
 		{
 		}
@@ -122,9 +122,9 @@ namespace ctp
 		 * Size of the buffer must be at least 4 bytes.
 		 * @param buffer The buffer.
 		 */
-		void copyRawTo( void *buffer ) const override
+		void copyRawTo(void *buffer) const override
 		{
-			std::memcpy( buffer, &m_address, 4 );
+			std::memcpy(buffer, &m_address, 4);
 		}
 
 		/**
@@ -143,7 +143,7 @@ namespace ctp
 		 * @return IPv4 address.
 		 * @throws std::invalid_argument If the string does not contain valid IPv4 address.
 		 */
-		static AddressIP4 CreateFromString( const KString & string );
+		static AddressIP4 CreateFromString(const KString & string);
 	};
 
 	/**
@@ -163,7 +163,7 @@ namespace ctp
 		 * @brief Constructor.
 		 * @param address Raw IPv6 address in network byte order.
 		 */
-		AddressIP6( const RawAddr & address )
+		AddressIP6(const RawAddr & address)
 		: m_address{ address[0], address[1], address[2], address[3] }
 		{
 		}
@@ -198,9 +198,9 @@ namespace ctp
 		 * Size of the buffer must be at least 16 bytes.
 		 * @param buffer The buffer.
 		 */
-		void copyRawTo( void *buffer ) const override
+		void copyRawTo(void *buffer) const override
 		{
-			std::memcpy( buffer, &m_address, 16 );
+			std::memcpy(buffer, &m_address, 16);
 		}
 
 		/**
@@ -219,7 +219,7 @@ namespace ctp
 		 * @return IPv6 address.
 		 * @throws std::invalid_argument If the string does not contain valid IPv6 address.
 		 */
-		static AddressIP6 CreateFromString( const KString & string );
+		static AddressIP6 CreateFromString(const KString & string);
 	};
 
 	/**
@@ -245,12 +245,12 @@ namespace ctp
 			return m_pack.size();
 		}
 
-		const IAddress & operator[]( size_t index ) const
+		const IAddress & operator[](size_t index) const
 		{
 			return *m_pack[index];
 		}
 
-		IAddress & operator[]( size_t index )
+		IAddress & operator[](size_t index)
 		{
 			return *m_pack[index];
 		}
@@ -261,15 +261,15 @@ namespace ctp
 		}
 
 		template<class T>
-		void add( const T & address )
+		void add(const T & address)
 		{
-			m_pack.emplace_back( std::make_unique<T>( address ) );
+			m_pack.emplace_back(std::make_unique<T>(address));
 		}
 
 		template<class T, class... Args>
-		void emplace( Args &&... args )
+		void emplace(Args &&... args)
 		{
-			m_pack.emplace_back( std::make_unique<T>( std::forward<Args>( args )... ) );
+			m_pack.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
 		}
 	};
 
@@ -314,7 +314,7 @@ namespace ctp
 		 * The address must be stored somewhere else because this class holds only a pointer to it.
 		 * @param address The address.
 		 */
-		AddressData( const IAddress & address )
+		AddressData(const IAddress & address)
 		: m_pAddress(&address),
 	#ifndef CONNTOP_DEDICATED
 		  m_isHostnameResolved(false),
@@ -348,7 +348,7 @@ namespace ctp
 		 */
 		bool isHostnameAvailable() const
 		{
-			return ! m_hostname.empty();
+			return !m_hostname.empty();
 		}
 
 		/**
@@ -366,7 +366,7 @@ namespace ctp
 		 */
 		bool isASNAvailable() const
 		{
-			return ! m_asn.isEmpty();
+			return !m_asn.isEmpty();
 		}
 
 		/**
@@ -384,7 +384,7 @@ namespace ctp
 		 */
 		bool isCountryAvailable() const
 		{
-			return ! m_country.isUnknown();
+			return !m_country.isUnknown();
 		}
 
 		/**
@@ -419,13 +419,13 @@ namespace ctp
 		 * @param type WHOIS data type.
 		 * @return True, if the address has the WHOIS data type, otherwise false.
 		 */
-		bool isWhoisAvailable( WhoisData::EType type ) const
+		bool isWhoisAvailable(WhoisData::EType type) const
 		{
-			for ( const WhoisData & data : m_whois )
+			for (const WhoisData & data : m_whois)
 			{
-				if ( data.getType() == type )
+				if (data.getType() == type)
 				{
-					return ! data.hasStatus() && ! data.isEmpty();
+					return !data.hasStatus() && !data.isEmpty();
 				}
 			}
 			return false;
@@ -437,7 +437,7 @@ namespace ctp
 		 */
 		bool isWhoisAddressAvailable() const
 		{
-			return isWhoisAvailable( WhoisData::IP_ADDRESS );
+			return isWhoisAvailable(WhoisData::IP_ADDRESS);
 		}
 
 		/**
@@ -446,7 +446,7 @@ namespace ctp
 		 */
 		bool isWhoisHostnameAvailable() const
 		{
-			return isWhoisAvailable( WhoisData::DOMAIN_NAME );
+			return isWhoisAvailable(WhoisData::DOMAIN_NAME);
 		}
 
 		/**
@@ -455,7 +455,7 @@ namespace ctp
 		 */
 		bool isWhoisASAvailable() const
 		{
-			return isWhoisAvailable( WhoisData::AUTONOMOUS_SYSTEM );
+			return isWhoisAvailable(WhoisData::AUTONOMOUS_SYSTEM);
 		}
 	#endif
 
@@ -543,11 +543,11 @@ namespace ctp
 		 * @param type WHOIS data type.
 		 * @return WHOIS data.
 		 */
-		const WhoisData & getWhois( WhoisData::EType type ) const
+		const WhoisData & getWhois(WhoisData::EType type) const
 		{
-			for ( const WhoisData & data : m_whois )
+			for (const WhoisData & data : m_whois)
 			{
-				if ( data.getType() == type )
+				if (data.getType() == type)
 				{
 					return data;
 				}
@@ -561,7 +561,7 @@ namespace ctp
 		 */
 		const WhoisData & getWhoisAddress() const
 		{
-			return getWhois( WhoisData::IP_ADDRESS );
+			return getWhois(WhoisData::IP_ADDRESS);
 		}
 
 		/**
@@ -570,7 +570,7 @@ namespace ctp
 		 */
 		const WhoisData & getWhoisHostname() const
 		{
-			return getWhois( WhoisData::DOMAIN_NAME );
+			return getWhois(WhoisData::DOMAIN_NAME);
 		}
 
 		/**
@@ -579,16 +579,16 @@ namespace ctp
 		 */
 		const WhoisData & getWhoisAS() const
 		{
-			return getWhois( WhoisData::AUTONOMOUS_SYSTEM );
+			return getWhois(WhoisData::AUTONOMOUS_SYSTEM);
 		}
 
 		/**
 		 * @brief Sets address hostname.
 		 * @param hostname Address hostname.
 		 */
-		void setResolvedHostname( std::string && hostname )
+		void setResolvedHostname(std::string && hostname)
 		{
-			m_hostname = std::move( hostname );
+			m_hostname = std::move(hostname);
 			m_isHostnameResolved = true;
 		}
 
@@ -596,9 +596,9 @@ namespace ctp
 		 * @brief Sets address autonomous system number.
 		 * @param asn Address autonomous system number.
 		 */
-		void setResolvedASN( ASN && asn )
+		void setResolvedASN(ASN && asn)
 		{
-			m_asn = std::move( asn );
+			m_asn = std::move(asn);
 			m_isASNResolved = true;
 		}
 
@@ -606,9 +606,9 @@ namespace ctp
 		 * @brief Sets address country.
 		 * @param country Address country.
 		 */
-		void setResolvedCountry( Country && country )
+		void setResolvedCountry(Country && country)
 		{
-			m_country = std::move( country );
+			m_country = std::move(country);
 			m_isCountryResolved = true;
 		}
 
@@ -616,9 +616,9 @@ namespace ctp
 		 * @brief Sets WHOIS data.
 		 * @param data WHOIS data.
 		 */
-		void setWhois( WhoisData && data )
+		void setWhois(WhoisData && data)
 		{
-			switch ( data.getType() )
+			switch (data.getType())
 			{
 				case WhoisData::UNKNOWN:
 				{
@@ -642,19 +642,19 @@ namespace ctp
 			}
 
 			bool isReplaced = false;
-			for ( auto it = m_whois.begin(); it != m_whois.end(); ++it )
+			for (auto it = m_whois.begin(); it != m_whois.end(); ++it)
 			{
-				if ( it->getType() == data.getType() )
+				if (it->getType() == data.getType())
 				{
-					(*it) = std::move( data );
+					(*it) = std::move(data);
 					isReplaced = true;
 					break;
 				}
 			}
 
-			if ( ! isReplaced )
+			if (!isReplaced)
 			{
-				m_whois.emplace_back( std::move( data ) );
+				m_whois.emplace_back(std::move(data));
 			}
 		}
 	#endif
@@ -664,23 +664,23 @@ namespace ctp
 		 * This function should be used only in ConnectionStorage class.
 		 * @param address The address.
 		 */
-		void setAddress( const IAddress & address )
+		void setAddress(const IAddress & address)
 		{
 			m_pAddress = &address;
 		}
 	};
 
-	inline bool operator==( const AddressIP4 & a, const AddressIP4 & b )
+	inline bool operator==(const AddressIP4 & a, const AddressIP4 & b)
 	{
 		return a.getRawAddr() == b.getRawAddr();
 	}
 
-	inline bool operator!=( const AddressIP4 & a, const AddressIP4 & b )
+	inline bool operator!=(const AddressIP4 & a, const AddressIP4 & b)
 	{
-		return ! (a == b);
+		return !(a == b);
 	}
 
-	inline bool operator==( const AddressIP6 & a, const AddressIP6 & b )
+	inline bool operator==(const AddressIP6 & a, const AddressIP6 & b)
 	{
 		const AddressIP6::RawAddr & aAddr = a.getRawAddr();
 		const AddressIP6::RawAddr & bAddr = b.getRawAddr();
@@ -690,9 +690,9 @@ namespace ctp
 		    && aAddr[0] == bAddr[0];
 	}
 
-	inline bool operator!=( const AddressIP6 & a, const AddressIP6 & b )
+	inline bool operator!=(const AddressIP6 & a, const AddressIP6 & b)
 	{
-		return ! (a == b);
+		return !(a == b);
 	}
 }
 
@@ -704,9 +704,9 @@ namespace std
 		using argument_type = ctp::AddressIP4;
 		using result_type = size_t;
 
-		result_type operator()( const argument_type & v ) const
+		result_type operator()(const argument_type & v) const
 		{
-			return hash<uint32_t>()( v.getRawAddr() );
+			return hash<uint32_t>()(v.getRawAddr());
 		}
 	};
 
@@ -716,16 +716,16 @@ namespace std
 		using argument_type = ctp::AddressIP6;
 		using result_type = size_t;
 
-		result_type operator()( const argument_type & v ) const
+		result_type operator()(const argument_type & v) const
 		{
 			using ctp::HashCombine;
 			using ctp::AddressIP6;
 
 			const AddressIP6::RawAddr & address = v.getRawAddr();
-			result_type h = hash<uint32_t>()( address[0] );
-			HashCombine( h, hash<uint32_t>()( address[1] ) );
-			HashCombine( h, hash<uint32_t>()( address[2] ) );
-			HashCombine( h, hash<uint32_t>()( address[3] ) );
+			result_type h = hash<uint32_t>()(address[0]);
+			HashCombine(h, hash<uint32_t>()(address[1]));
+			HashCombine(h, hash<uint32_t>()(address[2]));
+			HashCombine(h, hash<uint32_t>()(address[3]));
 
 			return h;
 		}

@@ -31,13 +31,13 @@ namespace ctp
 		{
 		}
 
-		ASN( uint32_t number, std::string && orgName )
+		ASN(uint32_t number, std::string && orgName)
 		: m_number(number),
 		  m_string(),
-		  m_orgName(std::move( orgName ))
+		  m_orgName(std::move(orgName))
 		{
 			m_string = "AS";
-			m_string += std::to_string( m_number );
+			m_string += std::to_string(m_number);
 		}
 
 		bool isEmpty() const
@@ -61,32 +61,32 @@ namespace ctp
 		}
 	};
 
-	inline bool operator==( const ASN & a, const ASN & b )
+	inline bool operator==(const ASN & a, const ASN & b)
 	{
 		return a.getNumber() == b.getNumber();
 	}
 
-	inline bool operator!=( const ASN & a, const ASN & b )
+	inline bool operator!=(const ASN & a, const ASN & b)
 	{
 		return a.getNumber() != b.getNumber();
 	}
 
-	inline bool operator<( const ASN & a, const ASN & b )
+	inline bool operator<(const ASN & a, const ASN & b)
 	{
 		return a.getNumber() < b.getNumber();
 	}
 
-	inline bool operator>( const ASN & a, const ASN & b )
+	inline bool operator>(const ASN & a, const ASN & b)
 	{
 		return a.getNumber() > b.getNumber();
 	}
 
-	inline bool operator<=( const ASN & a, const ASN & b )
+	inline bool operator<=(const ASN & a, const ASN & b)
 	{
 		return a.getNumber() <= b.getNumber();
 	}
 
-	inline bool operator>=( const ASN & a, const ASN & b )
+	inline bool operator>=(const ASN & a, const ASN & b)
 	{
 		return a.getNumber() >= b.getNumber();
 	}

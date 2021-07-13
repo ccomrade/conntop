@@ -40,7 +40,7 @@ namespace ctp
 		Screen *m_parent;
 		std::array<FunctionKey, 10> m_functionKeys;
 
-		void initKey( EKey key, const KString & name )
+		void initKey(EKey key, const KString & name)
 		{
 			FunctionKey & data = m_functionKeys[key];
 			data.name = name;
@@ -49,33 +49,33 @@ namespace ctp
 		}
 
 	public:
-		FunctionKeyBar( Screen *parent );
+		FunctionKeyBar(Screen *parent);
 
-		void restoreKey( EKey key );
-		bool handlePressedKey( int ch );
+		void restoreKey(EKey key);
+		bool handlePressedKey(int ch);
 		void draw();
 
-		bool isKeyEnabled( EKey key ) const
+		bool isKeyEnabled(EKey key) const
 		{
 			return m_functionKeys[key].isEnabled;
 		}
 
-		bool isKeyCustom( EKey key ) const
+		bool isKeyCustom(EKey key) const
 		{
 			return m_functionKeys[key].isCustom;
 		}
 
-		KString getKeyName( EKey key ) const
+		KString getKeyName(EKey key) const
 		{
-			return (isKeyEnabled( key )) ? KString( m_functionKeys[key].name ) : KString();
+			return (isKeyEnabled(key)) ? KString(m_functionKeys[key].name) : KString();
 		}
 
-		void setKeyEnabled( EKey key, bool isEnabled = true )
+		void setKeyEnabled(EKey key, bool isEnabled = true)
 		{
 			m_functionKeys[key].isEnabled = isEnabled;
 		}
 
-		void setCustomKey( EKey key, const KString & name )
+		void setCustomKey(EKey key, const KString & name)
 		{
 			FunctionKey & data = m_functionKeys[key];
 			data.name = name;
