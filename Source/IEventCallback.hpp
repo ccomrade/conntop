@@ -5,11 +5,8 @@
 
 #pragma once
 
-namespace ctp
+template<class T>
+struct IEventCallback
 {
-	template<class T>
-	struct IEventCallback
-	{
-		virtual void onEvent( const T & event ) = 0;
-	};
-}
+	virtual void onEvent(const T & event) = 0;
+};

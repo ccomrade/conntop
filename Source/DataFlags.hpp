@@ -5,17 +5,14 @@
 
 #pragma once
 
-namespace ctp
+/**
+ * @brief Provides unique bit flag for each data type.
+ * It is used in client-server communication.
+ */
+namespace EDataFlags
 {
-	/**
-	 * @brief Provides unique bit flag for each data type.
-	 * It is used in client-server communication.
-	 */
-	namespace EDataFlags
+	enum
 	{
-		enum
-		{
-			CONNECTION = (1 << 0)
-		};
-	}
+		CONNECTION = (1 << 0)
+	};
 }

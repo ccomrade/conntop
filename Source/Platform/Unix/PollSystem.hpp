@@ -8,54 +8,51 @@
 #include <memory>
 #include <functional>
 
-namespace ctp
+namespace EPollFlags
 {
-	namespace EPollFlags
+	enum
 	{
-		enum
-		{
-			INPUT  = (1 << 0),
-			OUTPUT = (1 << 1),
+		INPUT  = (1 << 0),
+		OUTPUT = (1 << 1),
 
-			ERROR  = (1 << 2)
-		};
+		ERROR  = (1 << 2)
 	};
+};
 
-	class PollSystem
+class PollSystem
+{
+public:
+	using Callback = std::function<void(int, void*)>;
+
+private:
+	class Impl;
+	std::unique_ptr<Impl> m_impl;
+
+public:
+	PollSystem();
+	~PollSystem();
+
+	template<class T>
+	void add(T & object, int flags, const Callback & callback, void *param)
 	{
-	public:
-		using Callback = std::function<void(int, void*)>;
+		return addFD(object.getFD(), flags, callback, param);
+	}
 
-	private:
-		class Impl;
-		std::unique_ptr<Impl> m_impl;
+	template<class T>
+	void reset(T & object, int flags)
+	{
+		return resetFD(object.getFD(), flags);
+	}
 
-	public:
-		PollSystem();
-		~PollSystem();
+	template<class T>
+	void remove(T & object)
+	{
+		return removeFD(object.getFD());
+	}
 
-		template<class T>
-		void add( T & object, int flags, const Callback & callback, void *param )
-		{
-			return addFD( object.getFD(), flags, callback, param );
-		}
+	// Platform-specific functions
 
-		template<class T>
-		void reset( T & object, int flags )
-		{
-			return resetFD( object.getFD(), flags );
-		}
-
-		template<class T>
-		void remove( T & object )
-		{
-			return removeFD( object.getFD() );
-		}
-
-		// Platform-specific functions
-
-		void addFD( int fd, int flags, const Callback & callback, void *param );
-		void resetFD( int fd, int flags );
-		void removeFD( int fd );
-	};
-}
+	void addFD(int fd, int flags, const Callback & callback, void *param);
+	void resetFD(int fd, int flags);
+	void removeFD(int fd);
+};

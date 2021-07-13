@@ -5,16 +5,13 @@
 
 #pragma once
 
-namespace ctp
+struct IScreen
 {
-	struct IScreen
-	{
-		virtual ~IScreen() = default;
+	virtual ~IScreen() = default;
 
-		virtual bool isRefreshRequired() = 0;
-		virtual void refresh() = 0;
-		virtual void invalidate() = 0;
-		virtual void onResize() = 0;
-		virtual bool onKey( int ch ) = 0;
-	};
-}
+	virtual bool isRefreshRequired() = 0;
+	virtual void refresh() = 0;
+	virtual void invalidate() = 0;
+	virtual void onResize() = 0;
+	virtual bool onKey(int ch) = 0;
+};

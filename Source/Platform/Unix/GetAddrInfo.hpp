@@ -12,83 +12,80 @@
 
 #include "Util.hpp"
 
-namespace ctp
+template<int Flags = 0>
+class GenericGetAddrInfo
 {
-	template<int Flags = 0>
-	class GenericGetAddrInfo
+	addrinfo *m_pAddrInfo;
+	addrinfo *m_pCurrentInfo;
+	int m_status;
+
+public:
+	GenericGetAddrInfo(const char *node, const char *service, int family, int type = SOCK_STREAM, int protocol = 0)
+	: m_pAddrInfo(nullptr),
+	  m_pCurrentInfo(nullptr),
+	  m_status()
 	{
-		addrinfo *m_pAddrInfo;
-		addrinfo *m_pCurrentInfo;
-		int m_status;
+		addrinfo hints{};
+		hints.ai_flags = Flags;
+		hints.ai_family = family;
+		hints.ai_socktype = type;
+		hints.ai_protocol = protocol;
 
-	public:
-		GenericGetAddrInfo( const char *node, const char *service, int family, int type = SOCK_STREAM, int protocol = 0 )
-		: m_pAddrInfo(nullptr),
-		  m_pCurrentInfo(nullptr),
-		  m_status()
+		m_status = getaddrinfo(node, service, &hints, &m_pAddrInfo);
+
+		if (m_status == 0)
 		{
-			addrinfo hints{};
-			hints.ai_flags = Flags;
-			hints.ai_family = family;
-			hints.ai_socktype = type;
-			hints.ai_protocol = protocol;
-
-			m_status = getaddrinfo( node, service, &hints, &m_pAddrInfo );
-
-			if ( m_status == 0 )
-			{
-				m_pCurrentInfo = m_pAddrInfo;
-			}
+			m_pCurrentInfo = m_pAddrInfo;
 		}
+	}
 
-		~GenericGetAddrInfo()
+	~GenericGetAddrInfo()
+	{
+		if (m_pAddrInfo)
 		{
-			if ( m_pAddrInfo )
-			{
-				freeaddrinfo( m_pAddrInfo );
-			}
+			freeaddrinfo(m_pAddrInfo);
 		}
+	}
 
-		bool hasError() const
+	bool hasError() const
+	{
+		return m_status != 0;
+	}
+
+	bool isEmpty() const
+	{
+		return m_pCurrentInfo == nullptr;
+	}
+
+	const addrinfo *operator->() const
+	{
+		return m_pCurrentInfo;
+	}
+
+	const addrinfo *get() const
+	{
+		return m_pCurrentInfo;
+	}
+
+	void next()
+	{
+		if (m_pCurrentInfo)
 		{
-			return m_status != 0;
+			m_pCurrentInfo = m_pCurrentInfo->ai_next;
 		}
+	}
 
-		bool isEmpty() const
-		{
-			return m_pCurrentInfo == nullptr;
-		}
+	int getErrorNumber() const
+	{
+		return m_status;
+	}
 
-		const addrinfo *operator->() const
-		{
-			return m_pCurrentInfo;
-		}
+	std::string getErrorString() const
+	{
+		return (m_status == EAI_SYSTEM) ? Util::ErrnoToString() : gai_strerror(m_status);
+	}
+};
 
-		const addrinfo *get() const
-		{
-			return m_pCurrentInfo;
-		}
+using GetAddrInfo = GenericGetAddrInfo<>;
 
-		void next()
-		{
-			if ( m_pCurrentInfo )
-			{
-				m_pCurrentInfo = m_pCurrentInfo->ai_next;
-			}
-		}
-
-		int getErrorNumber() const
-		{
-			return m_status;
-		}
-
-		std::string getErrorString() const
-		{
-			return (m_status == EAI_SYSTEM) ? Util::ErrnoToString() : gai_strerror( m_status );
-		}
-	};
-
-	using GetAddrInfo = GenericGetAddrInfo<>;
-
-	using GetAddrInfoNumeric = GenericGetAddrInfo<AI_NUMERICHOST | AI_NUMERICSERV>;
-}
+using GetAddrInfoNumeric = GenericGetAddrInfo<AI_NUMERICHOST | AI_NUMERICSERV>;

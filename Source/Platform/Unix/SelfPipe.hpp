@@ -7,41 +7,38 @@
 
 #include "Types.hpp"
 
-namespace ctp
+class SelfPipe
 {
-	class SelfPipe
+	int m_pipefd[2];
+
+	void destroy();
+
+public:
+	SelfPipe();
+
+	~SelfPipe()
 	{
-		int m_pipefd[2];
+		destroy();
+	}
 
-		void destroy();
+	int getFD()
+	{
+		return getReadFD();
+	}
 
-	public:
-		SelfPipe();
+	int getReadFD()
+	{
+		return m_pipefd[0];
+	}
 
-		~SelfPipe()
-		{
-			destroy();
-		}
+	int getWriteFD()
+	{
+		return m_pipefd[1];
+	}
 
-		int getFD()
-		{
-			return getReadFD();
-		}
+	size_t writeData(const char *data, size_t dataLength);
 
-		int getReadFD()
-		{
-			return m_pipefd[0];
-		}
+	size_t readData(char *buffer, size_t bufferSize);
 
-		int getWriteFD()
-		{
-			return m_pipefd[1];
-		}
-
-		size_t writeData( const char *data, size_t dataLength );
-
-		size_t readData( char *buffer, size_t bufferSize );
-
-		size_t clear();
-	};
-}
+	size_t clear();
+};

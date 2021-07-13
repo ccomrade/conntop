@@ -13,28 +13,25 @@
 #include <unistd.h>
 #endif
 
-namespace ctp
+void Thread::PlatformCurrentThreadSetName(const KString & name)
 {
-	void Thread::PlatformCurrentThreadSetName( const KString & name )
+	if (name.empty())
+		return;
+
+#ifdef CONNTOP_PLATFORM_LINUX
+	// this function returns true if current thread is main thread
+	auto IsMainThread = []() -> bool
 	{
-		if ( name.empty() )
-			return;
+		const pid_t processID = getpid();
+		const pid_t threadID = syscall(SYS_gettid);
 
-	#ifdef CONNTOP_PLATFORM_LINUX
-		// this function returns true if current thread is main thread
-		auto IsMainThread = []() -> bool
-		{
-			const pid_t processID = getpid();
-			const pid_t threadID = syscall( SYS_gettid );
+		return processID == threadID;
+	};
 
-			return processID == threadID;
-		};
-
-		// do not change name of main thread to prevent process rename
-		if ( ! IsMainThread() )
-		{
-			prctl( PR_SET_NAME, name.c_str() );
-		}
-	#endif
+	// do not change name of main thread to prevent process rename
+	if (!IsMainThread())
+	{
+		prctl(PR_SET_NAME, name.c_str());
 	}
+#endif
 }

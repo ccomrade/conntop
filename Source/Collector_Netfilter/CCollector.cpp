@@ -6,70 +6,67 @@
 #include "CCollector.hpp"
 #include "Conntrack.hpp"
 
-namespace ctp
+class CCollector_Netfilter::Impl
 {
-	class CCollector_Netfilter::Impl
-	{
-		Conntrack m_conntrack;
+	Conntrack m_conntrack;
 
-	public:
-		Impl()
-		: m_conntrack()
-		{
-		}
-
-		void init( IConnectionUpdateCallback *callback )
-		{
-			m_conntrack.init( callback );
-		}
-
-		void onUpdate()
-		{
-			m_conntrack.onUpdate();
-		}
-
-		bool isPaused() const
-		{
-			return m_conntrack.isPaused();
-		}
-
-		void setPaused( bool paused )
-		{
-			m_conntrack.setPaused( paused );
-		}
-	};
-
-	CCollector_Netfilter::CCollector_Netfilter()
-	: m_impl(std::make_unique<Impl>())
+public:
+	Impl()
+	: m_conntrack()
 	{
 	}
 
-	CCollector_Netfilter::~CCollector_Netfilter()
+	void init(IConnectionUpdateCallback *callback)
 	{
+		m_conntrack.init(callback);
 	}
 
-	KString CCollector_Netfilter::getName() const
+	void onUpdate()
 	{
-		return "Netfilter (conntrack)";
+		m_conntrack.onUpdate();
 	}
 
-	void CCollector_Netfilter::init( IConnectionUpdateCallback *callback )
+	bool isPaused() const
 	{
-		m_impl->init( callback );
+		return m_conntrack.isPaused();
 	}
 
-	void CCollector_Netfilter::onUpdate()
+	void setPaused(bool paused)
 	{
-		m_impl->onUpdate();
+		m_conntrack.setPaused(paused);
 	}
+};
 
-	bool CCollector_Netfilter::isPaused() const
-	{
-		return m_impl->isPaused();
-	}
+CCollector_Netfilter::CCollector_Netfilter()
+: m_impl(std::make_unique<Impl>())
+{
+}
 
-	void CCollector_Netfilter::setPaused( bool paused )
-	{
-		m_impl->setPaused( paused );
-	}
+CCollector_Netfilter::~CCollector_Netfilter()
+{
+}
+
+KString CCollector_Netfilter::getName() const
+{
+	return "Netfilter (conntrack)";
+}
+
+void CCollector_Netfilter::init(IConnectionUpdateCallback *callback)
+{
+	m_impl->init(callback);
+}
+
+void CCollector_Netfilter::onUpdate()
+{
+	m_impl->onUpdate();
+}
+
+bool CCollector_Netfilter::isPaused() const
+{
+	return m_impl->isPaused();
+}
+
+void CCollector_Netfilter::setPaused(bool paused)
+{
+	m_impl->setPaused(paused);
 }

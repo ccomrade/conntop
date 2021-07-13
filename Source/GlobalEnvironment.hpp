@@ -5,17 +5,14 @@
 
 #pragma once
 
-namespace ctp
-{
-	// forward declarations
-	class CmdLine;
-	class Platform;
-	class Log;
-	class App;
-}
+// forward declarations
+class CmdLine;
+class Platform;
+class Log;
+class App;
 
 // global environment
-extern ctp::CmdLine *gCmdLine;
-extern ctp::Platform *gPlatform;
-extern ctp::Log *gLog;
-extern ctp::App *gApp;
+extern CmdLine *gCmdLine;
+extern Platform *gPlatform;
+extern Log *gLog;
+extern App *gApp;

@@ -27,7 +27,7 @@ careful when using it in a production environment.
 
 #### Requirements
 
-To build it, you need CMake, C++14 compiler (GCC >= 5 or Clang >= 3.4), and the following libraries:
+To build it, you need CMake, C++17 compiler (GCC >= 7 or Clang >= 3.9), and the following libraries:
 
 - `libnetfilter-conntrack`
 - `libmaxminddb`

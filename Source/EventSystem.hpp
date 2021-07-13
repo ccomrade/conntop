@@ -10,67 +10,64 @@
 #include "IEventCallback.hpp"
 #include "EventWrapper.hpp"
 
-namespace ctp
+class EventSystem
 {
-	class EventSystem
+	class Impl;
+	std::unique_ptr<Impl> m_impl;
+
+	using ExecutorFunction = void (*)(void *pCallback, const EventWrapper & eventWrapper);
+
+	template<class T>
+	static void Executor(IEventCallback<T> *pCallback, const EventWrapper & eventWrapper)
 	{
-		class Impl;
-		std::unique_ptr<Impl> m_impl;
-
-		using ExecutorFunction = void (*)( void *pCallback, const EventWrapper & eventWrapper );
-
-		template<class T>
-		static void Executor( IEventCallback<T> *pCallback, const EventWrapper & eventWrapper )
+		const T *pEvent = eventWrapper.get<T>();
+		if (pEvent)
 		{
-			const T *pEvent = eventWrapper.get<T>();
-			if ( pEvent )
-			{
-				pCallback->onEvent( *pEvent );
-			}
+			pCallback->onEvent(*pEvent);
 		}
+	}
 
-		void pushEvent( EventWrapper && eventWrapper );
-		void addCallback( void *pCallback, void *pExecutor, int eventID );
-		void delCallback( void *pCallback, int eventID );
+	void pushEvent(EventWrapper && eventWrapper);
+	void addCallback(void *pCallback, void *pExecutor, int eventID);
+	void delCallback(void *pCallback, int eventID);
 
-	public:
-		EventSystem();
-		~EventSystem();
+public:
+	EventSystem();
+	~EventSystem();
 
-		template<class T>
-		void dispatch( T && event )
+	template<class T>
+	void dispatch(T && event)
+	{
+		pushEvent(EventWrapper(std::forward<T>(event)));
+	}
+
+	template<class T, class... Args>
+	void dispatch(Args &&... args)
+	{
+		EventWrapper event;
+		event.emplace<T>(std::forward<Args>(args)...);
+		pushEvent(std::move(event));
+	}
+
+	template<class T>
+	void registerCallback(IEventCallback<T> *pCallback)
+	{
+		if (pCallback)
 		{
-			pushEvent( EventWrapper( std::forward<T>( event ) ) );
+			addCallback(pCallback, reinterpret_cast<void*>(Executor<T>), T::ID);
 		}
+	}
 
-		template<class T, class... Args>
-		void dispatch( Args &&... args )
+	template<class T>
+	void removeCallback(IEventCallback<T> *pCallback)
+	{
+		if (pCallback)
 		{
-			EventWrapper event;
-			event.emplace<T>( std::forward<Args>( args )... );
-			pushEvent( std::move( event ) );
+			delCallback(pCallback, T::ID);
 		}
+	}
 
-		template<class T>
-		void registerCallback( IEventCallback<T> *pCallback )
-		{
-			if ( pCallback )
-			{
-				addCallback( pCallback, reinterpret_cast<void*>( Executor<T> ), T::ID );
-			}
-		}
+	void run();
 
-		template<class T>
-		void removeCallback( IEventCallback<T> *pCallback )
-		{
-			if ( pCallback )
-			{
-				delCallback( pCallback, T::ID );
-			}
-		}
-
-		void run();
-
-		void stop();
-	};
-}
+	void stop();
+};
