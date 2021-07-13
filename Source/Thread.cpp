@@ -8,69 +8,66 @@
 #include "Log.hpp"
 #include "App.hpp"
 
-namespace ctp
+static thread_local std::string g_threadName;
+
+const KString Thread::DEFAULT_NAME = "<unnamed>";
+
+Thread::Thread(std::string threadName, const Function & threadFunction)
+: m_name(std::move(threadName)),
+  m_thread()
 {
-	static thread_local std::string g_threadName;
-
-	const KString Thread::DEFAULT_NAME = "<unnamed>";
-
-	Thread::Thread(std::string threadName, const Function & threadFunction)
-	: m_name(std::move(threadName)),
-	  m_thread()
+	if (m_name.empty())
 	{
-		if (m_name.empty())
-		{
-			m_name = DEFAULT_NAME;
-		}
-
-		m_thread = std::thread(Run, m_name, threadFunction);  // may throw std::system_error
+		m_name = DEFAULT_NAME;
 	}
 
-	void Thread::join()
+	m_thread = std::thread(Run, m_name, threadFunction);  // may throw std::system_error
+}
+
+void Thread::join()
+{
+	if (isJoinable())
 	{
-		if (isJoinable())
-		{
-			gLog->info("[Thread] Waiting for %s thread...", m_name.c_str());
-			m_thread.join();
-			gLog->info("[Thread] %s thread stopped", m_name.c_str());
-		}
+		gLog->info("[Thread] Waiting for %s thread...", m_name.c_str());
+		m_thread.join();
+		gLog->info("[Thread] %s thread stopped", m_name.c_str());
 	}
+}
 
-	KString Thread::GetCurrentThreadName()
+KString Thread::GetCurrentThreadName()
+{
+	if (g_threadName.empty())
 	{
-		if (g_threadName.empty())
-		{
-			return DEFAULT_NAME;
-		}
-		else
-		{
-			return g_threadName;
-		}
+		return DEFAULT_NAME;
 	}
-
-	void Thread::SetCurrentThreadName(std::string name)
+	else
 	{
-		g_threadName = std::move(name);
-		PlatformCurrentThreadSetName(g_threadName);
+		return g_threadName;
 	}
+}
 
-	void Thread::Run(std::string threadName, Function threadFunction)
+void Thread::SetCurrentThreadName(std::string name)
+{
+	g_threadName = std::move(name);
+	PlatformCurrentThreadSetName(g_threadName);
+}
+
+void Thread::Run(std::string threadName, Function threadFunction)
+{
+	SetCurrentThreadName(std::move(threadName));
+
+	const KString name = GetCurrentThreadName();
+	gLog->info("[Thread] %s thread started", name.c_str());
+
+	try
 	{
-		SetCurrentThreadName(std::move(threadName));
+		threadFunction();
+	}
+	catch (const Exception & e)
+	{
+		KString origin = (e.hasOrigin()) ? e.getOrigin() : "?";
+		gLog->info("[Thread] Exception in %s thread: [%s] %s", name.c_str(), origin.c_str(), e.what());
 
-		const KString name = GetCurrentThreadName();
-		gLog->info("[Thread] %s thread started", name.c_str());
-
-		try
-		{
-			threadFunction();
-		}
-		catch (const Exception & e)
-		{
-			KString origin = (e.hasOrigin()) ? e.getOrigin() : "?";
-			gLog->info("[Thread] Exception in %s thread: [%s] %s", name.c_str(), origin.c_str(), e.what());
-
-			gApp->fatalError(e.getString(), e.getOrigin(), false);
-		}
+		gApp->fatalError(e.getString(), e.getOrigin(), false);
 	}
 }

@@ -6,51 +6,48 @@
 #include "CUI.hpp"
 #include "Curses.hpp"
 
-namespace ctp
+class CUI_Curses::Impl
 {
-	class CUI_Curses::Impl
-	{
-		Curses m_curses;
+	Curses m_curses;
 
-	public:
-		Impl()
-		: m_curses()
-		{
-		}
-
-		void init()
-		{
-			m_curses.init();
-		}
-
-		void refreshConnectionList()
-		{
-			m_curses.getConnectionListScreen().updateList();
-			m_curses.refreshScreen();
-		}
-	};
-
-	CUI_Curses::CUI_Curses()
-	: m_impl(std::make_unique<Impl>())
+public:
+	Impl()
+	: m_curses()
 	{
 	}
 
-	CUI_Curses::~CUI_Curses()
+	void init()
 	{
+		m_curses.init();
 	}
 
-	KString CUI_Curses::getName() const
+	void refreshConnectionList()
 	{
-		return "Curses";
+		m_curses.getConnectionListScreen().updateList();
+		m_curses.refreshScreen();
 	}
+};
 
-	void CUI_Curses::init()
-	{
-		m_impl->init();
-	}
+CUI_Curses::CUI_Curses()
+: m_impl(std::make_unique<Impl>())
+{
+}
 
-	void CUI_Curses::refreshConnectionList()
-	{
-		m_impl->refreshConnectionList();
-	}
+CUI_Curses::~CUI_Curses()
+{
+}
+
+KString CUI_Curses::getName() const
+{
+	return "Curses";
+}
+
+void CUI_Curses::init()
+{
+	m_impl->init();
+}
+
+void CUI_Curses::refreshConnectionList()
+{
+	m_impl->refreshConnectionList();
 }

@@ -7,16 +7,13 @@
 
 #include "KString.hpp"
 
-namespace ctp
+struct IUI
 {
-	struct IUI
-	{
-		virtual ~IUI() = default;
+	virtual ~IUI() = default;
 
-		virtual KString getName() const = 0;
+	virtual KString getName() const = 0;
 
-		virtual void init() = 0;
+	virtual void init() = 0;
 
-		virtual void refreshConnectionList() = 0;
-	};
-}
+	virtual void refreshConnectionList() = 0;
+};

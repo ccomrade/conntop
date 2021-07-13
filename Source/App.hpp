@@ -13,159 +13,156 @@
 #include "PollSystem.hpp"
 #include "conntop_config.h"
 
-namespace ctp
+class ConnectionList;
+class Client;
+class Server;
+class GeoIP;
+class Resolver;
+
+struct ICollector;
+struct IUI;
+
+class App
 {
-	class ConnectionList;
-	class Client;
-	class Server;
-	class GeoIP;
-	class Resolver;
+	std::unique_ptr<EventSystem> m_pEventSystem;
+	std::unique_ptr<PollSystem> m_pPollSystem;
+#ifndef CONNTOP_DEDICATED
+	std::unique_ptr<ConnectionList> m_pConnectionList;
+	std::unique_ptr<Client> m_pClient;
+	std::unique_ptr<GeoIP> m_pGeoIP;
+	std::unique_ptr<Resolver> m_pResolver;
+	std::unique_ptr<IUI> m_pUI;
+#endif
+	std::unique_ptr<Server> m_pServer;
+	std::unique_ptr<ICollector> m_pCollector;
 
-	struct ICollector;
-	struct IUI;
+public:
+	App();
+	~App();
 
-	class App
+	EventSystem *getEventSystem()
 	{
-		std::unique_ptr<EventSystem> m_pEventSystem;
-		std::unique_ptr<PollSystem> m_pPollSystem;
+		return m_pEventSystem.get();
+	}
+
+	PollSystem *getPollSystem()
+	{
+		return m_pPollSystem.get();
+	}
+
+	bool isClient() const
+	{
 	#ifndef CONNTOP_DEDICATED
-		std::unique_ptr<ConnectionList> m_pConnectionList;
-		std::unique_ptr<Client> m_pClient;
-		std::unique_ptr<GeoIP> m_pGeoIP;
-		std::unique_ptr<Resolver> m_pResolver;
-		std::unique_ptr<IUI> m_pUI;
+		return m_pClient.get() != nullptr;
+	#else
+		return false;
 	#endif
-		std::unique_ptr<Server> m_pServer;
-		std::unique_ptr<ICollector> m_pCollector;
+	}
 
-	public:
-		App();
-		~App();
+	bool isServer() const
+	{
+		return m_pServer.get() != nullptr;
+	}
 
-		EventSystem *getEventSystem()
-		{
-			return m_pEventSystem.get();
-		}
+	bool hasConnectionList() const
+	{
+	#ifndef CONNTOP_DEDICATED
+		return m_pConnectionList.get() != nullptr;
+	#else
+		return false;
+	#endif
+	}
 
-		PollSystem *getPollSystem()
-		{
-			return m_pPollSystem.get();
-		}
+	bool hasGeoIP() const
+	{
+	#ifndef CONNTOP_DEDICATED
+		return m_pGeoIP.get() != nullptr;
+	#else
+		return false;
+	#endif
+	}
 
-		bool isClient() const
-		{
-		#ifndef CONNTOP_DEDICATED
-			return m_pClient.get() != nullptr;
-		#else
-			return false;
-		#endif
-		}
+	bool hasResolver() const
+	{
+	#ifndef CONNTOP_DEDICATED
+		return m_pResolver.get() != nullptr;
+	#else
+		return false;
+	#endif
+	}
 
-		bool isServer() const
-		{
-			return m_pServer.get() != nullptr;
-		}
+	bool hasUI() const
+	{
+	#ifndef CONNTOP_DEDICATED
+		return m_pUI.get() != nullptr;
+	#else
+		return false;
+	#endif
+	}
 
-		bool hasConnectionList() const
-		{
-		#ifndef CONNTOP_DEDICATED
-			return m_pConnectionList.get() != nullptr;
-		#else
-			return false;
-		#endif
-		}
+	bool hasCollector() const
+	{
+		return m_pCollector.get() != nullptr;
+	}
 
-		bool hasGeoIP() const
-		{
-		#ifndef CONNTOP_DEDICATED
-			return m_pGeoIP.get() != nullptr;
-		#else
-			return false;
-		#endif
-		}
+	Client *getClient()
+	{
+	#ifndef CONNTOP_DEDICATED
+		return m_pClient.get();
+	#else
+		return nullptr;
+	#endif
+	}
 
-		bool hasResolver() const
-		{
-		#ifndef CONNTOP_DEDICATED
-			return m_pResolver.get() != nullptr;
-		#else
-			return false;
-		#endif
-		}
+	Server *getServer()
+	{
+		return m_pServer.get();
+	}
 
-		bool hasUI() const
-		{
-		#ifndef CONNTOP_DEDICATED
-			return m_pUI.get() != nullptr;
-		#else
-			return false;
-		#endif
-		}
+	ConnectionList *getConnectionList()
+	{
+	#ifndef CONNTOP_DEDICATED
+		return m_pConnectionList.get();
+	#else
+		return nullptr;
+	#endif
+	}
 
-		bool hasCollector() const
-		{
-			return m_pCollector.get() != nullptr;
-		}
+	GeoIP *getGeoIP()
+	{
+	#ifndef CONNTOP_DEDICATED
+		return m_pGeoIP.get();
+	#else
+		return nullptr;
+	#endif
+	}
 
-		Client *getClient()
-		{
-		#ifndef CONNTOP_DEDICATED
-			return m_pClient.get();
-		#else
-			return nullptr;
-		#endif
-		}
+	Resolver *getResolver()
+	{
+	#ifndef CONNTOP_DEDICATED
+		return m_pResolver.get();
+	#else
+		return nullptr;
+	#endif
+	}
 
-		Server *getServer()
-		{
-			return m_pServer.get();
-		}
+	IUI *getUI()
+	{
+	#ifndef CONNTOP_DEDICATED
+		return m_pUI.get();
+	#else
+		return nullptr;
+	#endif
+	}
 
-		ConnectionList *getConnectionList()
-		{
-		#ifndef CONNTOP_DEDICATED
-			return m_pConnectionList.get();
-		#else
-			return nullptr;
-		#endif
-		}
+	ICollector *getCollector()
+	{
+		return m_pCollector.get();
+	}
 
-		GeoIP *getGeoIP()
-		{
-		#ifndef CONNTOP_DEDICATED
-			return m_pGeoIP.get();
-		#else
-			return nullptr;
-		#endif
-		}
+	void launch();
 
-		Resolver *getResolver()
-		{
-		#ifndef CONNTOP_DEDICATED
-			return m_pResolver.get();
-		#else
-			return nullptr;
-		#endif
-		}
+	void quit();
 
-		IUI *getUI()
-		{
-		#ifndef CONNTOP_DEDICATED
-			return m_pUI.get();
-		#else
-			return nullptr;
-		#endif
-		}
-
-		ICollector *getCollector()
-		{
-			return m_pCollector.get();
-		}
-
-		void launch();
-
-		void quit();
-
-		void fatalError(std::string errorMessage, const char *origin = nullptr, bool log = true);
-	};
-}
+	void fatalError(std::string errorMessage, const char *origin = nullptr, bool log = true);
+};

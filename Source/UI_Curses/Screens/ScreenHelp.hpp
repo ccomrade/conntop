@@ -7,16 +7,13 @@
 
 #include "Screen.hpp"
 
-namespace ctp
+class ScreenHelp : public Screen
 {
-	class ScreenHelp : public Screen
-	{
-		void draw();
+	void draw();
 
-		void handleResize() override;
-		bool handleKey(int ch) override;
+	void handleResize() override;
+	bool handleKey(int ch) override;
 
-	public:
-		ScreenHelp();
-	};
-}
+public:
+	ScreenHelp();
+};
