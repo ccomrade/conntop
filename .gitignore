@@ -1,6 +1,0 @@
-# build folder
-/build
-/Build
-
-# Qt Creator
-/CMakeLists.txt.user
