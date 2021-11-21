@@ -5,54 +5,50 @@
 
 void CmdLine::Parse(int argc, char** argv)
 {
-	bool parseOptions = true;
-	bool attachValue = false;
+	bool optionsEndFound = false;
+	bool nextArgIsValue = false;
 
 	for (int i = 1; i < argc; i++)
 	{
 		const std::string_view arg = argv[i];
 
-		if (parseOptions)
+		if (!optionsEndFound)
 		{
+			bool useNextArgAsValue = false;
+
 			switch (ParseAndPushOption(arg))
 			{
-				case OptionType::NOT_AN_OPTION:
-					if (attachValue)
-					{
-						// m_options cannot be empty if attachValue is true
-						m_options.back().value = arg;
-						attachValue = false;
-					}
+				case OptionParseResult::NOT_AN_OPTION:
+					if (nextArgIsValue)
+						options.back().value = arg;
 					else
-					{
-						PushOperand(arg);
-					}
+						operands.push_back(arg);
 					break;
-				case OptionType::LONG_OPTION:
-				case OptionType::SHORT_OPTION:
-					attachValue = true;
+				case OptionParseResult::LONG_OPTION:
+				case OptionParseResult::SHORT_OPTION:
+					useNextArgAsValue = true;
 					break;
-				case OptionType::LONG_OPTION_WITH_VALUE:
-					attachValue = false;
+				case OptionParseResult::LONG_OPTION_WITH_VALUE:
 					break;
-				case OptionType::END_OF_OPTIONS:
-					parseOptions = false;
-					attachValue = false;
+				case OptionParseResult::END_OF_OPTIONS:
+					optionsEndFound = true;
 					break;
 			}
+
+			nextArgIsValue = useNextArgAsValue;
 		}
 		else
 		{
-			PushOperand(arg);
+			operands.push_back(arg);
 		}
 	}
 }
 
-CmdLine::OptionType CmdLine::ParseAndPushOption(const std::string_view& arg)
+CmdLine::OptionParseResult CmdLine::ParseAndPushOption(const std::string_view& arg)
 {
 	if (arg.length() < 2 || arg[0] != '-')
 	{
-		return OptionType::NOT_AN_OPTION;
+		return OptionParseResult::NOT_AN_OPTION;
 	}
 
 	if (arg[1] == '-')
@@ -60,192 +56,260 @@ CmdLine::OptionType CmdLine::ParseAndPushOption(const std::string_view& arg)
 		if (arg.length() == 2)
 		{
 			// found "--"
-			return OptionType::END_OF_OPTIONS;
+			return OptionParseResult::END_OF_OPTIONS;
 		}
 		else
 		{
-			// long option
-			std::string_view name = arg;
+			Option longOption;
+			longOption.name = arg;
 
 			// remove "--"
-			name.remove_prefix(2);
+			longOption.name.remove_prefix(2);
 
-			const auto equalSignPos = name.find('=');
-			if (equalSignPos != std::string_view::npos)
+			// parse "option=value"
+			if (const auto separatorPos = longOption.name.find('='); separatorPos != std::string_view::npos)
 			{
-				// "option=value"
-				std::string_view value = name;
+				longOption.value = longOption.name;
 
 				// remove "option="
-				value.remove_prefix(equalSignPos + 1);
+				longOption.value.remove_prefix(separatorPos + 1);
 				// remove "=value"
-				name.remove_suffix(name.length() - equalSignPos);
+				longOption.name.remove_suffix(longOption.name.length() - separatorPos);
 
-				PushOption(name, value);
+				options.push_back(longOption);
 
-				return OptionType::LONG_OPTION_WITH_VALUE;
+				return OptionParseResult::LONG_OPTION_WITH_VALUE;
 			}
 			else
 			{
-				PushOption(name);
+				options.push_back(longOption);
 
-				return OptionType::LONG_OPTION;
+				return OptionParseResult::LONG_OPTION;
 			}
 		}
 	}
 	else
 	{
-		// short option
-		std::string_view name = arg;
-
-		// remove "-"
-		name.remove_prefix(1);
-
-		if (name.length() > 1)
+		if (arg.length() == 2)
 		{
-			// multiple short options packed together
-			for (unsigned int i = 0; i < name.length(); i++)
-			{
-				PushOption(name.substr(i, 1));
-			}
+			Option shortOption;
+			shortOption.name = arg;
+
+			// remove "-"
+			shortOption.name.remove_prefix(1);
+
+			options.push_back(shortOption);
 		}
 		else
 		{
-			PushOption(name);
+			// parse multiple short options packed together
+			for (unsigned int i = 1; i < arg.length(); i++)
+			{
+				Option shortOption;
+				shortOption.name = arg.substr(i, 1);
+
+				options.push_back(shortOption);
+			}
 		}
 
-		return OptionType::SHORT_OPTION;
+		return OptionParseResult::SHORT_OPTION;
 	}
-}
-
-void CmdLine::PushOption(const std::string_view& name, const std::string_view& value)
-{
-	Option option;
-	option.name = name;
-	option.value = value;
-
-	m_options.emplace_back(option);
-}
-
-void CmdLine::PushOperand(const std::string_view& operand)
-{
-	m_operands.emplace_back(operand);
 }
 
 std::string_view CmdLine::PopRequiredOptionWithRequiredValue(const std::string_view& name)
 {
 	std::string_view value;
-	if (!TryPopOptionWithRequiredValue(name, value))
-		throw std::runtime_error("Option '" + PrettifyOption(name) + "' is missing");
 
-	return value;
+	if (!TryPopOptionWithRequiredValue(name, value))
+	{
+		throw std::runtime_error("Option '" + AddHyphens(name) + "' is missing");
+	}
+	else
+	{
+		return value;
+	}
 }
 
 std::string_view CmdLine::PopRequiredOptionWithRequiredValue(const std::string_view& name, const std::string_view& name2)
 {
 	std::string_view value;
-	if (!TryPopOptionWithRequiredValue(name, name2, value))
-		throw std::runtime_error("Option '" + PrettifyOption(name, name2) + "' is missing");
 
-	return value;
+	if (!TryPopOptionWithRequiredValue(name, name2, value))
+	{
+		throw std::runtime_error("Option '" + AddHyphens(name, name2) + "' is missing");
+	}
+	else
+	{
+		return value;
+	}
 }
 
 std::string_view CmdLine::PopRequiredOptionWithOptionalValue(const std::string_view& name)
 {
 	std::string_view value;
-	if (!TryPopOptionWithOptionalValue(name, value))
-		throw std::runtime_error("Option '" + PrettifyOption(name) + "' is missing");
 
-	return value;
+	if (!TryPopOptionWithOptionalValue(name, value))
+	{
+		throw std::runtime_error("Option '" + AddHyphens(name) + "' is missing");
+	}
+	else
+	{
+		return value;
+	}
 }
 
 std::string_view CmdLine::PopRequiredOptionWithOptionalValue(const std::string_view& name, const std::string_view& name2)
 {
 	std::string_view value;
-	if (!TryPopOptionWithOptionalValue(name, name2, value))
-		throw std::runtime_error("Option '" + PrettifyOption(name, name2) + "' is missing");
 
-	return value;
+	if (!TryPopOptionWithOptionalValue(name, name2, value))
+	{
+		throw std::runtime_error("Option '" + AddHyphens(name, name2) + "' is missing");
+	}
+	else
+	{
+		return value;
+	}
 }
 
 bool CmdLine::TryPopOptionWithoutValue(const std::string_view& name)
 {
 	std::string_view value;
+
 	if (!TryPopOptionWithOptionalValue(name, value))
+	{
 		return false;
+	}
+	else
+	{
+		if (!value.empty())
+		{
+			// this value is actually an operand
+			operands.push_back(value);
+		}
 
-	// so this value is actually an operand
-	if (!value.empty())
-		PushOperand(value);
-
-	return true;
+		return true;
+	}
 }
 
 bool CmdLine::TryPopOptionWithoutValue(const std::string_view& name, const std::string_view& name2)
 {
 	std::string_view value;
+
 	if (!TryPopOptionWithOptionalValue(name, name2, value))
+	{
 		return false;
+	}
+	else
+	{
+		if (!value.empty())
+		{
+			// this value is actually an operand
+			operands.push_back(value);
+		}
 
-	// so this value is actually an operand
-	if (!value.empty())
-		PushOperand(value);
-
-	return true;
+		return true;
+	}
 }
 
 bool CmdLine::TryPopOptionWithRequiredValue(const std::string_view& name, std::string_view& value)
 {
 	if (!TryPopOptionWithOptionalValue(name, value))
+	{
 		return false;
+	}
+	else
+	{
+		if (value.empty())
+		{
+			throw std::runtime_error("Option '" + AddHyphens(name) + "' requires a value");
+		}
 
-	if (value.empty())
-		throw std::runtime_error("Option '" + PrettifyOption(name) + "' requires a value");
-
-	return true;
+		return true;
+	}
 }
 
 bool CmdLine::TryPopOptionWithRequiredValue(const std::string_view& name, const std::string_view& name2, std::string_view& value)
 {
 	if (!TryPopOptionWithOptionalValue(name, name2, value))
+	{
 		return false;
+	}
+	else
+	{
+		if (value.empty())
+		{
+			throw std::runtime_error("Option '" + AddHyphens(name, name2) + "' requires a value");
+		}
 
-	if (value.empty())
-		throw std::runtime_error("Option '" + PrettifyOption(name, name2) + "' requires a value");
-
-	return true;
+		return true;
+	}
 }
 
 bool CmdLine::TryPopOptionWithOptionalValue(const std::string_view& name, std::string_view& value)
 {
-	// use reverse iterators to get the last matching option from the command line
-	const auto it = std::find(m_options.rbegin(), m_options.rend(), name);
-	if (it == m_options.rend())
+	const auto comparator = [&name](const Option& option)
+	{
+		return option.name == name;
+	};
+
+	// use reverse iterators to get the last matching option
+	const auto it = std::find_if(options.rbegin(), options.rend(), comparator);
+
+	if (it == options.rend())
+	{
 		return false;
+	}
+	else
+	{
+		value = it->value;
 
-	value = it->value;
+		// pop the option
+		// convert the reverse iterator into a forward iterator
+		options.erase(std::next(it).base());
 
-	// pop the option
-	m_options.erase(std::next(it).base());
-
-	return true;
+		return true;
+	}
 }
 
 bool CmdLine::TryPopOptionWithOptionalValue(const std::string_view& name, const std::string_view& name2, std::string_view& value)
 {
-	if (name < name2)
-		return TryPopOptionWithOptionalValue(name2, value) || TryPopOptionWithOptionalValue(name, value);
+	const auto comparator = [&name, &name2](const Option& option)
+	{
+		return option.name == name || option.name == name2;
+	};
+
+	// use reverse iterators to get the last matching option
+	const auto it = std::find_if(options.rbegin(), options.rend(), comparator);
+
+	if (it == options.rend())
+	{
+		return false;
+	}
 	else
-		return TryPopOptionWithOptionalValue(name, value) || TryPopOptionWithOptionalValue(name2, value);
+	{
+		value = it->value;
+
+		// pop the option
+		// convert the reverse iterator into a forward iterator
+		options.erase(std::next(it).base());
+
+		return true;
+	}
 }
 
 unsigned int CmdLine::CountAndPopOption(const std::string_view& name)
 {
-	const auto originalSize = m_options.size();
+	const auto comparator = [&name](const Option& option)
+	{
+		return option.name == name;
+	};
 
-	m_options.erase(std::remove(m_options.begin(), m_options.end(), name), m_options.end());
+	const auto originalSize = options.size();
 
-	return originalSize - m_options.size();
+	options.erase(std::remove_if(options.begin(), options.end(), comparator), options.end());
+
+	return originalSize - options.size();
 }
 
 unsigned int CmdLine::CountAndPopOption(const std::string_view& name, const std::string_view& name2)
@@ -253,23 +317,23 @@ unsigned int CmdLine::CountAndPopOption(const std::string_view& name, const std:
 	return CountAndPopOption(name) + CountAndPopOption(name2);
 }
 
-void CmdLine::Clear()
-{
-	m_options.clear();
-	m_operands.clear();
-}
-
-std::string CmdLine::PrettifyOption(const std::string_view& name)
+std::string CmdLine::AddHyphens(const std::string_view& name)
 {
 	if (name.length() == 1)
+	{
 		return "-" + std::string(name);
+	}
 	else if (name.length() > 1)
+	{
 		return "--" + std::string(name);
+	}
 	else
+	{
 		return {};
+	}
 }
 
-std::string CmdLine::PrettifyOption(const std::string_view& name, const std::string_view& name2)
+std::string CmdLine::AddHyphens(const std::string_view& name, const std::string_view& name2)
 {
-	return PrettifyOption(name) + "|" + PrettifyOption(name2);
+	return AddHyphens(name) + "|" + AddHyphens(name2);
 }

@@ -15,15 +15,15 @@ namespace
 		Log::config.verbosity = static_cast<int>(cmdLine.CountAndPopOption("v", "verbose"));
 
 		// make sure there are no remaining options
-		for (const CmdLine::Option& option : cmdLine.GetOptions())
+		for (const CmdLine::Option& option : cmdLine.options)
 		{
-			throw std::runtime_error("Unsupported option '" + option.GetPrettyName() + "'");
+			throw std::runtime_error("Unknown option '" + CmdLine::AddHyphens(option.name) + "'");
 		}
 
 		// make sure there are no remaining operands
-		for (const std::string_view& operand : cmdLine.GetOperands())
+		for (const std::string_view& operand : cmdLine.operands)
 		{
-			throw std::runtime_error("Unsupported operand '" + std::string(operand) + "'");
+			throw std::runtime_error("Unknown operand '" + std::string(operand) + "'");
 		}
 	}
 }
