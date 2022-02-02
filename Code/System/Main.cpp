@@ -11,8 +11,9 @@ namespace
 	{
 		CmdLine cmdLine(argc, argv);
 
-		// TODO
-		Log::config.verbosity = static_cast<int>(cmdLine.CountAndPopOption("v", "verbose"));
+		const unsigned int verboseCount = cmdLine.CountAndPopOption("v", "verbose");
+
+		Log::GetInstance().SetVerbosity(static_cast<int>(verboseCount));
 
 		// make sure there are no remaining options
 		for (const CmdLine::Option& option : cmdLine.options)

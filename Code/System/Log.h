@@ -6,49 +6,66 @@
 
 #include "Base/Format.h"
 
-enum class LogSeverity
+class Log
 {
-	ERROR, WARNING, NOTICE, INFO, DEBUG
-};
-
-struct LogConfig
-{
-	std::atomic<int> verbosity = 0;
-};
-
-namespace Log
-{
-	////////////////////////
-	inline LogConfig config;
-	////////////////////////
-
-	inline bool IsSeverityEnabled(LogSeverity severity)
+public:
+	enum class Severity
 	{
-		const int verbosity = config.verbosity;
+		ERROR, WARNING, NOTICE, INFO, DEBUG
+	};
+
+private:
+	std::atomic<int> m_verbosity = 0;
+
+	Log() = default;
+
+public:
+	static Log& GetInstance()
+	{
+		static Log instance;
+		return instance;
+	}
+
+	int GetVerbosity() const
+	{
+		return m_verbosity.load(std::memory_order_relaxed);
+	}
+
+	void SetVerbosity(int verbosity)
+	{
+		m_verbosity.store(verbosity, std::memory_order_relaxed);
+	}
+
+	bool IsSeverityEnabled(Severity severity) const
+	{
+		const int verbosity = GetVerbosity();
 
 		switch (severity)
 		{
-			case LogSeverity::ERROR:
-			case LogSeverity::WARNING:
-			case LogSeverity::NOTICE:
+			case Severity::ERROR:
+			case Severity::WARNING:
+			case Severity::NOTICE:
 				return verbosity >= 0;
-			case LogSeverity::INFO:
+			case Severity::INFO:
 				return verbosity >= 1;
-			case LogSeverity::DEBUG:
+			case Severity::DEBUG:
 				return verbosity >= 2;
 		}
 
 		return false;
 	}
 
-	void Write(LogSeverity severity, const std::string_view& message);
-}
+	void Write(Severity severity, const std::string_view& message);
+};
 
-// avoid construction of dropped log messages
-#define LOG_BASE(severity, message) if (Log::IsSeverityEnabled(severity)) Log::Write(severity, message)
+////////////////////////////////////////////////////////////////////////////////
 
-#define LOG_ERROR(message) LOG_BASE(LogSeverity::ERROR, message)
-#define LOG_WARNING(message) LOG_BASE(LogSeverity::WARNING, message)
-#define LOG_NOTICE(message) LOG_BASE(LogSeverity::NOTICE, message)
-#define LOG_INFO(message) LOG_BASE(LogSeverity::INFO, message)
-#define LOG_DEBUG(message) LOG_BASE(LogSeverity::DEBUG, message)
+#define LOG(severity, message) if (Log::GetInstance().IsSeverityEnabled(severity)) Log::GetInstance().Write(severity, message)
+
+#define LOG_ERROR(message) LOG(Log::Severity::ERROR, message)
+#define LOG_WARNING(message) LOG(Log::Severity::WARNING, message)
+#define LOG_NOTICE(message) LOG(Log::Severity::NOTICE, message)
+#define LOG_INFO(message) LOG(Log::Severity::INFO, message)
+#define LOG_DEBUG(message) LOG(Log::Severity::DEBUG, message)
+
+////////////////////////////////////////////////////////////////////////////////
