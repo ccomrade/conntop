@@ -2,12 +2,12 @@
 
 #include <utility>
 
+#include "System.h"
+
 class Handle
 {
 	// file descriptor
 	int m_fd = -1;
-
-	void Release() noexcept;
 
 public:
 	Handle() = default;
@@ -52,7 +52,9 @@ public:
 	{
 		if (IsOpen())
 		{
-			Release();
+			System::CloseFileDescriptor(m_fd);
+
+			m_fd = -1;
 		}
 	}
 

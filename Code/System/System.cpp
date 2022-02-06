@@ -5,6 +5,11 @@
 
 #include "System.h"
 
+void System::CloseFileDescriptor(int fd)
+{
+	close(fd);
+}
+
 void System::SetFileDescriptorNonBlocking(int fd)
 {
 	if (fcntl(fd, F_SETFL, O_NONBLOCK) < 0)

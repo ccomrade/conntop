@@ -24,7 +24,6 @@ add_executable(conntop
 	Code/Base/IPProtocol.h
 	Code/System/CmdLine.cpp
 	Code/System/CmdLine.h
-	Code/System/Handle.cpp
 	Code/System/Handle.h
 	Code/System/Log.cpp
 	Code/System/Log.h
