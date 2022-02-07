@@ -309,7 +309,7 @@ unsigned int CmdLine::CountAndPopOption(const std::string_view& name)
 
 	options.erase(std::remove_if(options.begin(), options.end(), comparator), options.end());
 
-	return originalSize - options.size();
+	return static_cast<unsigned int>(originalSize - options.size());
 }
 
 unsigned int CmdLine::CountAndPopOption(const std::string_view& name, const std::string_view& name2)

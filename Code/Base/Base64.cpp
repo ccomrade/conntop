@@ -122,9 +122,9 @@ std::string Base64::Decode(const std::string_view& text)
 			}
 		}
 
-		*output++ = (block[0] << 2) | (block[1] >> 4);
-		*output++ = (block[1] << 4) | (block[2] >> 2);
-		*output++ = (block[2] << 6) | (block[3]);
+		*output++ = static_cast<unsigned char>((block[0] << 2) | (block[1] >> 4));
+		*output++ = static_cast<unsigned char>((block[1] << 4) | (block[2] >> 2));
+		*output++ = static_cast<unsigned char>((block[2] << 6) | (block[3]));
 	}
 
 	result.resize(result.size() - padding);
