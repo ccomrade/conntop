@@ -4,6 +4,13 @@ project(conntop)
 set(CMAKE_CXX_STANDARD 17)
 include_directories(Code)
 
+add_compile_options(
+	-Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic
+	-Wconversion -Wmisleading-indentation -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wnull-dereference
+	-Wuseless-cast -Wdouble-promotion -Wformat=2
+	-pedantic
+)
+
 add_executable(conntop
 	Code/App/App.cpp
 	Code/App/App.h
