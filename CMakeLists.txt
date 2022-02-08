@@ -23,6 +23,8 @@ add_executable(conntop
 	Code/App/Probe/Probe.h
 	Code/App/Probe/SocketPids.cpp
 	Code/App/Probe/SocketPids.h
+	Code/Base/Base64.cpp
+	Code/Base/Base64.h
 	Code/Base/Endian.h
 	Code/Base/Format.cpp
 	Code/Base/Format.h
