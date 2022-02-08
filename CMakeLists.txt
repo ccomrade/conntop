@@ -38,6 +38,11 @@ add_executable(conntop
 	Code/System/Reactor.cpp
 	Code/System/Reactor.h
 	Code/System/System.cpp
-	Code/System/System.h)
+	Code/System/System.h
+	Code/System/TCPServerSocket.cpp
+	Code/System/TCPServerSocket.h
+	Code/System/TCPSocket.cpp
+	Code/System/TCPSocket.h
+)
 
 target_link_libraries(conntop PUBLIC netfilter_conntrack)
