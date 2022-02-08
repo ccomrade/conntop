@@ -55,13 +55,13 @@ void TCPSocket::StartConnect(const IPAddress& address, std::uint16_t port)
 
 	const sockaddr_storage socketAddress = [&address, port]()
 	{
-		sockaddr_storage result = {};
+		sockaddr_storage socketAddress = {};
 
 		switch (address.type)
 		{
 			case IPAddressType::IPv4:
 			{
-				auto sa4 = reinterpret_cast<sockaddr_in*>(&result);
+				auto sa4 = reinterpret_cast<sockaddr_in*>(&socketAddress);
 
 				sa4->sin_family = AF_INET;
 				sa4->sin_port = htons(port);
@@ -71,7 +71,7 @@ void TCPSocket::StartConnect(const IPAddress& address, std::uint16_t port)
 			}
 			case IPAddressType::IPv6:
 			{
-				auto sa6 = reinterpret_cast<sockaddr_in6*>(&result);
+				auto sa6 = reinterpret_cast<sockaddr_in6*>(&socketAddress);
 
 				sa6->sin6_family = AF_INET6;
 				sa6->sin6_port = htons(port);
@@ -81,7 +81,7 @@ void TCPSocket::StartConnect(const IPAddress& address, std::uint16_t port)
 			}
 		}
 
-		return result;
+		return socketAddress;
 	}();
 
 	////////////////////////////////////////////////////////////////////////////////
