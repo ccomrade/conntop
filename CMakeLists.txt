@@ -30,6 +30,10 @@ add_executable(conntop
 	Code/Base/Format.h
 	Code/Base/HTTP.h
 	Code/Base/HTTPMethod.h
+	Code/Base/HTTPRequestBuilder.cpp
+	Code/Base/HTTPRequestBuilder.h
+	Code/Base/HTTPResponseBuilder.cpp
+	Code/Base/HTTPResponseBuilder.h
 	Code/Base/HTTPStatus.h
 	Code/Base/IPAddress.cpp
 	Code/Base/IPAddress.h
