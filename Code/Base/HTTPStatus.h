@@ -6,56 +6,56 @@ namespace HTTP
 {
 	enum class Status
 	{
-		SwitchingProtocols  = 101,
+		SWITCHING_PROTOCOLS   = 101,
 
-		OK                  = 200,
-		Created             = 201,
-		Accepted            = 202,
-		NoContent           = 204,
+		OK                    = 200,
+		CREATED               = 201,
+		ACCEPTED              = 202,
+		NO_CONTENT            = 204,
 
-		MovedPermanently    = 301,
-		Found               = 302,
-		SeeOther            = 303,
-		NotModified         = 304,
-		TemporaryRedirect   = 307,
+		MOVED_PERMANENTLY     = 301,
+		FOUND                 = 302,
+		SEE_OTHER             = 303,
+		NOT_MODIFIED          = 304,
+		TEMPORARY_REDIRECT    = 307,
 
-		BadRequest          = 400,
-		Unauthorized        = 401,
-		Forbidden           = 403,
-		NotFound            = 404,
-		MethodNotAllowed    = 405,
+		BAD_REQUEST           = 400,
+		UNAUTHORIZED          = 401,
+		FORBIDDEN             = 403,
+		NOT_FOUND             = 404,
+		METHOD_NOT_ALLOWED    = 405,
 
-		InternalServerError = 500,
-		NotImplemented      = 501,
-		BadGateway          = 502,
-		ServiceUnavailable  = 503,
-		GatewayTimeout      = 504,
+		INTERNAL_SERVER_ERROR = 500,
+		NOT_IMPLEMENTED       = 501,
+		BAD_GATEWAY           = 502,
+		SERVICE_UNAVAILABLE   = 503,
+		GATEWAY_TIMEOUT       = 504,
 	};
 
 	constexpr std::string_view StatusToString(Status status)
 	{
 		switch (status)
 		{
-			case Status::SwitchingProtocols:  return "Switching Protocols";
-			case Status::OK:                  return "OK";
-			case Status::Created:             return "Created";
-			case Status::Accepted:            return "Accepted";
-			case Status::NoContent:           return "No Content";
-			case Status::MovedPermanently:    return "Moved Permanently";
-			case Status::Found:               return "Found";
-			case Status::SeeOther:            return "See Other";
-			case Status::NotModified:         return "Not Modified";
-			case Status::TemporaryRedirect:   return "Temporary Redirect";
-			case Status::BadRequest:          return "Bad Request";
-			case Status::Unauthorized:        return "Unauthorized";
-			case Status::Forbidden:           return "Forbidden";
-			case Status::NotFound:            return "Not Found";
-			case Status::MethodNotAllowed:    return "Method Not Allowed";
-			case Status::InternalServerError: return "Internal Server Error";
-			case Status::NotImplemented:      return "Not Implemented";
-			case Status::BadGateway:          return "Bad Gateway";
-			case Status::ServiceUnavailable:  return "Service Unavailable";
-			case Status::GatewayTimeout:      return "Gateway Timeout";
+			case Status::SWITCHING_PROTOCOLS:   return "Switching Protocols";
+			case Status::OK:                    return "OK";
+			case Status::CREATED:               return "Created";
+			case Status::ACCEPTED:              return "Accepted";
+			case Status::NO_CONTENT:            return "No Content";
+			case Status::MOVED_PERMANENTLY:     return "Moved Permanently";
+			case Status::FOUND:                 return "Found";
+			case Status::SEE_OTHER:             return "See Other";
+			case Status::NOT_MODIFIED:          return "Not Modified";
+			case Status::TEMPORARY_REDIRECT:    return "Temporary Redirect";
+			case Status::BAD_REQUEST:           return "Bad Request";
+			case Status::UNAUTHORIZED:          return "Unauthorized";
+			case Status::FORBIDDEN:             return "Forbidden";
+			case Status::NOT_FOUND:             return "Not Found";
+			case Status::METHOD_NOT_ALLOWED:    return "Method Not Allowed";
+			case Status::INTERNAL_SERVER_ERROR: return "Internal Server Error";
+			case Status::NOT_IMPLEMENTED:       return "Not Implemented";
+			case Status::BAD_GATEWAY:           return "Bad Gateway";
+			case Status::SERVICE_UNAVAILABLE:   return "Service Unavailable";
+			case Status::GATEWAY_TIMEOUT:       return "Gateway Timeout";
 		}
 
 		return {};
