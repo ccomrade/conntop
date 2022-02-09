@@ -28,6 +28,9 @@ add_executable(conntop
 	Code/Base/Endian.h
 	Code/Base/Format.cpp
 	Code/Base/Format.h
+	Code/Base/HTTP.h
+	Code/Base/HTTPMethod.h
+	Code/Base/HTTPStatus.h
 	Code/Base/IPAddress.cpp
 	Code/Base/IPAddress.h
 	Code/Base/IPProtocol.h
