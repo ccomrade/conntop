@@ -9,18 +9,18 @@
 
 Conntrack::Conntrack()
 {
-	m_handle = nfct_open(CONNTRACK, 0);
+	m_handle = Handle(nfct_open(CONNTRACK, 0));
 	if (!m_handle)
 	{
 		throw std::system_error(errno, std::system_category(), "Failed to open conntrack");
 	}
 
-	const int fd = nfct_fd(m_handle);
+	const int fd = nfct_fd(m_handle.get());
 
 	// only set close-on-exec and keep the Netlink socket blocking to ensure that nfct_query works as expected
 	System::SetFileDescriptorCloseOnExec(fd);
 
-	if (nfct_callback_register(m_handle, NFCT_T_ALL, UpdateCallbackWrapper, this) < 0)
+	if (nfct_callback_register(m_handle.get(), NFCT_T_ALL, UpdateCallbackWrapper, this) < 0)
 	{
 		throw std::system_error(errno, std::system_category(), "Failed to register conntrack callback");
 	}
@@ -30,9 +30,7 @@ Conntrack::Conntrack()
 
 Conntrack::~Conntrack()
 {
-	const int fd = nfct_fd(m_handle);
-
-	nfct_close(m_handle);
+	const int fd = nfct_fd(m_handle.get());
 
 	LOG_DEBUG(Format("[Conntrack] Closed on file descriptor %d", fd));
 }
@@ -46,7 +44,7 @@ void Conntrack::Update()
 
 	// dump content of the conntrack table
 	// calls UpdateCallback for each entry
-	if (nfct_query(m_handle, NFCT_Q_DUMP, &addressFamily) < 0)
+	if (nfct_query(m_handle.get(), NFCT_Q_DUMP, &addressFamily) < 0)
 	{
 		throw std::system_error(errno, std::system_category(), "Failed to query conntrack");
 	}

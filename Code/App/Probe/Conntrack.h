@@ -1,13 +1,24 @@
 #pragma once
 
 #include <libnetfilter_conntrack/libnetfilter_conntrack.h>
+#include <memory>
 #include <vector>
 
 #include "App/Connection.h"
 
 class Conntrack
 {
-	nfct_handle* m_handle = nullptr;
+	struct HandleDeleter
+	{
+		void operator()(nfct_handle* handle) const
+		{
+			nfct_close(handle);
+		}
+	};
+
+	using Handle = std::unique_ptr<nfct_handle, HandleDeleter>;
+
+	Handle m_handle;
 	std::vector<Connection> m_connections;
 
 	void UpdateCallback(nf_conntrack_msg_type type, nf_conntrack* ct);
