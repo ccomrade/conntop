@@ -4,6 +4,8 @@
 #include <string_view>
 #include <stdexcept>
 
+#include "URLParser.h"
+
 struct URL
 {
 	////////////////////////////////////////////////////////////////////////////////
@@ -29,257 +31,42 @@ struct URL
 
 	////////////////////////////////////////////////////////////////////////////////
 
-private:
-	constexpr bool ParseScheme(std::string_view& text)
+	constexpr bool Parse(const std::string_view& text)
 	{
-		std::string_view::size_type length = 0;
+		std::string_view remainingText = text;
 
-		for (char ch : text)
-		{
-			if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '+' || ch == '-' || ch == '.')
-			{
-				length++;
-			}
-			else if (ch == ':')
-			{
-				break;
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		if (length < text.length() && text[length] == ':')
-		{
-			scheme = text.substr(0, length);
-
-			// remove scheme and ':'
-			text.remove_prefix(length + 1);
-
-			return true;
-		}
-		else
-		{
+		const auto [isSchemeOK, newScheme] = URLParser::ParseScheme(remainingText);
+		if (!isSchemeOK)
 			return false;
-		}
-	}
 
-	constexpr bool ParseAuthority_Userinfo(std::string_view& text)
-	{
-		std::string_view::size_type length = 0;
-
-		for (char ch : text)
-		{
-			if (ch == '/')
-			{
-				break;
-			}
-			else if (ch == '@')
-			{
-				authority.userinfo = text.substr(0, length);
-
-				// remove userinfo and '@'
-				text.remove_prefix(length + 1);
-
-				return true;
-			}
-
-			length++;
-		}
-
-		return false;
-	}
-
-	constexpr bool ParseAuthority_Host(std::string_view& text)
-	{
-		std::string_view::size_type length = 0;
-
-		// IPv6 address
-		bool foundOpeningBracket = false;
-		bool foundClosingBracket = false;
-
-		for (char ch : text)
-		{
-			if (ch == '/' || (ch == ':' && (!foundOpeningBracket || foundClosingBracket)))
-			{
-				break;
-			}
-			else if (ch == '[')
-			{
-				if (foundOpeningBracket)
-				{
-					return false;
-				}
-
-				foundOpeningBracket = true;
-			}
-			else if (ch == ']')
-			{
-				if (!foundOpeningBracket || foundClosingBracket)
-				{
-					return false;
-				}
-
-				foundClosingBracket = true;
-			}
-
-			length++;
-		}
-
-		if (length > 0)
-		{
-			authority.host = text.substr(0, length);
-
-			// remove host and keep ':' or '/'
-			text.remove_prefix(length);
-
-			return true;
-		}
-		else
-		{
+		const auto [isAuthorityOK, newUserinfo, newHost, newPort] = URLParser::ParseAuthority(remainingText);
+		if (!isAuthorityOK)
 			return false;
-		}
-	}
 
-	constexpr bool ParseAuthority_Port(std::string_view& text)
-	{
-		if (text.empty() || text[0] != ':')
-		{
+		const auto [isPathOK, newPath] = URLParser::ParsePath(remainingText);
+		if (!isPathOK)
 			return false;
-		}
 
-		// remove ':'
-		text.remove_prefix(1);
-
-		std::string_view::size_type length = 0;
-
-		for (char ch : text)
-		{
-			if (ch == '/')
-			{
-				break;
-			}
-
-			length++;
-		}
-
-		if (length > 0)
-		{
-			authority.port = text.substr(0, length);
-
-			// remove port and keep '/'
-			text.remove_prefix(length);
-
-			return true;
-		}
-		else
-		{
+		const auto [isQueryOK, newQuery] = URLParser::ParseQuery(remainingText);
+		if (!isQueryOK)
 			return false;
-		}
-	}
 
-	constexpr bool ParseAuthority(std::string_view& text)
-	{
-		if (text.length() < 2 || text.substr(0, 2) != "//")
-		{
-			// authority is optional
-			return true;
-		}
+		const auto [isFragmentOK, newFragment] = URLParser::ParseFragment(remainingText);
+		if (!isFragmentOK)
+			return false;
 
-		// remove "//"
-		text.remove_prefix(2);
+		if (!remainingText.empty())
+			return false;
 
-		const bool foundUserinfo = ParseAuthority_Userinfo(text);
-		const bool foundHost = ParseAuthority_Host(text);
-		const bool foundPort = ParseAuthority_Port(text);
-
-		return foundHost || (!foundUserinfo && !foundPort);
-	}
-
-	constexpr bool ParsePath(std::string_view& text)
-	{
-		std::string_view::size_type length = 0;
-
-		for (char ch : text)
-		{
-			if (ch == '?' || ch == '#')
-			{
-				break;
-			}
-
-			length++;
-		}
-
-		path = text.substr(0, length);
-
-		// remove path and keep '?' or '#'
-		text.remove_prefix(length);
+		this->scheme = newScheme;
+		this->authority.userinfo = newUserinfo;
+		this->authority.host = newHost;
+		this->authority.port = newPort;
+		this->path = newPath;
+		this->query = newQuery;
+		this->fragment = newFragment;
 
 		return true;
-	}
-
-	constexpr bool ParseQuery(std::string_view& text)
-	{
-		if (text.empty() || text[0] != '?')
-		{
-			// query is optional
-			return true;
-		}
-
-		// remove '?'
-		text.remove_prefix(1);
-
-		std::string_view::size_type length = 0;
-
-		for (char ch : text)
-		{
-			if (ch == '#')
-			{
-				break;
-			}
-
-			length++;
-		}
-
-		query = text.substr(0, length);
-
-		// remove path and keep '#'
-		text.remove_prefix(length);
-
-		return true;
-	}
-
-	constexpr bool ParseFragment(std::string_view& text)
-	{
-		if (text.empty() || text[0] != '#')
-		{
-			// fragment is optional
-			return true;
-		}
-
-		// remove '#'
-		text.remove_prefix(1);
-
-		fragment = text;
-
-		// remove fragment
-		text.remove_prefix(text.length());
-
-		return true;
-	}
-
-public:
-	constexpr bool Parse(std::string_view text)
-	{
-		*this = {};
-
-		return ParseScheme(text)
-		    && ParseAuthority(text)
-		    && ParsePath(text)
-		    && ParseQuery(text)
-		    && ParseFragment(text)
-		    && text.empty();
 	}
 
 	static constexpr URL FromString(const std::string_view& text)
