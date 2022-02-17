@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <array>
 #include <string>
 #include <string_view>
@@ -13,7 +13,7 @@ enum class IPAddressType
 
 struct IPAddress
 {
-	using Value = std::array<uint8_t, 16>;
+	using Value = std::array<std::uint8_t, 16>;
 
 	///////////////
 	// Variables //
@@ -174,7 +174,7 @@ constexpr bool IPAddress::ParseIPv4(const std::string_view& string, IPAddress::V
 		if (digitCount == 0 || byteValue > 255)
 			return false;
 
-		result[byteIndex] = static_cast<uint8_t>(byteValue);
+		result[byteIndex] = static_cast<std::uint8_t>(byteValue);
 
 		// there must be a dot after each byte except the last one
 		if (byteIndex < 3)
@@ -234,9 +234,9 @@ constexpr bool IPAddress::ParseIPv6(const std::string_view& string, IPAddress::V
 
 		if (digitCount > 0)
 		{
-			*it = static_cast<uint8_t>(fieldValue >> 8);
+			*it = static_cast<std::uint8_t>(fieldValue >> 8);
 			++it;
-			*it = static_cast<uint8_t>(fieldValue);
+			*it = static_cast<std::uint8_t>(fieldValue);
 			++it;
 		}
 

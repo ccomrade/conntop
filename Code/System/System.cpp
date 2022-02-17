@@ -1,6 +1,6 @@
 #include <unistd.h>
 #include <fcntl.h>
-#include <errno.h>
+#include <cerrno>
 #include <system_error>
 
 #include "System.h"

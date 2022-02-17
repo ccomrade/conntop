@@ -1,6 +1,6 @@
 #pragma once
 
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 #include <vector>
 
@@ -34,7 +34,7 @@ public:
 		return std::is_sorted(begin(), end(), CompareFunctor());
 	}
 
-	iterator find(uint64_t inode)
+	iterator find(std::uint64_t inode)
 	{
 		assert(is_sorted());
 
@@ -44,7 +44,7 @@ public:
 		return (it != end() && it->inode == inode) ? it : end();
 	}
 
-	const_iterator find(uint64_t inode) const
+	const_iterator find(std::uint64_t inode) const
 	{
 		assert(is_sorted());
 

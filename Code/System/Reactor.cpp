@@ -1,5 +1,5 @@
 #include <sys/epoll.h>
-#include <errno.h>
+#include <cerrno>
 #include <array>
 #include <stdexcept>
 #include <system_error>
@@ -118,7 +118,7 @@ void Reactor::Detach(const Handle& handle)
 
 void Reactor::Attach(int fd, ReactorHandler&& handler)
 {
-	if (fd >= 0 && static_cast<size_t>(fd) >= m_handlers.size())
+	if (fd >= 0 && static_cast<unsigned>(fd) >= m_handlers.size())
 	{
 		m_handlers.resize(fd + 1);
 	}
@@ -136,7 +136,7 @@ void Reactor::Attach(int fd, ReactorHandler&& handler)
 
 void Reactor::Modify(int fd, ReactorEvents events)
 {
-	if (fd < 0 && static_cast<size_t>(fd) >= m_handlers.size())
+	if (fd < 0 && static_cast<unsigned>(fd) >= m_handlers.size())
 	{
 		// invalid file descriptor
 		return;
@@ -163,7 +163,7 @@ void Reactor::Modify(int fd, ReactorEvents events)
 
 void Reactor::Detach(int fd)
 {
-	if (fd < 0 && static_cast<size_t>(fd) >= m_handlers.size())
+	if (fd < 0 && static_cast<unsigned>(fd) >= m_handlers.size())
 	{
 		// invalid file descriptor
 		return;
@@ -220,7 +220,7 @@ void Reactor::Stop()
 
 void Reactor::Dispatch(int fd, bool isRead, bool isWrite, bool isError)
 {
-	if (fd < 0 && static_cast<size_t>(fd) >= m_handlers.size())
+	if (fd < 0 && static_cast<unsigned>(fd) >= m_handlers.size())
 	{
 		// invalid file descriptor
 		return;

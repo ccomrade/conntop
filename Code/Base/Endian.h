@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <type_traits>
 
 enum class Endian
@@ -32,7 +32,7 @@ enum class Endian
 #define ENDIAN_HAS_CONSTEXPR_BSWAP_BUILTINS
 #endif
 
-inline constexpr uint16_t SwapEndian16(uint16_t value)
+inline constexpr std::uint16_t SwapEndian16(std::uint16_t value)
 {
 #ifdef ENDIAN_HAS_CONSTEXPR_BSWAP_BUILTINS
 	return __builtin_bswap16(value);
@@ -41,25 +41,25 @@ inline constexpr uint16_t SwapEndian16(uint16_t value)
 #endif
 }
 
-inline constexpr uint32_t SwapEndian32(uint32_t value)
+inline constexpr std::uint32_t SwapEndian32(std::uint32_t value)
 {
 #ifdef ENDIAN_HAS_CONSTEXPR_BSWAP_BUILTINS
 	return __builtin_bswap32(value);
 #else
-	const uint32_t hi = SwapEndian16(value);
-	const uint32_t lo = SwapEndian16(value >> 16);
+	const std::uint32_t hi = SwapEndian16(value);
+	const std::uint32_t lo = SwapEndian16(value >> 16);
 
 	return (hi << 16) | lo;
 #endif
 }
 
-inline constexpr uint64_t SwapEndian64(uint64_t value)
+inline constexpr std::uint64_t SwapEndian64(std::uint64_t value)
 {
 #ifdef ENDIAN_HAS_CONSTEXPR_BSWAP_BUILTINS
 	return __builtin_bswap64(value);
 #else
-	const uint64_t hi = SwapEndian32(value);
-	const uint64_t lo = SwapEndian32(value >> 32);
+	const std::uint64_t hi = SwapEndian32(value);
+	const std::uint64_t lo = SwapEndian32(value >> 32);
 
 	return (hi << 32) | lo;
 #endif

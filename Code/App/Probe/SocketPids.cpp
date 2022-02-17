@@ -1,7 +1,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -35,7 +35,7 @@ namespace
 		return dir;
 	}
 
-	bool ParsePid(const std::string_view& text, uint32_t& pid)
+	bool ParsePid(const std::string_view& text, std::uint32_t& pid)
 	{
 		const char* first = text.data();
 		const char* last = first + text.length();
@@ -45,7 +45,7 @@ namespace
 		return status.ec == std::errc() && status.ptr == last;
 	}
 
-	bool ParseSocketInode(const std::string_view& text, uint64_t& inode)
+	bool ParseSocketInode(const std::string_view& text, std::uint64_t& inode)
 	{
 		constexpr std::string_view PREFIX = "socket:[";
 
@@ -64,7 +64,7 @@ namespace
 		return status.ec == std::errc() && status.ptr == last;
 	}
 
-	bool ReadAndParseSocketInode(const std::string& path, uint64_t& inode)
+	bool ReadAndParseSocketInode(const std::string& path, std::uint64_t& inode)
 	{
 		char buffer[64];
 		const ssize_t length = readlink(path.c_str(), buffer, sizeof buffer);
@@ -76,7 +76,7 @@ namespace
 		return ParseSocketInode(std::string_view(buffer, length), inode);
 	}
 
-	void AddSocketPid(LocalSocketCollection& sockets, uint64_t inode, uint32_t pid)
+	void AddSocketPid(LocalSocketCollection& sockets, std::uint64_t inode, std::uint32_t pid)
 	{
 		const auto it = sockets.find(inode);
 		if (it != sockets.end())
@@ -103,7 +103,7 @@ void SocketPids::Resolve(LocalSocketCollection& sockets)
 	dirent* procDirEntry;
 	while ((procDirEntry = readdir(procDir.get())) != nullptr)
 	{
-		uint32_t pid = 0;
+		std::uint32_t pid = 0;
 
 		// only process directories
 		if (procDirEntry->d_type & DT_DIR && ParsePid(procDirEntry->d_name, pid))
@@ -126,7 +126,7 @@ void SocketPids::Resolve(LocalSocketCollection& sockets)
 					// keep "/proc/123/fd/" and add file descriptor number
 					path.replace(fdBasePathLength, path.length(), fdDirEntry->d_name);
 
-					uint64_t inode = 0;
+					std::uint64_t inode = 0;
 
 					if (ReadAndParseSocketInode(path, inode))
 					{

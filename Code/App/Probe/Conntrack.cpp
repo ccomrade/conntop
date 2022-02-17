@@ -1,4 +1,4 @@
-#include <errno.h>
+#include <cerrno>
 #include <system_error>
 
 #include "Base/Endian.h"
@@ -40,7 +40,7 @@ void Conntrack::Update()
 	m_connections.clear();
 
 	// both IPv4 and IPv6
-	const uint32_t addressFamily = AF_UNSPEC;
+	const std::uint32_t addressFamily = AF_UNSPEC;
 
 	// dump content of the conntrack table
 	// calls UpdateCallback for each entry
@@ -90,14 +90,14 @@ bool Conntrack::ToConnection(nf_conntrack* ct, Connection& result)
 			result.srcAddress.type = IPAddressType::IPv4;
 			result.dstAddress.type = IPAddressType::IPv4;
 
-			auto pSrcAddress = static_cast<const uint32_t*>(nfct_get_attr(ct, ATTR_IPV4_SRC));
-			auto pDstAddress = static_cast<const uint32_t*>(nfct_get_attr(ct, ATTR_IPV4_DST));
+			auto pSrcAddress = static_cast<const std::uint32_t*>(nfct_get_attr(ct, ATTR_IPV4_SRC));
+			auto pDstAddress = static_cast<const std::uint32_t*>(nfct_get_attr(ct, ATTR_IPV4_DST));
 
 			if (pSrcAddress)
-				reinterpret_cast<uint32_t&>(result.srcAddress.value) = *pSrcAddress;
+				reinterpret_cast<std::uint32_t&>(result.srcAddress.value) = *pSrcAddress;
 
 			if (pDstAddress)
-				reinterpret_cast<uint32_t&>(result.dstAddress.value) = *pDstAddress;
+				reinterpret_cast<std::uint32_t&>(result.dstAddress.value) = *pDstAddress;
 
 			break;
 		}

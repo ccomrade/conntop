@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdarg.h>
-#include <stddef.h>
+#include <cstdarg>
+#include <cstddef>
 #include <string>
 
 // use std::format from C++20 instead when it becomes available
@@ -15,5 +15,5 @@
 std::string Format(const char* format, ...) FORMAT_ARGS_CHECK(1, 2);
 std::string FormatV(const char* format, va_list args);
 
-size_t FormatTo(char* buffer, size_t bufferSize, const char* format, ...) FORMAT_ARGS_CHECK(3, 4);
-size_t FormatToV(char* buffer, size_t bufferSize, const char* format, va_list args);
+std::size_t FormatTo(char* buffer, std::size_t bufferSize, const char* format, ...) FORMAT_ARGS_CHECK(3, 4);
+std::size_t FormatToV(char* buffer, std::size_t bufferSize, const char* format, va_list args);
