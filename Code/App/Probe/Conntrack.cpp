@@ -87,34 +87,14 @@ bool Conntrack::ToConnection(nf_conntrack* ct, Connection& result)
 	{
 		case AF_INET:
 		{
-			result.srcAddress.type = IPAddressType::IPv4;
-			result.dstAddress.type = IPAddressType::IPv4;
-
-			auto pSrcAddress = static_cast<const std::uint32_t*>(nfct_get_attr(ct, ATTR_IPV4_SRC));
-			auto pDstAddress = static_cast<const std::uint32_t*>(nfct_get_attr(ct, ATTR_IPV4_DST));
-
-			if (pSrcAddress)
-				reinterpret_cast<std::uint32_t&>(result.srcAddress.value) = *pSrcAddress;
-
-			if (pDstAddress)
-				reinterpret_cast<std::uint32_t&>(result.dstAddress.value) = *pDstAddress;
-
+			result.srcAddress.CopyFrom(nfct_get_attr(ct, ATTR_IPV4_SRC), IPAddressType::IPv4);
+			result.dstAddress.CopyFrom(nfct_get_attr(ct, ATTR_IPV4_DST), IPAddressType::IPv4);
 			break;
 		}
 		case AF_INET6:
 		{
-			result.srcAddress.type = IPAddressType::IPv6;
-			result.dstAddress.type = IPAddressType::IPv6;
-
-			auto pSrcAddress = static_cast<const IPAddress::Value*>(nfct_get_attr(ct, ATTR_IPV6_SRC));
-			auto pDstAddress = static_cast<const IPAddress::Value*>(nfct_get_attr(ct, ATTR_IPV6_DST));
-
-			if (pSrcAddress)
-				result.srcAddress.value = *pSrcAddress;
-
-			if (pDstAddress)
-				result.dstAddress.value = *pDstAddress;
-
+			result.srcAddress.CopyFrom(nfct_get_attr(ct, ATTR_IPV6_SRC), IPAddressType::IPv6);
+			result.dstAddress.CopyFrom(nfct_get_attr(ct, ATTR_IPV6_DST), IPAddressType::IPv6);
 			break;
 		}
 		default:

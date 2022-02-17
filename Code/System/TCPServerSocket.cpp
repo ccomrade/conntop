@@ -4,7 +4,6 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <cerrno>
-#include <cstring>
 
 #include "TCPServerSocket.h"
 #include "System.h"
@@ -65,7 +64,7 @@ void TCPServerSocket::Open(const IPAddress& address, std::uint16_t port)
 
 				sa4->sin_family = AF_INET;
 				sa4->sin_port = htons(port);
-				std::memcpy(&sa4->sin_addr, &address.value, sizeof sa4->sin_addr);
+				address.CopyTo(&sa4->sin_addr);
 
 				break;
 			}
@@ -75,7 +74,7 @@ void TCPServerSocket::Open(const IPAddress& address, std::uint16_t port)
 
 				sa6->sin6_family = AF_INET6;
 				sa6->sin6_port = htons(port);
-				std::memcpy(&sa6->sin6_addr, &address.value, sizeof sa6->sin6_addr);
+				address.CopyTo(&sa6->sin6_addr);
 
 				break;
 			}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstring>
 #include <array>
 #include <string>
 #include <string_view>
@@ -29,6 +30,11 @@ struct IPAddress
 	constexpr IPAddress() = default;
 
 	constexpr unsigned int GetValueSize() const;
+
+	void CopyTo(void* buffer) const;
+
+	void CopyFrom(const void* buffer);
+	void CopyFrom(const void* buffer, IPAddressType newType);
 
 	// Creation
 	static constexpr IPAddress ZeroIPv4();
@@ -73,6 +79,28 @@ constexpr unsigned int IPAddress::GetValueSize() const
 	}
 
 	return 0;
+}
+
+inline void IPAddress::CopyTo(void* buffer) const
+{
+	if (buffer)
+	{
+		std::memcpy(buffer, value.data(), GetValueSize());
+	}
+}
+
+inline void IPAddress::CopyFrom(const void* buffer)
+{
+	if (buffer)
+	{
+		std::memcpy(value.data(), buffer, GetValueSize());
+	}
+}
+
+inline void IPAddress::CopyFrom(const void* buffer, IPAddressType newType)
+{
+	type = newType;
+	CopyFrom(buffer);
 }
 
 //////////////////////////////
