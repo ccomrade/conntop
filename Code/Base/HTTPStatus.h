@@ -32,7 +32,7 @@ namespace HTTP
 		GATEWAY_TIMEOUT       = 504,
 	};
 
-	constexpr std::string_view StatusToString(Status status)
+	inline constexpr std::string_view StatusToString(Status status)
 	{
 		switch (status)
 		{

@@ -11,7 +11,7 @@ namespace HTTP
 		GET, HEAD, POST, PUT, DELETE, OPTIONS
 	};
 
-	constexpr std::string_view MethodToString(Method method)
+	inline constexpr std::string_view MethodToString(Method method)
 	{
 		switch (method)
 		{
@@ -26,7 +26,7 @@ namespace HTTP
 		return {};
 	}
 
-	constexpr bool ParseMethod(const std::string_view& string, Method& result)
+	inline constexpr bool ParseMethod(const std::string_view& string, Method& result)
 	{
 		constexpr struct { std::string_view string; Method method; } TABLE[] = {
 			{ "GET", Method::GET },
@@ -49,7 +49,7 @@ namespace HTTP
 		return false;
 	}
 
-	constexpr Method MethodFromString(const std::string_view& string)
+	inline constexpr Method MethodFromString(const std::string_view& string)
 	{
 		Method method = {};
 		if (!ParseMethod(string, method))

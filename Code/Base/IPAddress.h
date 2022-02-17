@@ -68,7 +68,7 @@ struct IPAddress
 // Implementation //
 ////////////////////
 
-constexpr unsigned int IPAddress::GetValueSize() const
+inline constexpr unsigned int IPAddress::GetValueSize() const
 {
 	switch (type)
 	{
@@ -107,7 +107,7 @@ inline void IPAddress::CopyFrom(const void* buffer, IPAddressType newType)
 // Creation of IP addresses //
 //////////////////////////////
 
-constexpr IPAddress IPAddress::ZeroIPv4()
+inline constexpr IPAddress IPAddress::ZeroIPv4()
 {
 	IPAddress result;
 	result.type = IPAddressType::IPv4;
@@ -115,7 +115,7 @@ constexpr IPAddress IPAddress::ZeroIPv4()
 	return result;
 }
 
-constexpr IPAddress IPAddress::ZeroIPv6()
+inline constexpr IPAddress IPAddress::ZeroIPv6()
 {
 	IPAddress result;
 	result.type = IPAddressType::IPv6;
@@ -123,7 +123,7 @@ constexpr IPAddress IPAddress::ZeroIPv6()
 	return result;
 }
 
-constexpr IPAddress IPAddress::FromString(const std::string_view& string)
+inline constexpr IPAddress IPAddress::FromString(const std::string_view& string)
 {
 	IPAddress result;
 
@@ -143,7 +143,7 @@ constexpr IPAddress IPAddress::FromString(const std::string_view& string)
 	return result;
 }
 
-constexpr IPAddress IPAddress::FromStringIPv4(const std::string_view& string)
+inline constexpr IPAddress IPAddress::FromStringIPv4(const std::string_view& string)
 {
 	IPAddress result;
 	result.type = IPAddressType::IPv4;
@@ -156,7 +156,7 @@ constexpr IPAddress IPAddress::FromStringIPv4(const std::string_view& string)
 	return result;
 }
 
-constexpr IPAddress IPAddress::FromStringIPv6(const std::string_view& string)
+inline constexpr IPAddress IPAddress::FromStringIPv6(const std::string_view& string)
 {
 	IPAddress result;
 	result.type = IPAddressType::IPv6;
@@ -173,7 +173,7 @@ constexpr IPAddress IPAddress::FromStringIPv6(const std::string_view& string)
 // IP address from string //
 ////////////////////////////
 
-constexpr bool IPAddress::ParseIPv4(const std::string_view& string, IPAddress::Value& result)
+inline constexpr bool IPAddress::ParseIPv4(const std::string_view& string, IPAddress::Value& result)
 {
 	auto stringIt = string.begin();
 
@@ -218,7 +218,7 @@ constexpr bool IPAddress::ParseIPv4(const std::string_view& string, IPAddress::V
 	return stringIt == string.end();
 }
 
-constexpr bool IPAddress::ParseIPv6(const std::string_view& string, IPAddress::Value& result)
+inline constexpr bool IPAddress::ParseIPv6(const std::string_view& string, IPAddress::Value& result)
 {
 	unsigned int colonCount = 0;
 
@@ -323,7 +323,7 @@ constexpr bool IPAddress::ParseIPv6(const std::string_view& string, IPAddress::V
 // Comparison of IP addresses //
 ////////////////////////////////
 
-constexpr int IPAddress::Compare(const IPAddress& other) const
+inline constexpr int IPAddress::Compare(const IPAddress& other) const
 {
 	if (type != other.type)
 	{
@@ -345,12 +345,12 @@ constexpr int IPAddress::Compare(const IPAddress& other) const
 	}
 }
 
-constexpr bool IPAddress::IsEqual(const IPAddress& other) const
+inline constexpr bool IPAddress::IsEqual(const IPAddress& other) const
 {
 	return Compare(other) == 0;
 }
 
-constexpr bool IPAddress::IsInRange(const IPAddress& first, const IPAddress& last) const
+inline constexpr bool IPAddress::IsInRange(const IPAddress& first, const IPAddress& last) const
 {
 	return Compare(first) >= 0 && Compare(last) <= 0;
 }
@@ -359,32 +359,32 @@ constexpr bool IPAddress::IsInRange(const IPAddress& first, const IPAddress& las
 // Comparison operators //
 //////////////////////////
 
-constexpr bool operator==(const IPAddress& a, const IPAddress& b)
+inline constexpr bool operator==(const IPAddress& a, const IPAddress& b)
 {
 	return a.Compare(b) == 0;
 }
 
-constexpr bool operator!=(const IPAddress& a, const IPAddress& b)
+inline constexpr bool operator!=(const IPAddress& a, const IPAddress& b)
 {
 	return a.Compare(b) != 0;
 }
 
-constexpr bool operator<=(const IPAddress& a, const IPAddress& b)
+inline constexpr bool operator<=(const IPAddress& a, const IPAddress& b)
 {
 	return a.Compare(b) <= 0;
 }
 
-constexpr bool operator>=(const IPAddress& a, const IPAddress& b)
+inline constexpr bool operator>=(const IPAddress& a, const IPAddress& b)
 {
 	return a.Compare(b) >= 0;
 }
 
-constexpr bool operator<(const IPAddress& a, const IPAddress& b)
+inline constexpr bool operator<(const IPAddress& a, const IPAddress& b)
 {
 	return a.Compare(b) < 0;
 }
 
-constexpr bool operator>(const IPAddress& a, const IPAddress& b)
+inline constexpr bool operator>(const IPAddress& a, const IPAddress& b)
 {
 	return a.Compare(b) > 0;
 }
@@ -393,7 +393,7 @@ constexpr bool operator>(const IPAddress& a, const IPAddress& b)
 // Reserved IP addresses //
 ///////////////////////////
 
-constexpr bool IPAddress::IsZero() const
+inline constexpr bool IPAddress::IsZero() const
 {
 	switch (type)
 	{
@@ -414,7 +414,7 @@ constexpr bool IPAddress::IsZero() const
 	return false;
 }
 
-constexpr bool IPAddress::IsLoopBack() const
+inline constexpr bool IPAddress::IsLoopBack() const
 {
 	switch (type)
 	{
@@ -436,7 +436,7 @@ constexpr bool IPAddress::IsLoopBack() const
 	return false;
 }
 
-constexpr bool IPAddress::IsLinkLocal() const
+inline constexpr bool IPAddress::IsLinkLocal() const
 {
 	switch (type)
 	{
@@ -459,7 +459,7 @@ constexpr bool IPAddress::IsLinkLocal() const
 	return false;
 }
 
-constexpr bool IPAddress::IsPrivate() const
+inline constexpr bool IPAddress::IsPrivate() const
 {
 	switch (type)
 	{
@@ -490,7 +490,7 @@ constexpr bool IPAddress::IsPrivate() const
 	return false;
 }
 
-constexpr bool IPAddress::IsMulticast() const
+inline constexpr bool IPAddress::IsMulticast() const
 {
 	switch (type)
 	{
