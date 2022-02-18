@@ -40,7 +40,6 @@ add_executable(conntop
 	Code/Base/IPProtocol.h
 	Code/Base/URL.cpp
 	Code/Base/URL.h
-	Code/Base/URLParser.h
 	Code/System/CmdLine.cpp
 	Code/System/CmdLine.h
 	Code/System/Handle.h
