@@ -8,7 +8,7 @@ namespace HTTP
 {
 	enum class Method
 	{
-		GET, HEAD, POST, PUT, DELETE, OPTIONS
+		GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
 	};
 
 	inline constexpr std::string_view MethodToString(Method method)
@@ -20,7 +20,10 @@ namespace HTTP
 			case Method::POST:    return "POST";
 			case Method::PUT:     return "PUT";
 			case Method::DELETE:  return "DELETE";
+			case Method::CONNECT: return "CONNECT";
 			case Method::OPTIONS: return "OPTIONS";
+			case Method::TRACE:   return "TRACE";
+			case Method::PATCH:   return "PATCH";
 		}
 
 		return {};
@@ -34,7 +37,10 @@ namespace HTTP
 			{ "POST", Method::POST },
 			{ "PUT", Method::PUT },
 			{ "DELETE", Method::DELETE },
+			{ "CONNECT", Method::CONNECT },
 			{ "OPTIONS", Method::OPTIONS },
+			{ "TRACE", Method::TRACE },
+			{ "PATCH", Method::PATCH },
 		};
 
 		for (const auto& entry : TABLE)
