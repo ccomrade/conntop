@@ -73,7 +73,7 @@ template<class T, unsigned int Size>
 struct SwapEndianTraits;
 
 template<class T>
-struct SwapEndianTraits<T, 1>  // 8-bit
+struct SwapEndianTraits<T, 1>
 {
 	static constexpr T Swap(T value)
 	{
@@ -83,7 +83,7 @@ struct SwapEndianTraits<T, 1>  // 8-bit
 };
 
 template<class T>
-struct SwapEndianTraits<T, 2>  // 16-bit
+struct SwapEndianTraits<T, 2>
 {
 	static constexpr T Swap(T value)
 	{
@@ -92,7 +92,7 @@ struct SwapEndianTraits<T, 2>  // 16-bit
 };
 
 template<class T>
-struct SwapEndianTraits<T, 4>  // 32-bit
+struct SwapEndianTraits<T, 4>
 {
 	static constexpr T Swap(T value)
 	{
@@ -101,7 +101,7 @@ struct SwapEndianTraits<T, 4>  // 32-bit
 };
 
 template<class T>
-struct SwapEndianTraits<T, 8>  // 64-bit
+struct SwapEndianTraits<T, 8>
 {
 	static constexpr T Swap(T value)
 	{
@@ -112,7 +112,7 @@ struct SwapEndianTraits<T, 8>  // 64-bit
 template<class T>
 inline constexpr T SwapEndian(T value)
 {
-	static_assert(std::is_integral<T>(), "The value must be an integral type!");
+	static_assert(std::is_integral_v<T>);
 
 	return SwapEndianTraits<T, sizeof(T)>::Swap(value);
 }
@@ -124,7 +124,10 @@ inline constexpr T SwapEndian(T value)
 template<class T>
 inline constexpr T LittleEndian(T value)
 {
-	return (Endian::NATIVE == Endian::LITTLE) ? value : SwapEndian(value);
+	if constexpr (Endian::NATIVE == Endian::LITTLE)
+		return value;
+	else
+		return SwapEndian(value);
 }
 
 //////////////////////////////////////////////////
@@ -134,5 +137,8 @@ inline constexpr T LittleEndian(T value)
 template<class T>
 inline constexpr T BigEndian(T value)
 {
-	return (Endian::NATIVE == Endian::BIG) ? value : SwapEndian(value);
+	if constexpr (Endian::NATIVE == Endian::BIG)
+		return value;
+	else
+		return SwapEndian(value);
 }

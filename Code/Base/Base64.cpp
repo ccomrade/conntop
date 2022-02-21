@@ -5,10 +5,9 @@
 namespace
 {
 	constexpr std::string_view ENCODING_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	static_assert(ENCODING_TABLE.size() == 64);
 
 	constexpr unsigned char INVALID_CHARACTER = 0xFF;
-	constexpr std::array<unsigned char, 256> DECODING_TABLE = []()
+	constexpr auto DECODING_TABLE = []()
 	{
 		std::array<unsigned char, 256> table = {};
 
@@ -24,6 +23,9 @@ namespace
 
 		return table;
 	}();
+
+	static_assert(ENCODING_TABLE.size() == 64);
+	static_assert(DECODING_TABLE.size() == 256);
 }
 
 std::string Base64::Encode(const std::string_view& text)

@@ -29,21 +29,21 @@ namespace HTTP
 		return {};
 	}
 
+	inline constexpr struct { std::string_view string; Method method; } STRING_METHOD_TABLE[] = {
+		{ "GET", Method::GET },
+		{ "HEAD", Method::HEAD },
+		{ "POST", Method::POST },
+		{ "PUT", Method::PUT },
+		{ "DELETE", Method::DELETE },
+		{ "CONNECT", Method::CONNECT },
+		{ "OPTIONS", Method::OPTIONS },
+		{ "TRACE", Method::TRACE },
+		{ "PATCH", Method::PATCH },
+	};
+
 	inline constexpr bool ParseMethod(const std::string_view& string, Method& result)
 	{
-		constexpr struct { std::string_view string; Method method; } TABLE[] = {
-			{ "GET", Method::GET },
-			{ "HEAD", Method::HEAD },
-			{ "POST", Method::POST },
-			{ "PUT", Method::PUT },
-			{ "DELETE", Method::DELETE },
-			{ "CONNECT", Method::CONNECT },
-			{ "OPTIONS", Method::OPTIONS },
-			{ "TRACE", Method::TRACE },
-			{ "PATCH", Method::PATCH },
-		};
-
-		for (const auto& entry : TABLE)
+		for (const auto& entry : STRING_METHOD_TABLE)
 		{
 			if (entry.string == string)
 			{

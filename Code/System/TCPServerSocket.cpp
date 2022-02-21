@@ -92,7 +92,7 @@ void TCPServerSocket::Open(const IPAddress& address, std::uint16_t port)
 
 	////////////////////////////////////////////////////////////////////////////////
 
-	constexpr int LISTEN_BACKLOG_SIZE = 64;
+	const int LISTEN_BACKLOG_SIZE = 64;
 
 	if (listen(m_handle.GetFileDescriptor(), LISTEN_BACKLOG_SIZE) < 0)
 	{

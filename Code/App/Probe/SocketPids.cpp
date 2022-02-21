@@ -47,7 +47,7 @@ namespace
 
 	bool ParseSocketInode(const std::string_view& text, std::uint64_t& inode)
 	{
-		constexpr std::string_view PREFIX = "socket:[";
+		static constexpr std::string_view PREFIX = "socket:[";
 
 		// make sure the text contains at least one additional character and begins with the prefix
 		if (text.length() <= PREFIX.length() || std::string_view(text.data(), PREFIX.length()) != PREFIX)

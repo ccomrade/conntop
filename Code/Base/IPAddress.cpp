@@ -81,7 +81,7 @@ namespace
 
 				it += 2;
 
-				constexpr std::string_view DIGITS = "0123456789abcdef";
+				static constexpr std::string_view DIGITS = "0123456789abcdef";
 
 				// skip leading zeros
 				if (hiByte > 0xF)

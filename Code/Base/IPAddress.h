@@ -37,9 +37,6 @@ struct IPAddress
 	void CopyFrom(const void* buffer, IPAddressType newType);
 
 	// Creation
-	static constexpr IPAddress ZeroIPv4();
-	static constexpr IPAddress ZeroIPv6();
-
 	static constexpr IPAddress FromString(const std::string_view& string);
 	static constexpr IPAddress FromStringIPv4(const std::string_view& string);
 	static constexpr IPAddress FromStringIPv6(const std::string_view& string);
@@ -106,22 +103,6 @@ inline void IPAddress::CopyFrom(const void* buffer, IPAddressType newType)
 //////////////////////////////
 // Creation of IP addresses //
 //////////////////////////////
-
-inline constexpr IPAddress IPAddress::ZeroIPv4()
-{
-	IPAddress result;
-	result.type = IPAddressType::IPv4;
-
-	return result;
-}
-
-inline constexpr IPAddress IPAddress::ZeroIPv6()
-{
-	IPAddress result;
-	result.type = IPAddressType::IPv6;
-
-	return result;
-}
 
 inline constexpr IPAddress IPAddress::FromString(const std::string_view& string)
 {
@@ -393,21 +374,57 @@ inline constexpr bool operator>(const IPAddress& a, const IPAddress& b)
 // Reserved IP addresses //
 ///////////////////////////
 
+namespace ReservedIPAddresses
+{
+	namespace IPv4
+	{
+		inline constexpr IPAddress ZERO = IPAddress::FromStringIPv4("0.0.0.0");
+
+		inline constexpr IPAddress LOOPBACK_FIRST = IPAddress::FromStringIPv4("127.0.0.0");
+		inline constexpr IPAddress LOOPBACK_LAST  = IPAddress::FromStringIPv4("127.255.255.255");
+
+		inline constexpr IPAddress LINK_LOCAL_FIRST = IPAddress::FromStringIPv4("169.254.0.0");
+		inline constexpr IPAddress LINK_LOCAL_LAST  = IPAddress::FromStringIPv4("169.254.255.255");
+
+		inline constexpr IPAddress PRIVATE_A_FIRST = IPAddress::FromStringIPv4("10.0.0.0");
+		inline constexpr IPAddress PRIVATE_A_LAST  = IPAddress::FromStringIPv4("10.255.255.255");
+		inline constexpr IPAddress PRIVATE_B_FIRST = IPAddress::FromStringIPv4("172.16.0.0");
+		inline constexpr IPAddress PRIVATE_B_LAST  = IPAddress::FromStringIPv4("172.31.255.255");
+		inline constexpr IPAddress PRIVATE_C_FIRST = IPAddress::FromStringIPv4("192.168.0.0");
+		inline constexpr IPAddress PRIVATE_C_LAST  = IPAddress::FromStringIPv4("192.168.255.255");
+
+		inline constexpr IPAddress MULTICAST_FIRST = IPAddress::FromStringIPv4("224.0.0.0");
+		inline constexpr IPAddress MULTICAST_LAST  = IPAddress::FromStringIPv4("239.255.255.255");
+	}
+
+	namespace IPv6
+	{
+		inline constexpr IPAddress ZERO = IPAddress::FromStringIPv6("::");
+
+		inline constexpr IPAddress LOOPBACK = IPAddress::FromStringIPv6("::1");
+
+		inline constexpr IPAddress LINK_LOCAL_FIRST = IPAddress::FromStringIPv6("fe80::");
+		inline constexpr IPAddress LINK_LOCAL_LAST  = IPAddress::FromStringIPv6("fe80::ffff:ffff:ffff:ffff");
+
+		inline constexpr IPAddress PRIVATE_FIRST = IPAddress::FromStringIPv6("fc00::");
+		inline constexpr IPAddress PRIVATE_LAST  = IPAddress::FromStringIPv6("fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
+
+		inline constexpr IPAddress MULTICAST_FIRST = IPAddress::FromStringIPv6("ff00::");
+		inline constexpr IPAddress MULTICAST_LAST  = IPAddress::FromStringIPv6("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
+	}
+}
+
 inline constexpr bool IPAddress::IsZero() const
 {
 	switch (type)
 	{
 		case IPAddressType::IPv4:
 		{
-			constexpr IPAddress ZERO_V4 = IPAddress::FromStringIPv4("0.0.0.0");
-
-			return IsEqual(ZERO_V4);
+			return IsEqual(ReservedIPAddresses::IPv4::ZERO);
 		}
 		case IPAddressType::IPv6:
 		{
-			constexpr IPAddress ZERO_V6 = IPAddress::FromStringIPv6("::");
-
-			return IsEqual(ZERO_V6);
+			return IsEqual(ReservedIPAddresses::IPv6::ZERO);
 		}
 	}
 
@@ -420,16 +437,11 @@ inline constexpr bool IPAddress::IsLoopBack() const
 	{
 		case IPAddressType::IPv4:
 		{
-			constexpr IPAddress LOOP_BACK_V4_A = IPAddress::FromStringIPv4("127.0.0.0");
-			constexpr IPAddress LOOP_BACK_V4_B = IPAddress::FromStringIPv4("127.255.255.255");
-
-			return IsInRange(LOOP_BACK_V4_A, LOOP_BACK_V4_B);
+			return IsInRange(ReservedIPAddresses::IPv4::LOOPBACK_FIRST, ReservedIPAddresses::IPv4::LOOPBACK_LAST);
 		}
 		case IPAddressType::IPv6:
 		{
-			constexpr IPAddress LOOP_BACK_V6 = IPAddress::FromStringIPv6("::1");
-
-			return IsEqual(LOOP_BACK_V6);
+			return IsEqual(ReservedIPAddresses::IPv6::LOOPBACK);
 		}
 	}
 
@@ -442,17 +454,11 @@ inline constexpr bool IPAddress::IsLinkLocal() const
 	{
 		case IPAddressType::IPv4:
 		{
-			constexpr IPAddress LINK_LOCAL_V4_A = IPAddress::FromStringIPv4("169.254.0.0");
-			constexpr IPAddress LINK_LOCAL_V4_B = IPAddress::FromStringIPv4("169.254.255.255");
-
-			return IsInRange(LINK_LOCAL_V4_A, LINK_LOCAL_V4_B);
+			return IsInRange(ReservedIPAddresses::IPv4::LINK_LOCAL_FIRST, ReservedIPAddresses::IPv4::LINK_LOCAL_LAST);
 		}
 		case IPAddressType::IPv6:
 		{
-			constexpr IPAddress LINK_LOCAL_V6_A = IPAddress::FromStringIPv6("fe80::");
-			constexpr IPAddress LINK_LOCAL_V6_B = IPAddress::FromStringIPv6("fe80::ffff:ffff:ffff:ffff");
-
-			return IsInRange(LINK_LOCAL_V6_A, LINK_LOCAL_V6_B);
+			return IsInRange(ReservedIPAddresses::IPv6::LINK_LOCAL_FIRST, ReservedIPAddresses::IPv6::LINK_LOCAL_LAST);
 		}
 	}
 
@@ -465,25 +471,13 @@ inline constexpr bool IPAddress::IsPrivate() const
 	{
 		case IPAddressType::IPv4:
 		{
-			constexpr IPAddress PRIVATE_V4_1_A = IPAddress::FromStringIPv4("10.0.0.0");
-			constexpr IPAddress PRIVATE_V4_1_B = IPAddress::FromStringIPv4("10.255.255.255");
-
-			constexpr IPAddress PRIVATE_V4_2_A = IPAddress::FromStringIPv4("172.16.0.0");
-			constexpr IPAddress PRIVATE_V4_2_B = IPAddress::FromStringIPv4("172.31.255.255");
-
-			constexpr IPAddress PRIVATE_V4_3_A = IPAddress::FromStringIPv4("192.168.0.0");
-			constexpr IPAddress PRIVATE_V4_3_B = IPAddress::FromStringIPv4("192.168.255.255");
-
-			return IsInRange(PRIVATE_V4_1_A, PRIVATE_V4_1_B) ||
-			       IsInRange(PRIVATE_V4_2_A, PRIVATE_V4_2_B) ||
-			       IsInRange(PRIVATE_V4_3_A, PRIVATE_V4_3_B);
+			return IsInRange(ReservedIPAddresses::IPv4::PRIVATE_A_FIRST, ReservedIPAddresses::IPv4::PRIVATE_A_LAST)
+			    || IsInRange(ReservedIPAddresses::IPv4::PRIVATE_B_FIRST, ReservedIPAddresses::IPv4::PRIVATE_B_LAST)
+			    || IsInRange(ReservedIPAddresses::IPv4::PRIVATE_C_FIRST, ReservedIPAddresses::IPv4::PRIVATE_C_LAST);
 		}
 		case IPAddressType::IPv6:
 		{
-			constexpr IPAddress PRIVATE_V6_A = IPAddress::FromStringIPv6("fc00::");
-			constexpr IPAddress PRIVATE_V6_B = IPAddress::FromStringIPv6("fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
-
-			return IsInRange(PRIVATE_V6_A, PRIVATE_V6_B);
+			return IsInRange(ReservedIPAddresses::IPv6::PRIVATE_FIRST, ReservedIPAddresses::IPv6::PRIVATE_LAST);
 		}
 	}
 
@@ -496,17 +490,11 @@ inline constexpr bool IPAddress::IsMulticast() const
 	{
 		case IPAddressType::IPv4:
 		{
-			constexpr IPAddress MULTICAST_V4_A = IPAddress::FromStringIPv4("224.0.0.0");
-			constexpr IPAddress MULTICAST_V4_B = IPAddress::FromStringIPv4("239.255.255.255");
-
-			return IsInRange(MULTICAST_V4_A, MULTICAST_V4_B);
+			return IsInRange(ReservedIPAddresses::IPv4::MULTICAST_FIRST, ReservedIPAddresses::IPv4::MULTICAST_LAST);
 		}
 		case IPAddressType::IPv6:
 		{
-			constexpr IPAddress MULTICAST_V6_A = IPAddress::FromStringIPv6("ff00::");
-			constexpr IPAddress MULTICAST_V6_B = IPAddress::FromStringIPv6("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
-
-			return IsInRange(MULTICAST_V6_A, MULTICAST_V6_B);
+			return IsInRange(ReservedIPAddresses::IPv6::MULTICAST_FIRST, ReservedIPAddresses::IPv6::MULTICAST_LAST);
 		}
 	}
 
