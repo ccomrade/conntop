@@ -10,6 +10,5 @@ void App::Run()
 	LOG_INFO("Info");
 	LOG_DEBUG("Debug");
 
-	// event loop
-	m_reactor.Run();
+	m_reactor.EventLoop();
 }
