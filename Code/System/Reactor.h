@@ -33,9 +33,12 @@ private:
 	};
 
 	Handle m_epoll;
+
 	bool m_isRunning = false;
 	bool m_isCommitNeeded = false;
-	std::vector<Handler> m_handlers;  // index of each handler is its file descriptor
+
+	// index of each handler is its file descriptor
+	std::vector<Handler> m_handlers;
 
 	Handler& GetHandler(int fd);
 
