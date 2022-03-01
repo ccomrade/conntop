@@ -5,42 +5,61 @@
 
 #include "Handle.h"
 
-enum class ReactorEvents
-{
-	NONE_EXCEPT_ERRORS, READ_ONLY, WRITE_ONLY, READ_WRITE
-};
-
-struct ReactorHandler
-{
-	ReactorEvents events = ReactorEvents::NONE_EXCEPT_ERRORS;
-
-	std::function<void()> onRead;
-	std::function<void()> onWrite;
-	std::function<void()> onError;
-};
-
 class Reactor
 {
-	Handle m_epoll;
-	bool m_running = false;
-	std::vector<ReactorHandler> m_handlers;  // index of each handler is equal to its file descriptor
+public:
+	enum class CallbackResult
+	{
+		STOP, CONTINUE
+	};
 
-	void Dispatch(int fd, bool isRead, bool isWrite, bool isError);
+	using Callback = std::function<CallbackResult()>;
+
+private:
+	struct Handler
+	{
+		// true if the corresponding file descriptor is registered in the epoll instance inside the kernel
+		bool isRegistered = false;
+
+		// the current state of the epoll instance inside the kernel
+		bool isReadEnabled = false;
+		bool isWriteEnabled = false;
+		bool isErrorEnabled = false;
+
+		// disabled callbacks are empty
+		Callback onRead;
+		Callback onWrite;
+		Callback onError;
+	};
+
+	Handle m_epoll;
+	bool m_isRunning = false;
+	bool m_isCommitNeeded = false;
+	std::vector<Handler> m_handlers;  // index of each handler is its file descriptor
+
+	Handler& GetHandler(int fd);
+
+	void CommitAllChanges();
+	void Commit(int fd, Handler& handler);
+
+	void DispatchEvent(int fd, bool isRead, bool isWrite, bool isError);
+	void ExecuteCallback(Callback& callback);
 
 public:
 	Reactor() = default;
 
 	void Init();
 
-	void Attach(const Handle& handle, ReactorHandler&& handler);
-	void Modify(const Handle& handle, ReactorEvents events);
+	void EventLoop();
+	void StopEventLoop();
+
+	void AttachReadHandler(const Handle& handle, Callback&& callback);
+	void AttachWriteHandler(const Handle& handle, Callback&& callback);
+	void AttachErrorHandler(const Handle& handle, Callback&& callback);
 	void Detach(const Handle& handle);
 
-	void Attach(int fd, ReactorHandler&& handler);
-	void Modify(int fd, ReactorEvents events);
+	void AttachReadHandler(int fd, Callback&& callback);
+	void AttachWriteHandler(int fd, Callback&& callback);
+	void AttachErrorHandler(int fd, Callback&& callback);
 	void Detach(int fd);
-
-	void Run();
-
-	void Stop();
 };

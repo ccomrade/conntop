@@ -5,84 +5,7 @@
 #include <system_error>
 
 #include "Reactor.h"
-
-namespace
-{
-	epoll_event CreateConfig(int fd, ReactorEvents events)
-	{
-		epoll_event config = {};
-
-		switch (events)
-		{
-			case ReactorEvents::NONE_EXCEPT_ERRORS:
-				config.events = 0;
-				break;
-			case ReactorEvents::READ_ONLY:
-				config.events = EPOLLIN;
-				break;
-			case ReactorEvents::WRITE_ONLY:
-				config.events = EPOLLOUT;
-				break;
-			case ReactorEvents::READ_WRITE:
-				config.events = EPOLLIN | EPOLLOUT;
-				break;
-		}
-
-		config.data.fd = fd;
-
-		return config;
-	}
-
-	bool IsReadEnabled(ReactorEvents events)
-	{
-		switch (events)
-		{
-			case ReactorEvents::READ_ONLY:
-			case ReactorEvents::READ_WRITE:
-				return true;
-			default:
-				return false;
-		}
-	}
-
-	bool IsWriteEnabled(ReactorEvents events)
-	{
-		switch (events)
-		{
-			case ReactorEvents::WRITE_ONLY:
-			case ReactorEvents::READ_WRITE:
-				return true;
-			default:
-				return false;
-		}
-	}
-
-	ReactorEvents DisableRead(ReactorEvents events)
-	{
-		switch (events)
-		{
-			case ReactorEvents::READ_ONLY:
-				return ReactorEvents::NONE_EXCEPT_ERRORS;
-			case ReactorEvents::READ_WRITE:
-				return ReactorEvents::WRITE_ONLY;
-			default:
-				return events;
-		}
-	}
-
-	ReactorEvents DisableWrite(ReactorEvents events)
-	{
-		switch (events)
-		{
-			case ReactorEvents::WRITE_ONLY:
-				return ReactorEvents::NONE_EXCEPT_ERRORS;
-			case ReactorEvents::READ_WRITE:
-				return ReactorEvents::READ_ONLY;
-			default:
-				return events;
-		}
-	}
-}
+#include "Log.h"
 
 void Reactor::Init()
 {
@@ -92,112 +15,173 @@ void Reactor::Init()
 		throw std::system_error(errno, std::system_category(), "Failed to create epoll");
 	}
 
-	m_running = true;
+	m_isRunning = true;
+
+	LOG_DEBUG(Format("[Reactor] Created epoll instance on file descriptor %d", m_epoll.GetFileDescriptor()));
 }
 
-void Reactor::Attach(const Handle& handle, ReactorHandler&& handler)
+Reactor::Handler& Reactor::GetHandler(int fd)
 {
-	const int fd = handle.GetFileDescriptor();
+	const auto index = static_cast<unsigned int>(fd);
 
-	Attach(fd, std::move(handler));
+	if (index >= m_handlers.size())
+	{
+		m_handlers.resize(index + 1);
+	}
+
+	return m_handlers[index];
 }
 
-void Reactor::Modify(const Handle& handle, ReactorEvents events)
+void Reactor::CommitAllChanges()
 {
-	const int fd = handle.GetFileDescriptor();
+	if (m_isCommitNeeded)
+	{
+		int fd = 0;
 
-	Modify(fd, events);
+		for (Handler& handler : m_handlers)
+		{
+			Commit(fd++, handler);
+		}
+
+		m_isCommitNeeded = false;
+	}
 }
 
-void Reactor::Detach(const Handle& handle)
+void Reactor::Commit(int fd, Handler& handler)
 {
-	const int fd = handle.GetFileDescriptor();
+	const bool hasRead = static_cast<bool>(handler.onRead);
+	const bool hasWrite = static_cast<bool>(handler.onWrite);
+	const bool hasError = static_cast<bool>(handler.onError);
 
-	Detach(fd);
+	const bool nothingEnabled = !hasRead && !hasWrite && !hasError;
+
+	const auto buildConfig = [&fd](bool enableRead, bool enableWrite) -> epoll_event
+	{
+		epoll_event config = {};
+
+		if (enableRead)
+			config.events |= EPOLLIN;
+
+		if (enableWrite)
+			config.events |= EPOLLOUT;
+
+		config.data.fd = fd;
+
+		return config;
+	};
+
+	epoll_event oldConfig = buildConfig(handler.isReadEnabled, handler.isWriteEnabled);
+	epoll_event newConfig = buildConfig(hasRead, hasWrite);
+
+	if (!handler.isRegistered)
+	{
+		if (nothingEnabled)
+		{
+			return;
+		}
+
+		LOG_DEBUG(Format("[Reactor] EPOLL_CTL_ADD | fd: %d | events: %u", fd, newConfig.events));
+
+		if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_ADD, fd, &newConfig) < 0)
+		{
+			throw std::system_error(errno, std::system_category(),
+			                        "Failed to register file descriptor " + std::to_string(fd) + " in epoll");
+		}
+
+		handler.isRegistered = true;
+	}
+	else if (nothingEnabled)
+	{
+		LOG_DEBUG(Format("[Reactor] EPOLL_CTL_DEL | fd: %d", fd));
+
+		if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_DEL, fd, nullptr) < 0)
+		{
+			throw std::system_error(errno, std::system_category(),
+			                        "Failed to delete file descriptor " + std::to_string(fd) + " in epoll");
+		}
+
+		handler.isRegistered = false;
+	}
+	else if (oldConfig.events != newConfig.events)
+	{
+		LOG_DEBUG(Format("[Reactor] EPOLL_CTL_MOD | fd: %d | events: %u -> %u", fd, oldConfig.events, newConfig.events));
+
+		if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_MOD, fd, &newConfig) < 0)
+		{
+			throw std::system_error(errno, std::system_category(),
+			                        "Failed to modify file descriptor " + std::to_string(fd) + " in epoll");
+		}
+	}
+
+	handler.isReadEnabled = hasRead;
+	handler.isWriteEnabled = hasWrite;
+	handler.isErrorEnabled = hasError;
 }
 
-void Reactor::Attach(int fd, ReactorHandler&& handler)
+void Reactor::DispatchEvent(int fd, bool isRead, bool isWrite, bool isError)
 {
-	if (fd >= 0 && static_cast<unsigned>(fd) >= m_handlers.size())
+	Handler& handler = GetHandler(fd);
+
+	if (isError)
 	{
-		m_handlers.resize(fd + 1);
+		if (handler.onError)
+		{
+			ExecuteCallback(handler.onError);
+		}
+		else
+		{
+			throw std::runtime_error("Unhandled error event on file descriptor " + std::to_string(fd));
+		}
 	}
 
-	epoll_event config = CreateConfig(fd, handler.events);
-
-	if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_ADD, fd, &config) < 0)
+	if (isRead)
 	{
-		throw std::system_error(errno, std::system_category(),
-		                        "Failed to attach file descriptor " + std::to_string(fd) + " to epoll");
+		ExecuteCallback(handler.onRead);
 	}
 
-	m_handlers[fd] = std::move(handler);
+	if (isWrite)
+	{
+		ExecuteCallback(handler.onWrite);
+	}
 }
 
-void Reactor::Modify(int fd, ReactorEvents events)
+void Reactor::ExecuteCallback(Callback& callback)
 {
-	if (fd < 0 && static_cast<unsigned>(fd) >= m_handlers.size())
+	if (callback)
 	{
-		// invalid file descriptor
-		return;
-	}
+		const CallbackResult result = callback();
 
-	ReactorHandler& handler = m_handlers[fd];
-
-	if (handler.events == events)
-	{
-		// nothing to do
-		return;
-	}
-
-	epoll_event config = CreateConfig(fd, events);
-
-	if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_MOD, fd, &config) < 0)
-	{
-		throw std::system_error(errno, std::system_category(),
-		                        "Failed to modify file descriptor " + std::to_string(fd) + " in epoll");
-	}
-
-	handler.events = events;
-}
-
-void Reactor::Detach(int fd)
-{
-	if (fd < 0 && static_cast<unsigned>(fd) >= m_handlers.size())
-	{
-		// invalid file descriptor
-		return;
-	}
-
-	m_handlers[fd] = ReactorHandler();
-
-	if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_DEL, fd, nullptr) < 0)
-	{
-		throw std::system_error(errno, std::system_category(),
-		                        "Failed to detach file descriptor " + std::to_string(fd) + " from epoll");
+		if (result == CallbackResult::STOP)
+		{
+			callback = {};
+			m_isCommitNeeded = true;
+		}
 	}
 }
 
-void Reactor::Run()
+void Reactor::EventLoop()
 {
 	std::array<epoll_event, 64> buffer = {};
 
-	while (m_running)
+	while (m_isRunning)
 	{
-		// wait for events
+		CommitAllChanges();
+
 		const int eventCount = epoll_wait(m_epoll.GetFileDescriptor(), buffer.data(), buffer.size(), -1);
 		if (eventCount < 0)
 		{
 			const int code = errno;
 
-			// waiting interrupted by an asynchronous signal is not an error
-			if (code != EINTR)
+			if (code == EINTR)
+			{
+				LOG_DEBUG("[Reactor] Waiting interrupted by a signal");
+			}
+			else
 			{
 				throw std::system_error(code, std::system_category(), "Failed to wait on epoll");
 			}
 		}
 
-		// dispatch events
 		for (int i = 0; i < eventCount; i++)
 		{
 			const auto flags = buffer[i].events;
@@ -208,47 +192,111 @@ void Reactor::Run()
 
 			const int fd = buffer[i].data.fd;
 
-			Dispatch(fd, isRead, isWrite, isError);
+			DispatchEvent(fd, isRead, isWrite, isError);
 		}
 	}
 }
 
-void Reactor::Stop()
+void Reactor::StopEventLoop()
 {
-	m_running = false;
+	m_isRunning = false;
 }
 
-void Reactor::Dispatch(int fd, bool isRead, bool isWrite, bool isError)
+void Reactor::AttachReadHandler(const Handle& handle, Callback&& callback)
 {
-	if (fd < 0 && static_cast<unsigned>(fd) >= m_handlers.size())
+	AttachReadHandler(handle.GetFileDescriptor(), std::move(callback));
+}
+
+void Reactor::AttachWriteHandler(const Handle& handle, Callback&& callback)
+{
+	AttachWriteHandler(handle.GetFileDescriptor(), std::move(callback));
+}
+
+void Reactor::AttachErrorHandler(const Handle& handle, Callback&& callback)
+{
+	AttachErrorHandler(handle.GetFileDescriptor(), std::move(callback));
+}
+
+void Reactor::Detach(const Handle& handle)
+{
+	Detach(handle.GetFileDescriptor());
+}
+
+void Reactor::AttachReadHandler(int fd, Callback&& callback)
+{
+	if (fd < 0)
 	{
-		// invalid file descriptor
 		return;
 	}
 
-	const ReactorHandler& handler = m_handlers[fd];
+	Handler& handler = GetHandler(fd);
 
-	if (isError)
+	const bool hadReadBefore = static_cast<bool>(handler.onRead);
+	const bool hasReadNow = static_cast<bool>(callback);
+
+	handler.onRead = std::move(callback);
+
+	if (hadReadBefore != hasReadNow)
 	{
-		if (handler.onError)
-			handler.onError();
-		else
-			throw std::runtime_error("Unhandled error event on file descriptor " + std::to_string(fd));
+		m_isCommitNeeded = true;
+	}
+}
+
+void Reactor::AttachWriteHandler(int fd, Callback&& callback)
+{
+	if (fd < 0)
+	{
+		return;
 	}
 
-	if (isRead)
+	Handler& handler = GetHandler(fd);
+
+	const bool hadWriteBefore = static_cast<bool>(handler.onWrite);
+	const bool hasWriteNow = static_cast<bool>(callback);
+
+	handler.onWrite = std::move(callback);
+
+	if (hadWriteBefore != hasWriteNow)
 	{
-		if (handler.onRead && IsReadEnabled(handler.events))
-			handler.onRead();
-		else
-			Modify(fd, DisableRead(handler.events));
+		m_isCommitNeeded = true;
+	}
+}
+
+void Reactor::AttachErrorHandler(int fd, Callback&& callback)
+{
+	if (fd < 0)
+	{
+		return;
 	}
 
-	if (isWrite)
+	Handler& handler = GetHandler(fd);
+
+	const bool hadErrorBefore = static_cast<bool>(handler.onWrite);
+	const bool hasErrorNow = static_cast<bool>(callback);
+
+	handler.onError = std::move(callback);
+
+	if (hadErrorBefore != hasErrorNow)
 	{
-		if (handler.onWrite && IsWriteEnabled(handler.events))
-			handler.onWrite();
-		else
-			Modify(fd, DisableWrite(handler.events));
+		m_isCommitNeeded = true;
+	}
+}
+
+void Reactor::Detach(int fd)
+{
+	if (fd < 0)
+	{
+		return;
+	}
+
+	Handler& handler = GetHandler(fd);
+
+	handler.onRead = {};
+	handler.onWrite = {};
+	handler.onError = {};
+
+	if (handler.isReadEnabled || handler.isWriteEnabled || handler.isErrorEnabled)
+	{
+		m_isCommitNeeded = true;
 	}
 }
