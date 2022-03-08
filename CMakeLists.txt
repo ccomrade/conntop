@@ -26,8 +26,6 @@ add_executable(conntop
 	Code/Base/Base64.cpp
 	Code/Base/Base64.h
 	Code/Base/Endian.h
-	Code/Base/Format.cpp
-	Code/Base/Format.h
 	Code/Base/HTTP.h
 	Code/Base/HTTPMethod.h
 	Code/Base/HTTPRequestBuilder.cpp
@@ -56,4 +54,4 @@ add_executable(conntop
 	Code/System/TCPSocket.h
 )
 
-target_link_libraries(conntop PUBLIC netfilter_conntrack)
+target_link_libraries(conntop PUBLIC netfilter_conntrack fmt)

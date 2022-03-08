@@ -17,7 +17,7 @@ void Reactor::Init()
 
 	m_isRunning = true;
 
-	LOG_DEBUG(Format("[Reactor] Created epoll instance on file descriptor %d", m_epoll.GetFileDescriptor()));
+	Log::Debug("[Reactor] Created epoll instance on file descriptor {}", m_epoll.GetFileDescriptor());
 }
 
 Reactor::Handler& Reactor::GetHandler(int fd)
@@ -73,6 +73,9 @@ void Reactor::Commit(int fd, Handler& handler)
 	epoll_event oldConfig = buildConfig(handler.isReadEnabled, handler.isWriteEnabled);
 	epoll_event newConfig = buildConfig(hasRead, hasWrite);
 
+	const auto oldEvents = oldConfig.events;
+	const auto newEvents = newConfig.events;
+
 	if (!handler.isRegistered)
 	{
 		if (nothingEnabled)
@@ -80,7 +83,7 @@ void Reactor::Commit(int fd, Handler& handler)
 			return;
 		}
 
-		LOG_DEBUG(Format("[Reactor] EPOLL_CTL_ADD | fd: %d | events: %u", fd, newConfig.events));
+		Log::Debug("[Reactor] EPOLL_CTL_ADD | fd: {} | events: {}", fd, newEvents);
 
 		if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_ADD, fd, &newConfig) < 0)
 		{
@@ -92,7 +95,7 @@ void Reactor::Commit(int fd, Handler& handler)
 	}
 	else if (nothingEnabled)
 	{
-		LOG_DEBUG(Format("[Reactor] EPOLL_CTL_DEL | fd: %d", fd));
+		Log::Debug("[Reactor] EPOLL_CTL_DEL | fd: {}", fd);
 
 		if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_DEL, fd, nullptr) < 0)
 		{
@@ -104,7 +107,7 @@ void Reactor::Commit(int fd, Handler& handler)
 	}
 	else if (oldConfig.events != newConfig.events)
 	{
-		LOG_DEBUG(Format("[Reactor] EPOLL_CTL_MOD | fd: %d | events: %u -> %u", fd, oldConfig.events, newConfig.events));
+		Log::Debug("[Reactor] EPOLL_CTL_MOD | fd: {} | events: {} -> {}", fd, oldEvents, newEvents);
 
 		if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_MOD, fd, &newConfig) < 0)
 		{
@@ -174,7 +177,7 @@ void Reactor::EventLoop()
 
 			if (code == EINTR)
 			{
-				LOG_DEBUG("[Reactor] Waiting interrupted by a signal");
+				Log::Debug("[Reactor] Waiting interrupted by a signal");
 			}
 			else
 			{

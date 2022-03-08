@@ -25,14 +25,14 @@ Conntrack::Conntrack()
 		throw std::system_error(errno, std::system_category(), "Failed to register conntrack callback");
 	}
 
-	LOG_DEBUG(Format("[Conntrack] Opened on file descriptor %d", fd));
+	Log::Debug("[Conntrack] Opened on file descriptor {}", fd);
 }
 
 Conntrack::~Conntrack()
 {
 	const int fd = nfct_fd(m_handle.get());
 
-	LOG_DEBUG(Format("[Conntrack] Closed on file descriptor %d", fd));
+	Log::Debug("[Conntrack] Closed on file descriptor {}", fd);
 }
 
 void Conntrack::Update()
@@ -67,7 +67,7 @@ void Conntrack::UpdateCallback(nf_conntrack_msg_type type, nf_conntrack* ct)
 	}
 	else
 	{
-		LOG_DEBUG(Format("[Conntrack] Unexpected message of type %d", type));
+		Log::Debug("[Conntrack] Unexpected message of type {}", type);
 	}
 }
 
@@ -99,7 +99,7 @@ bool Conntrack::ToConnection(nf_conntrack* ct, Connection& result)
 		}
 		default:
 		{
-			LOG_DEBUG(Format("[Conntrack] Unknown address family %d", addressFamily));
+			Log::Debug("[Conntrack] Unknown address family {}", addressFamily);
 			return false;
 		}
 	}
@@ -146,7 +146,7 @@ bool Conntrack::ToConnection(nf_conntrack* ct, Connection& result)
 		}
 		default:
 		{
-			LOG_DEBUG(Format("[Conntrack] Unknown protocol %d", protocol));
+			Log::Debug("[Conntrack] Unknown protocol {}", protocol);
 			return false;
 		}
 	}

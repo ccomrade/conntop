@@ -13,7 +13,7 @@ namespace
 
 		const unsigned int verboseCount = cmdLine.CountAndPopOption("v", "verbose");
 
-		Log::GetInstance().SetVerbosity(static_cast<int>(verboseCount));
+		Log::GetInstance().SetVerbosity(static_cast<Log::Verbosity>(verboseCount));
 
 		// make sure there are no remaining options
 		for (const CmdLine::Option& option : cmdLine.options)
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 	}
 	catch (const std::runtime_error& error)
 	{
-		LOG_ERROR(error.what());
+		Log::Error(error.what());
 		return 2;
 	}
 
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 	}
 	catch (const std::runtime_error& error)
 	{
-		LOG_ERROR(error.what());
+		Log::Error(error.what());
 		return 1;
 	}
 

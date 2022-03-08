@@ -5,14 +5,8 @@
 #include "Log.h"
 #include "System.h"
 
-void Log::Write(Severity severity, const std::string_view& message)
+void Log::WriteMessageAlways(Severity severity, const std::string_view& message)
 {
-	if (!IsSeverityEnabled(severity))
-	{
-		// drop messages above the current verbosity level
-		return;
-	}
-
 	// let systemd-journal know about message severity
 	const std::string_view messagePrefix = [severity]() -> std::string_view
 	{
@@ -41,7 +35,7 @@ void Log::Write(Severity severity, const std::string_view& message)
 	if (write(STDERR_FILENO, buffer.c_str(), buffer.length()) < 0)
 	{
 		// disable the log to avoid recursive throw in case of write error
-		SetVerbosity(-1);
+		SetVerbosity(Verbosity::DISABLED);
 
 		throw std::system_error(errno, std::system_category(), "Log write failed");
 	}

@@ -4,11 +4,11 @@ void App::Run()
 {
 	m_reactor.Init();
 
-	LOG_ERROR("Error");
-	LOG_WARNING("Warning");
-	LOG_NOTICE("Notice");
-	LOG_INFO("Info");
-	LOG_DEBUG("Debug");
+	Log::Error("Error");
+	Log::Warning("Warning");
+	Log::Notice("Notice");
+	Log::Info("Info");
+	Log::Debug("Debug");
 
 	m_reactor.EventLoop();
 }
