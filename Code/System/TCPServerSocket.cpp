@@ -3,7 +3,6 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#include <cerrno>
 
 #include "TCPServerSocket.h"
 #include "System.h"
@@ -32,7 +31,7 @@ void TCPServerSocket::Open(const IPAddress& address, std::uint16_t port)
 	m_handle = Handle(socket(addressFamily, SOCK_STREAM, IPPROTO_TCP));
 	if (!m_handle)
 	{
-		throw std::system_error(errno, std::system_category(), "socket");
+		throw System::Error("socket");
 	}
 
 	System::SetFileDescriptorNonBlocking(m_handle.GetFileDescriptor());
@@ -46,7 +45,7 @@ void TCPServerSocket::Open(const IPAddress& address, std::uint16_t port)
 
 		if (setsockopt(m_handle.GetFileDescriptor(), IPPROTO_IPV6, IPV6_V6ONLY, &v6Only, sizeof v6Only) < 0)
 		{
-			throw std::system_error(errno, std::system_category(), "setsockopt");
+			throw System::Error("setsockopt");
 		}
 	}
 
@@ -87,7 +86,7 @@ void TCPServerSocket::Open(const IPAddress& address, std::uint16_t port)
 
 	if (bind(m_handle.GetFileDescriptor(), reinterpret_cast<const sockaddr*>(&socketAddress), sizeof socketAddress) < 0)
 	{
-		throw std::system_error(errno, std::system_category(), "bind");
+		throw System::Error("bind");
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +95,7 @@ void TCPServerSocket::Open(const IPAddress& address, std::uint16_t port)
 
 	if (listen(m_handle.GetFileDescriptor(), LISTEN_BACKLOG_SIZE) < 0)
 	{
-		throw std::system_error(errno, std::system_category(), "listen");
+		throw System::Error("listen");
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +108,7 @@ TCPSocket TCPServerSocket::Accept()
 	socket.m_handle = Handle(accept(m_handle.GetFileDescriptor(), nullptr, nullptr));
 	if (!socket.IsOpen())
 	{
-		throw std::system_error(errno, std::system_category(), "accept");
+		throw System::Error("accept");
 	}
 
 	System::SetFileDescriptorNonBlocking(socket.GetHandle().GetFileDescriptor());

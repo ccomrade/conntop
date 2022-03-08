@@ -3,7 +3,6 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#include <cerrno>
 
 #include "TCPSocket.h"
 #include "System.h"
@@ -32,7 +31,7 @@ void TCPSocket::StartConnect(const IPAddress& address, std::uint16_t port)
 	m_handle = Handle(socket(addressFamily, SOCK_STREAM, IPPROTO_TCP));
 	if (!m_handle)
 	{
-		throw std::system_error(errno, std::system_category(), "socket");
+		throw System::Error("socket");
 	}
 
 	System::SetFileDescriptorNonBlocking(m_handle.GetFileDescriptor());
@@ -46,7 +45,7 @@ void TCPSocket::StartConnect(const IPAddress& address, std::uint16_t port)
 
 		if (setsockopt(m_handle.GetFileDescriptor(), IPPROTO_IPV6, IPV6_V6ONLY, &v6Only, sizeof v6Only) < 0)
 		{
-			throw std::system_error(errno, std::system_category(), "setsockopt");
+			throw System::Error("setsockopt");
 		}
 	}
 
@@ -91,7 +90,7 @@ void TCPSocket::StartConnect(const IPAddress& address, std::uint16_t port)
 
 		if (errorNumber != EINPROGRESS)
 		{
-			throw std::system_error(errorNumber, std::system_category(), "connect");
+			throw System::Error(errorNumber, "connect");
 		}
 	}
 
@@ -105,12 +104,12 @@ void TCPSocket::VerifyConnect()
 
 	if (getsockopt(m_handle.GetFileDescriptor(), SOL_SOCKET, SO_ERROR, &errorNumber, &errorNumberSize) < 0)
 	{
-		throw std::system_error(errno, std::system_category(), "getsockopt");
+		throw System::Error("getsockopt");
 	}
 
 	if (errorNumber)
 	{
-		throw std::system_error(errorNumber, std::system_category(), "connect");
+		throw System::Error(errorNumber, "connect");
 	}
 }
 
@@ -120,7 +119,7 @@ std::size_t TCPSocket::Send(const void* buffer, std::size_t bufferSize)
 
 	if (bytesSent < 0)
 	{
-		throw std::system_error(errno, std::system_category(), "send");
+		throw System::Error("send");
 	}
 	else
 	{
@@ -134,7 +133,7 @@ std::size_t TCPSocket::Receive(void* buffer, std::size_t bufferSize)
 
 	if (bytesReceived < 0)
 	{
-		throw std::system_error(errno, std::system_category(), "recv");
+		throw System::Error("recv");
 	}
 	else
 	{

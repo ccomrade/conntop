@@ -1,6 +1,3 @@
-#include <cerrno>
-#include <system_error>
-
 #include "Base/Endian.h"
 #include "System/Log.h"
 #include "System/System.h"
@@ -12,7 +9,7 @@ Conntrack::Conntrack()
 	m_handle = Handle(nfct_open(CONNTRACK, 0));
 	if (!m_handle)
 	{
-		throw std::system_error(errno, std::system_category(), "Failed to open conntrack");
+		throw System::Error("Failed to open conntrack");
 	}
 
 	const int fd = nfct_fd(m_handle.get());
@@ -22,7 +19,7 @@ Conntrack::Conntrack()
 
 	if (nfct_callback_register(m_handle.get(), NFCT_T_ALL, UpdateCallbackWrapper, this) < 0)
 	{
-		throw std::system_error(errno, std::system_category(), "Failed to register conntrack callback");
+		throw System::Error("Failed to register conntrack callback");
 	}
 
 	Log::Debug("[Conntrack] Opened on file descriptor {}", fd);
@@ -46,7 +43,7 @@ void Conntrack::Update()
 	// calls UpdateCallback for each entry
 	if (nfct_query(m_handle.get(), NFCT_Q_DUMP, &addressFamily) < 0)
 	{
-		throw std::system_error(errno, std::system_category(), "Failed to query conntrack");
+		throw System::Error("Failed to query conntrack");
 	}
 }
 

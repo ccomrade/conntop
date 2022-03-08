@@ -1,10 +1,9 @@
 #include <sys/epoll.h>
-#include <cerrno>
 #include <array>
 #include <stdexcept>
-#include <system_error>
 
 #include "Reactor.h"
+#include "System.h"
 #include "Log.h"
 
 void Reactor::Init()
@@ -12,7 +11,7 @@ void Reactor::Init()
 	m_epoll = Handle(epoll_create1(EPOLL_CLOEXEC));
 	if (!m_epoll)
 	{
-		throw std::system_error(errno, std::system_category(), "Failed to create epoll");
+		throw System::Error("Failed to create epoll");
 	}
 
 	m_isRunning = true;
@@ -87,8 +86,7 @@ void Reactor::Commit(int fd, Handler& handler)
 
 		if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_ADD, fd, &newConfig) < 0)
 		{
-			throw std::system_error(errno, std::system_category(),
-			                        "Failed to register file descriptor " + std::to_string(fd) + " in epoll");
+			throw System::Error("Failed to register file descriptor {} in epoll", fd);
 		}
 
 		handler.isRegistered = true;
@@ -99,8 +97,7 @@ void Reactor::Commit(int fd, Handler& handler)
 
 		if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_DEL, fd, nullptr) < 0)
 		{
-			throw std::system_error(errno, std::system_category(),
-			                        "Failed to delete file descriptor " + std::to_string(fd) + " in epoll");
+			throw System::Error("Failed to delete file descriptor {} in epoll", fd);
 		}
 
 		handler.isRegistered = false;
@@ -111,8 +108,7 @@ void Reactor::Commit(int fd, Handler& handler)
 
 		if (epoll_ctl(m_epoll.GetFileDescriptor(), EPOLL_CTL_MOD, fd, &newConfig) < 0)
 		{
-			throw std::system_error(errno, std::system_category(),
-			                        "Failed to modify file descriptor " + std::to_string(fd) + " in epoll");
+			throw System::Error("Failed to modify file descriptor {} in epoll", fd);
 		}
 	}
 
@@ -181,7 +177,7 @@ void Reactor::EventLoop()
 			}
 			else
 			{
-				throw std::system_error(code, std::system_category(), "Failed to wait on epoll");
+				throw System::Error(code, "Failed to wait on epoll");
 			}
 		}
 

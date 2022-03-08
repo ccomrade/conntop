@@ -1,6 +1,4 @@
 #include <unistd.h>
-#include <cerrno>
-#include <system_error>
 
 #include "Log.h"
 #include "System.h"
@@ -37,6 +35,6 @@ void Log::WriteMessageAlways(Severity severity, const std::string_view& message)
 		// disable the log to avoid recursive throw in case of write error
 		SetVerbosity(Verbosity::DISABLED);
 
-		throw std::system_error(errno, std::system_category(), "Log write failed");
+		throw System::Error("Log write failed");
 	}
 }

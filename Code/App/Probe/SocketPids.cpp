@@ -1,14 +1,13 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
-#include <cerrno>
 #include <memory>
 #include <string>
 #include <string_view>
-#include <system_error>
 #include <charconv>
 
 #include "App/LocalSocketCollection.h"
+#include "System/System.h"
 
 #include "SocketPids.h"
 
@@ -29,7 +28,7 @@ namespace
 		auto dir = DIR_Wrapper(opendir(path.c_str()));
 		if (!dir)
 		{
-			throw std::system_error(errno, std::system_category(), "Failed to open " + path + " directory");
+			throw System::Error("Failed to open directory '{}'", path);
 		}
 
 		return dir;
@@ -70,7 +69,7 @@ namespace
 		const ssize_t length = readlink(path.c_str(), buffer, sizeof buffer);
 		if (length < 0)
 		{
-			throw std::system_error(errno, std::system_category(), "Failed to read " + path + " symlink");
+			throw System::Error("Failed to read symlink '{}'", path);
 		}
 
 		return ParseSocketInode(std::string_view(buffer, length), inode);
