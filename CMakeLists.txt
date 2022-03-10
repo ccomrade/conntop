@@ -26,13 +26,6 @@ add_executable(conntop
 	Code/Base/Base64.cpp
 	Code/Base/Base64.h
 	Code/Base/Endian.h
-	Code/Base/HTTP.h
-	Code/Base/HTTPMethod.h
-	Code/Base/HTTPRequestBuilder.cpp
-	Code/Base/HTTPRequestBuilder.h
-	Code/Base/HTTPResponseBuilder.cpp
-	Code/Base/HTTPResponseBuilder.h
-	Code/Base/HTTPStatus.h
 	Code/Base/IPAddress.cpp
 	Code/Base/IPAddress.h
 	Code/Base/IPProtocol.h
