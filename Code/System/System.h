@@ -16,15 +16,15 @@ namespace System
 	void SetFileDescriptorNonBlocking(int fd);
 	void SetFileDescriptorCloseOnExec(int fd);
 
-	template<class Format, class... Args>
-	std::system_error Error(Format&& format, Args&&... args)
+	template<class... Args>
+	std::system_error Error(fmt::format_string<Args...> format, Args&&... args)
 	{
-		return { errno, std::system_category(), fmt::format(std::forward<Format>(format), std::forward<Args>(args)...) };
+		return { errno, std::system_category(), fmt::format(format, std::forward<Args>(args)...) };
 	}
 
-	template<class Format, class... Args>
-	std::system_error Error(int code, Format&& format, Args&&... args)
+	template<class... Args>
+	std::system_error Error(int code, fmt::format_string<Args...> format, Args&&... args)
 	{
-		return { code, std::system_category(), fmt::format(std::forward<Format>(format), std::forward<Args>(args)...) };
+		return { code, std::system_category(), fmt::format(format, std::forward<Args>(args)...) };
 	}
 }

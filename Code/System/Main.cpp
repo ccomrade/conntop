@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 	}
 	catch (const std::runtime_error& error)
 	{
-		Log::Error(error.what());
+		Log::Error("{}", error.what());
 		return 2;
 	}
 
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 	}
 	catch (const std::runtime_error& error)
 	{
-		Log::Error(error.what());
+		Log::Error("{}", error.what());
 		return 1;
 	}
 

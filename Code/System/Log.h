@@ -74,54 +74,51 @@ public:
 		}
 	}
 
-	template<class Format, class... Args>
-	void WriteFormatAlways(Severity severity, Format&& format, Args&&... args)
+	template<class... Args>
+	void WriteFormatAlways(Severity severity, fmt::format_string<Args...> format, Args&&... args)
 	{
-		// build the message only when it's really needed
-		const std::string message = fmt::format(std::forward<Format>(format), std::forward<Args>(args)...);
-
-		WriteMessageAlways(severity, message);
+		WriteMessageAlways(severity, fmt::format(format, std::forward<Args>(args)...));
 	}
 
-	template<class Format, class... Args>
-	void WriteFormat(Severity severity, Format&& format, Args&&... args)
+	template<class... Args>
+	void WriteFormat(Severity severity, fmt::format_string<Args...> format, Args&&... args)
 	{
 		if (IsSeverityEnabled(severity))
 		{
-			WriteFormatAlways(severity, std::forward<Format>(format), std::forward<Args>(args)...);
+			WriteFormatAlways(severity, format, std::forward<Args>(args)...);
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
 
-	template<class Format, class... Args>
-	static void Error(Format&& format, Args&&... args)
+	template<class... Args>
+	static void Error(fmt::format_string<Args...> format, Args&&... args)
 	{
-		GetInstance().WriteFormat(Severity::ERROR, std::forward<Format>(format), std::forward<Args>(args)...);
+		GetInstance().WriteFormat(Severity::ERROR, format, std::forward<Args>(args)...);
 	}
 
-	template<class Format, class... Args>
-	static void Warning(Format&& format, Args&&... args)
+	template<class... Args>
+	static void Warning(fmt::format_string<Args...> format, Args&&... args)
 	{
-		GetInstance().WriteFormat(Severity::WARNING, std::forward<Format>(format), std::forward<Args>(args)...);
+		GetInstance().WriteFormat(Severity::WARNING, format, std::forward<Args>(args)...);
 	}
 
-	template<class Format, class... Args>
-	static void Notice(Format&& format, Args&&... args)
+	template<class... Args>
+	static void Notice(fmt::format_string<Args...> format, Args&&... args)
 	{
-		GetInstance().WriteFormat(Severity::NOTICE, std::forward<Format>(format), std::forward<Args>(args)...);
+		GetInstance().WriteFormat(Severity::NOTICE, format, std::forward<Args>(args)...);
 	}
 
-	template<class Format, class... Args>
-	static void Info(Format&& format, Args&&... args)
+	template<class... Args>
+	static void Info(fmt::format_string<Args...> format, Args&&... args)
 	{
-		GetInstance().WriteFormat(Severity::INFO, std::forward<Format>(format), std::forward<Args>(args)...);
+		GetInstance().WriteFormat(Severity::INFO, format, std::forward<Args>(args)...);
 	}
 
-	template<class Format, class... Args>
-	static void Debug(Format&& format, Args&&... args)
+	template<class... Args>
+	static void Debug(fmt::format_string<Args...> format, Args&&... args)
 	{
-		GetInstance().WriteFormat(Severity::DEBUG, std::forward<Format>(format), std::forward<Args>(args)...);
+		GetInstance().WriteFormat(Severity::DEBUG, format, std::forward<Args>(args)...);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
